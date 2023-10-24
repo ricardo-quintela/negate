@@ -1,11 +1,15 @@
 from typing import TypedDict, Dict, List
 from random import randint
 import os
+import logging
 
 from flask import Flask, render_template, redirect, request, abort
 from flask_socketio import SocketIO, join_room, leave_room, close_room, emit
 
 
+
+
+# configure rooms
 ROOM_ID_LEN = 5
 
 class RoomInfo(TypedDict):
@@ -17,6 +21,8 @@ class RoomInfo(TypedDict):
 
 HTMLElement = str
 
+# allocating a dictionary to save the room's info
+rooms: Dict[str, RoomInfo] = dict()
 
 
 app = Flask(
@@ -28,8 +34,15 @@ app = Flask(
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-rooms: Dict[str, RoomInfo] = dict()
 
+# configure logger
+gunicorn_logger = logging.getLogger('gunicorn.error')
+app.logger.handlers = gunicorn_logger.handlers
+app.logger.setLevel(gunicorn_logger.level)
+
+
+
+# views
 
 @app.route("/")
 def home() -> str:
