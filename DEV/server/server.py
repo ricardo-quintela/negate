@@ -2,7 +2,8 @@ import logging
 
 from typing import Dict, Union
 from flask import Flask, render_template, redirect, request, abort
-from flask_socketio import SocketIO, join_room, leave_room, close_room, emit
+from flask_socketio import SocketIO
+
 
 from rooms import RoomData
 
@@ -10,13 +11,11 @@ app = Flask(
     __name__,
     static_url_path="",
     static_folder="static",
-    template_folder="templates"    
+    template_folder="templates"
 )
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# json response annotation
-JSONResponse = Dict[str, Union[str, int, float, bool]]
 
 
 # configure logger
@@ -28,6 +27,8 @@ app.logger.setLevel(gunicorn_error_logger.level)
 room_data = RoomData()
 
 
+# json response annotation
+JSONResponse = Dict[str, Union[str, int, float, bool]]
 
 # views
 
@@ -101,7 +102,7 @@ def game(room_id: str):
     # username not in params
     if "username" not in args:
         abort(400)
-    
+
     username = args["username"]
 
     # room does not exist
@@ -173,6 +174,8 @@ def testing_delete_room() -> JSONResponse:
         "roomId": room_id,
         "roomData": room_data.delete(room_id)
     }
+
+
 
 
 if __name__ == "__main__":
