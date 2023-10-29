@@ -1,16 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Negate</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href="css/styles.css">
-    <script src='main.js'></script>
-</head>
-<body>
-    
-    <h1>{{ room_id }} - {{ username }}</h1>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}
+Negate - {{ room_id }}
+{% endblock %}
+
+{% block styles %}
+<link rel='stylesheet' type='text/css' media='screen' href="css/styles.css">
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block content %}
+<!-- URL: game/room_id?username=username -->
+<!-- Context variables -->
+<!-- room_id: str -->
+<!-- username: str -->
+<h1>{{ room_id }} - {{ username }}</h1>
+{% endblock %}
