@@ -1,5 +1,8 @@
+# pylint: skip-file
+# gunicorn config file
 loglevel = "debug"
-errorlog = 'error_log.txt'
+errorlog = 'logs/error_log.txt'
+accesslog = '-'
 
 workers = 1
 worker_class = "geventwebsocket.gunicorn.workers.GeventWebSocketWorker"
