@@ -193,6 +193,14 @@ def event_join(json: JSONDictionary):
 
 @socket_server.on("leave")
 def event_leave(json: JSONDictionary):
+    """Leave
+
+    This event is issued whenever a player leaves the room
+    hey're connected to
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
     app.logger.debug("Triggered event 'leave'")
 
     # validates the dict
