@@ -11,6 +11,7 @@ class PlayerInfo(TypedDict):
     """
     username: str
     isReady: bool
+    character: int
 
 class RoomInfo(TypedDict):
     """Annotates information about how the room info
@@ -99,7 +100,8 @@ class RoomData:
 
         self._rooms[room_id]["players"][player_id] = {
             "username": username,
-            "isReady": False
+            "isReady": False,
+            "character": -1
         }
         self._rooms[room_id]["playerCount"] += 1
         return True
