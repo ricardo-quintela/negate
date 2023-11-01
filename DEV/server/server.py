@@ -2,7 +2,7 @@
 import logging
 
 from flask import Flask, render_template, redirect, request, abort
-from flask_socketio import SocketIO, join_room
+from flask_socketio import SocketIO, join_room as sio_join_room, leave_room as sio_leave_room
 
 from json_validation import JSONDictionary, ValidateJson
 
@@ -49,7 +49,7 @@ def home() -> str:
 @app.route("/create-room", methods=["GET"])
 def create_room():
     """Randomly creates a room id;
-    opens a room on the API and redirects
+    opens a room on the server and redirects
     the user to it
 
     Returns:
@@ -63,15 +63,46 @@ def create_room():
     args = request.args
 
     if "username" not in args:
-        abort(404)
+        abort(400)
 
     username = args["username"]
 
     room_id = room_data.create_room()
 
     app.logger.debug("Opened room '%s'", room_id)
-    return redirect(f"/game/{room_id}?username={username}")
+    return redirect(f"/game/{room_id}?username={username}", code=303)
 
+
+
+@app.route("/join-room", methods=["GET"])
+def join_room():
+    """Attempts to join an existing room
+
+    If the room doesn't exist a 404 code is returned
+
+    Returns:
+        Response: redirects the user to the game room
+    """
+    # bad request
+    if request.method != "GET":
+        abort(400)
+
+    args = request.args
+
+    if "username" not in args:
+        abort(400)
+
+    if "roomId" not in args:
+        abort(400)
+
+    username = args["username"]
+    room_id = args["roomId"]
+
+    # room doesn't exist
+    if room_id not in room_data:
+        abort(404)
+
+    return redirect(f"/game/{room_id}?username={username}", code=303)
 
 
 @app.route("/game/<room_id>", methods=["GET"])
@@ -123,7 +154,7 @@ def game(room_id: str):
 
 
 @socket_server.on("join")
-def event_join(json):
+def event_join(json: JSONDictionary):
     """Join
 
     This event is issued whenever a player wishes to join an existing room
@@ -141,36 +172,64 @@ def event_join(json):
     username = json["username"]
 
     # connect the player to the socket room
-    join_room(room_id)
+    sio_join_room(room_id)
 
     # get the socket id
     socket_id = request.sid
 
-    app.logger.debug("Joined '%s' to room '%s'", socket_id, room_id)
-
     if room_id not in room_data:
         return
+
+    app.logger.debug("Joined '%s' to room '%s'", socket_id, room_id)
 
     # add the player to the room data
     room_data.add_player(room_id, socket_id, username)
 
-    socket_server.emit("playerData", room_data.get_players(room_id))
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
 
     app.logger.debug("Sent player data to all in room '%s'", room_id)
 
 
 
+@socket_server.on("leave")
+def event_leave(json: JSONDictionary):
+    app.logger.debug("Triggered event 'leave'")
 
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId"):
+        return
 
+    room_id = json["roomId"]
 
+    # disconnect the player to the socket room
+    sio_leave_room(room_id)
 
+    # get the socket id
+    socket_id = request.sid
 
+    if room_id not in room_data:
+        return
+
+    app.logger.debug("Disconnected '%s' from room '%s'", socket_id, room_id)
+
+    # add the player to the room data
+    room_data.remove_player(room_id, socket_id)
+
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
+
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
+
+    # delete the room
+    if room_data.get_player_count(room_id) == 0:
+        room_data.delete(room_id)
+        app.logger.debug("Deleted room '%s': No players left", room_id)
 
 
 
 #*==================================================================
 #*                      TESTING ENDPOINTS
 #*==================================================================
+
 
 
 @app.route("/testing/create-room", methods=["POST"])
