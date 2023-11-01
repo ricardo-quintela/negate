@@ -63,10 +63,15 @@ def test_websocket_event_join(socket: SocketIOTestClient, rooms: RoomData):
         "username": "testClient"
     })
 
-    assert list(socket.get_received()[0]["args"][0].values())[0] == {
-        "username": "testClient",
-        "isReady": False
-    }
+    events = socket.get_received()
+
+    assert events[0]["name"] == "playerData" \
+        and \
+        list(events[0]["args"][0].values())[0] == {
+            "username": "testClient",
+            "isReady": False,
+            "character": -1
+        }
 
 
 def test_websocket_event_leave(socket: SocketIOTestClient, rooms: RoomData):
@@ -85,3 +90,53 @@ def test_websocket_event_leave(socket: SocketIOTestClient, rooms: RoomData):
 
     assert rooms.get("AAAAA") == None
 
+def test_websocket_event_ready(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerData event to
+    everyone connected after leave event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient3"
+    })
+    socket.get_received()
+
+    socket.emit("ready", {
+        "roomId": "AAAAA",
+        "isReady": True
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "playerData" \
+        and \
+        list(events[0]["args"][0].values())[0] == {
+            "username": "testClient3",
+            "isReady": True,
+            "character": -1
+        }
+
+
+def test_websocket_event_lock_in(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a characterData event to
+    everyone connected after lockIn event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient3"
+    })
+    socket.get_received()
+
+    socket.emit("lockIn", {
+        "roomId": "AAAAA",
+        "character": 100
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "characterData" \
+        and \
+        list(events[0]["args"][0].values())[0] == {
+            "character": 100
+        }
