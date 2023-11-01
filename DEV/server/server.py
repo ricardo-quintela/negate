@@ -1,7 +1,7 @@
 # pylint: disable=no-member
 import logging
 
-from flask import Flask, render_template, redirect, request, abort
+from flask import Flask, render_template, redirect, request, abort, Response
 from flask_socketio import SocketIO, join_room as sio_join_room, leave_room as sio_leave_room
 
 from json_validation import JSONDictionary, ValidateJson
@@ -185,6 +185,7 @@ def event_join(json: JSONDictionary):
     # add the player to the room data
     room_data.add_player(room_id, socket_id, username)
 
+    # send player data to all players
     socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
 
     app.logger.debug("Sent player data to all in room '%s'", room_id)
@@ -223,6 +224,7 @@ def event_leave(json: JSONDictionary):
     # add the player to the room data
     room_data.remove_player(room_id, socket_id)
 
+    # send player data to all players
     socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
 
     app.logger.debug("Sent player data to all in room '%s'", room_id)
@@ -231,6 +233,80 @@ def event_leave(json: JSONDictionary):
     if room_data.get_player_count(room_id) == 0:
         room_data.delete(room_id)
         app.logger.debug("Deleted room '%s': No players left", room_id)
+
+
+
+@socket_server.on("ready")
+def event_ready(json: JSONDictionary):
+    """Ready
+
+    This event is issued whenever a player changes it's ready state
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'ready'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "isReady"):
+        return
+
+    room_id = json["roomId"]
+    is_ready = json["isReady"]
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    room_data.get_players(room_id)[socket_id]["isReady"] = is_ready
+    app.logger.debug("Set ready state of '%s' on room '%s' to '%s'", socket_id, room_data, is_ready)
+
+    # send player data to all players
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
+
+
+@socket_server.on("lockIn")
+def event_lock_in(json: JSONDictionary):
+    """LockIn
+
+    This event is issued whenever a player locks the character
+    that they want to play with
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'lockIn'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "character"):
+        return
+
+    room_id = json["roomId"]
+    character = json["character"]
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    # set the player's character
+    room_data.get_players(room_id)[socket_id]["character"] = character
+
+    data = room_data.get_players(room_id)
+
+    # send player data to all players
+    socket_server.emit(
+        "characterData",
+        {sid: {"character": data[sid]["character"]} for sid in data},
+        to=room_id
+    )
+    app.logger.debug("Sent character data to all in room '%s'", room_id)
+
+
 
 
 
@@ -292,6 +368,66 @@ def testing_delete_room() -> JSONDictionary:
         "roomId": room_id,
         "roomData": room_data.delete(room_id)
     }
+
+
+
+#*==================================================================
+#*                      ERROR CODE HANDLERS
+#*==================================================================
+
+@app.errorhandler(400)
+def error_code_bad_request(error) -> Response:
+    """Handles an error code by returning
+    an HTML HTTPResponse
+
+    Args:
+        error (_type_): the error
+
+    Returns:
+        Response: the HTTPResponse with the rendered template
+    """
+    return render_template('error/400.html', error=error), 400
+
+@app.errorhandler(403)
+def error_code_forbidden(error) -> Response:
+    """Handles an error code by returning
+    an HTML HTTPResponse
+
+    Args:
+        error (_type_): the error
+
+    Returns:
+        Response: the HTTPResponse with the rendered template
+    """
+    return render_template('error/403.html', error=error), 403
+
+@app.errorhandler(404)
+def error_code_not_found(error) -> Response:
+    """Handles an error code by returning
+    an HTML HTTPResponse
+
+    Args:
+        error (_type_): the error
+
+    Returns:
+        Response: the HTTPResponse with the rendered template
+    """
+    return render_template('error/404.html', error=error), 404
+
+@app.errorhandler(500)
+def error_code_internal_server_error(error) -> Response:
+    """Handles an error code by returning
+    an HTML HTTPResponse
+
+    Args:
+        error (_type_): the error
+
+    Returns:
+        Response: the HTTPResponse with the rendered template
+    """
+    return render_template('error/500.html', error=error), 500
+
+
 
 
 if __name__ == "__main__":
