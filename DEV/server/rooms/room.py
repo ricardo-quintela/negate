@@ -6,13 +6,19 @@ from typing import TypedDict, Dict, List, Union
 # configure rooms
 ROOM_ID_LEN = 5
 
+class PlayerInfo(TypedDict):
+    """Annotates information about a Player
+    """
+    username: str
+    isReady: bool
+    character: int
+
 class RoomInfo(TypedDict):
     """Annotates information about how the room info
     """
     playerCount: int
-    players: List[str]
+    players: Dict[str, PlayerInfo]
     ready: List[str]
-
 
 
 class RoomData:
@@ -26,7 +32,7 @@ class RoomData:
 
     def __contains__(self, item) -> bool:
         return item in self._rooms
-    
+
 
     def get(self, room_id: str) -> Union[RoomInfo, None]:
         """Returns the information about a room
@@ -52,6 +58,69 @@ class RoomData:
             return None
 
         return self._rooms.pop(room_id)
+
+
+    def get_player_count(self, room_id: str) -> Union[int, None]:
+        """Returns the number of connected players
+
+        Args:
+            room_id (str): the room's id
+
+        Returns:
+            Union[int, None]: the number of connected players
+            to that room or None if the room does not exist
+        """
+        return self._rooms[room_id]["playerCount"] if room_id in self._rooms else None
+
+    def get_players(self, room_id: str) -> Union[Dict[str, PlayerInfo], None]:
+        """Returns the connected players info
+
+        Args:
+            room_id (str): the room's id
+
+        Returns:
+            Union[Dict[str, PlayerInfo], None]: the connected players info
+            of the given room or None if the room does not exist
+        """
+        return self._rooms[room_id]["players"] if room_id in self._rooms else None
+
+
+    def add_player(self, room_id: str, player_id: str, username: str) -> bool:
+        """Adds a new player to the room
+
+        Args:
+            room_id (str): the room's id
+            player_id (str): the player's id
+            username (str): the player's username
+
+        Returns: True if the player was added, False if the room does not exist
+        """
+        if room_id not in self._rooms:
+            return False
+
+        self._rooms[room_id]["players"][player_id] = {
+            "username": username,
+            "isReady": False,
+            "character": -1
+        }
+        self._rooms[room_id]["playerCount"] += 1
+        return True
+
+    def remove_player(self, room_id: str, player_id: str) -> bool:
+        """Removes a player from the room
+
+        Args:
+            player_id (str): the player's id
+            username (str): the player's username
+
+        Returns: True if the player was removed, False if the room does not exist
+        """
+        if room_id not in self._rooms:
+            return False
+
+        self._rooms[room_id]["players"].pop(player_id)
+        self._rooms[room_id]["playerCount"] -= 1
+        return True
 
 
     def generate_id(self):
@@ -100,11 +169,10 @@ class RoomData:
         else:
             ascii_id = room_id
 
-        self._rooms[ascii_id] = {
-            "playerCount": 0,
-            "players": list(),
-            "ready": list()
-        }
+        self._rooms[ascii_id] = dict(
+            playerCount = 0,
+            players = dict()
+        )
 
         return ascii_id
 

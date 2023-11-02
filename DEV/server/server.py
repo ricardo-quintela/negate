@@ -1,9 +1,10 @@
+# pylint: disable=no-member
 import logging
 
-from typing import Dict, Union
-from flask import Flask, render_template, redirect, request, abort
-from flask_socketio import SocketIO
+from flask import Flask, render_template, redirect, request, abort, Response
+from flask_socketio import SocketIO, join_room as sio_join_room, leave_room as sio_leave_room
 
+from json_validation import JSONDictionary, ValidateJson
 
 from rooms import RoomData
 
@@ -14,7 +15,7 @@ app = Flask(
     template_folder="templates"
 )
 app.config["SECRET_KEY"] = "secret!"
-socketio = SocketIO(app, cors_allowed_origins="*")
+socket_server = SocketIO(app, cors_allowed_origins="*")
 
 
 
@@ -23,12 +24,9 @@ gunicorn_error_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers.extend(gunicorn_error_logger.handlers)
 app.logger.setLevel(gunicorn_error_logger.level)
 
-
+# Allocate space for the room data
 room_data = RoomData()
 
-
-# json response annotation
-JSONResponse = Dict[str, Union[str, int, float, bool]]
 
 # views
 
@@ -51,7 +49,7 @@ def home() -> str:
 @app.route("/create-room", methods=["GET"])
 def create_room():
     """Randomly creates a room id;
-    opens a room on the API and redirects
+    opens a room on the server and redirects
     the user to it
 
     Returns:
@@ -65,15 +63,46 @@ def create_room():
     args = request.args
 
     if "username" not in args:
-        abort(404)
+        abort(400)
 
     username = args["username"]
 
     room_id = room_data.create_room()
 
     app.logger.debug("Opened room '%s'", room_id)
-    return redirect(f"/game/{room_id}?username={username}")
+    return redirect(f"/game/{room_id}?username={username}", code=303)
 
+
+
+@app.route("/join-room", methods=["GET"])
+def join_room():
+    """Attempts to join an existing room
+
+    If the room doesn't exist a 404 code is returned
+
+    Returns:
+        Response: redirects the user to the game room
+    """
+    # bad request
+    if request.method != "GET":
+        abort(400)
+
+    args = request.args
+
+    if "username" not in args:
+        abort(400)
+
+    if "roomId" not in args:
+        abort(400)
+
+    username = args["username"]
+    room_id = args["roomId"]
+
+    # room doesn't exist
+    if room_id not in room_data:
+        abort(404)
+
+    return redirect(f"/game/{room_id}?username={username}", code=303)
 
 
 @app.route("/game/<room_id>", methods=["GET"])
@@ -110,10 +139,173 @@ def game(room_id: str):
         abort(404)
 
     # room is full
-    if room_data.get(room_id)["playerCount"] == 5:
+    if room_data.get_player_count(room_id) == 5:
         abort(403)
 
     return render_template("game.html", room_id=room_id, username=username)
+
+
+
+
+#*==================================================================
+#*                      WEBSOCKET EVENTS
+#*==================================================================
+
+
+
+@socket_server.on("join")
+def event_join(json: JSONDictionary):
+    """Join
+
+    This event is issued whenever a player wishes to join an existing room
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'join'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "username"):
+        return
+
+    room_id = json["roomId"]
+    username = json["username"]
+
+    # connect the player to the socket room
+    sio_join_room(room_id)
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    app.logger.debug("Joined '%s' to room '%s'", socket_id, room_id)
+
+    # add the player to the room data
+    room_data.add_player(room_id, socket_id, username)
+
+    # send player data to all players
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
+
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
+
+
+
+@socket_server.on("leave")
+def event_leave(json: JSONDictionary):
+    """Leave
+
+    This event is issued whenever a player leaves the room
+    hey're connected to
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'leave'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId"):
+        return
+
+    room_id = json["roomId"]
+
+    # disconnect the player to the socket room
+    sio_leave_room(room_id)
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    app.logger.debug("Disconnected '%s' from room '%s'", socket_id, room_id)
+
+    # add the player to the room data
+    room_data.remove_player(room_id, socket_id)
+
+    # send player data to all players
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
+
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
+
+    # delete the room
+    if room_data.get_player_count(room_id) == 0:
+        room_data.delete(room_id)
+        app.logger.debug("Deleted room '%s': No players left", room_id)
+
+
+
+@socket_server.on("ready")
+def event_ready(json: JSONDictionary):
+    """Ready
+
+    This event is issued whenever a player changes it's ready state
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'ready'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "isReady"):
+        return
+
+    room_id = json["roomId"]
+    is_ready = json["isReady"]
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    room_data.get_players(room_id)[socket_id]["isReady"] = is_ready
+    app.logger.debug("Set ready state of '%s' on room '%s' to '%s'", socket_id, room_data, is_ready)
+
+    # send player data to all players
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
+
+
+@socket_server.on("lockIn")
+def event_lock_in(json: JSONDictionary):
+    """LockIn
+
+    This event is issued whenever a player locks the character
+    that they want to play with
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'lockIn'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "character"):
+        return
+
+    room_id = json["roomId"]
+    character = json["character"]
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    # set the player's character
+    room_data.get_players(room_id)[socket_id]["character"] = character
+
+    data = room_data.get_players(room_id)
+
+    # send player data to all players
+    socket_server.emit(
+        "characterData",
+        {sid: {"character": data[sid]["character"]} for sid in data},
+        to=room_id
+    )
+    app.logger.debug("Sent character data to all in room '%s'", room_id)
+
 
 
 
@@ -123,12 +315,13 @@ def game(room_id: str):
 #*==================================================================
 
 
+
 @app.route("/testing/create-room", methods=["POST"])
-def testing_create_room() -> JSONResponse:
+def testing_create_room() -> JSONDictionary:
     """Creates a room in memory with the given ID
 
     Returns:
-        JSONResponse: the room info in JSON format
+        JSONDictionary: the room info in JSON format
     """
     # bad request
     if request.method != "POST":
@@ -136,7 +329,8 @@ def testing_create_room() -> JSONResponse:
 
     payload = request.form
 
-    if "roomId" not in payload:
+    # validate the payload
+    if not ValidateJson.validate_keys(payload, "roomId"):
         abort(400)
 
     room_id = room_data.create_room(payload["roomId"])
@@ -148,7 +342,7 @@ def testing_create_room() -> JSONResponse:
 
 
 @app.route("/testing/delete-room", methods=["DELETE"])
-def testing_delete_room() -> JSONResponse:
+def testing_delete_room() -> JSONDictionary:
     """Deletes a room in memory
 
     If the room does not exist, the returned roomData will be `None`
@@ -157,7 +351,7 @@ def testing_delete_room() -> JSONResponse:
         room_id (str): the id of the room to delete
 
     Returns:
-        JSONResponse: the deleted room info
+        JSONDictionary: the deleted room info
     """
     # bad request
     if request.method != "DELETE":
@@ -177,6 +371,64 @@ def testing_delete_room() -> JSONResponse:
 
 
 
+#*==================================================================
+#*                      ERROR CODE HANDLERS
+#*==================================================================
+
+@app.errorhandler(400)
+def error_code_bad_request(error) -> Response:
+    """Handles an error code by returning
+    an HTML HTTPResponse
+
+    Args:
+        error (_type_): the error
+
+    Returns:
+        Response: the HTTPResponse with the rendered template
+    """
+    return render_template('error/400.html', error=error), 400
+
+@app.errorhandler(403)
+def error_code_forbidden(error) -> Response:
+    """Handles an error code by returning
+    an HTML HTTPResponse
+
+    Args:
+        error (_type_): the error
+
+    Returns:
+        Response: the HTTPResponse with the rendered template
+    """
+    return render_template('error/403.html', error=error), 403
+
+@app.errorhandler(404)
+def error_code_not_found(error) -> Response:
+    """Handles an error code by returning
+    an HTML HTTPResponse
+
+    Args:
+        error (_type_): the error
+
+    Returns:
+        Response: the HTTPResponse with the rendered template
+    """
+    return render_template('error/404.html', error=error), 404
+
+@app.errorhandler(500)
+def error_code_internal_server_error(error) -> Response:
+    """Handles an error code by returning
+    an HTML HTTPResponse
+
+    Args:
+        error (_type_): the error
+
+    Returns:
+        Response: the HTTPResponse with the rendered template
+    """
+    return render_template('error/500.html', error=error), 500
+
+
+
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socket_server.run(app)

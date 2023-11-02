@@ -1,2 +1,2 @@
 #!/bin/bash
-gunicorn server:app
+gunicorn server:app --reload

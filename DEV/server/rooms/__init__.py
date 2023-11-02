@@ -1,1 +1,1 @@
-from .room import RoomData, RoomInfo
+from .room import RoomData, RoomInfo, PlayerInfo
