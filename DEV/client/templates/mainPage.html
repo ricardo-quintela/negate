@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>{% block title %}{% endblock %}</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    {% block styles %}{% endblock styles %}
+    {% block scripts %}{% endblock scripts %}
+</head>
+<body>
+    <div id="main-menu">
+        <input type="text" id="usernameInput" placeholder="Enter your username">
+        <button id="createRoomButton" onclick="createRoom()">Create Room</button>
+        <button id="joinButton" onclick="showJoinPopup()">Join</button>
+    </div>
+
+    <!-- Add a hidden popup for joining -->
+    <div id="joinPopup" style="display: none;">
+        <input type="text" id="joinCodeInput" placeholder="Enter room code">
+        <input type="text" id="joinUsernameInput" placeholder="Enter your username">
+        <button onclick="joinRoom()">Join</button>
+        <button onclick="closeJoinPopup()">Cancel</button>
+    </div>
+</body>
+</html>
