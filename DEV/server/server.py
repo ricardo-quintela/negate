@@ -70,6 +70,7 @@ def create_room():
     room_id = room_data.create_room()
 
     app.logger.debug("Opened room '%s'", room_id)
+    
     return redirect(f"/game/{room_id}?username={username}", code=303)
 
 
@@ -150,8 +151,6 @@ def game(room_id: str):
 #*==================================================================
 #*                      WEBSOCKET EVENTS
 #*==================================================================
-
-
 
 @socket_server.on("join")
 def event_join(json: JSONDictionary):
