@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const roomId = window.location.pathname.slice(6);
 
     // getting socket
-    const socket = io.connect(window.location.hostname);
+    var socket = io();
 
     socket.emit("join", { roomId: roomId, username: username });
     
