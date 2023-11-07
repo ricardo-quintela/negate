@@ -5,10 +5,12 @@ Negate - {{ room_id }}
 {% endblock %}
 
 {% block styles %}
-<link rel='stylesheet' type='text/css' media='screen' href="css/styles.css">
+<link rel='stylesheet' type='text/css' media='screen' href="/css/styles.css">
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+<script src="/js/game.js"></script>
 {% endblock %}
 
 {% block content %}
