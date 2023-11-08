@@ -140,3 +140,18 @@ def test_websocket_event_lock_in(socket: SocketIOTestClient, rooms: RoomData):
         list(events[0]["args"][0].values())[0] == {
             "character": 100
         }
+
+
+def test_load_resource(socket: SocketIOTestClient, rooms: RoomData, client: FlaskClient):
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient4"
+    })
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]
+
+    response = client.get(f"/resource?resource=test/test_component&roomId=AAAAA&playerId={player_id}")
+
+    assert response.status_code == 200
+
+
