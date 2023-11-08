@@ -9,6 +9,13 @@ const domain = window.location.hostname;
 
 var gamePhase = "lobby";
 
+const characters = {
+    tech: 0,
+    journalist: 1,
+    detective: 2,
+    mechanic: 3
+}
+
 
 /**
  * Emits a ready event with the current ready state
