@@ -47,6 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
             // atualizar display
             readyCountEl.innerHTML = `${playersReady}/4`;
         }
+
+        // colocar na fase de seleção de personagens
+        if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
+            gamePhase = "characterSelection";
+        }
     });
 
 
