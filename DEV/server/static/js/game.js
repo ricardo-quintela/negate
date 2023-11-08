@@ -4,6 +4,16 @@ var username = null;
 var roomId = null;
 var socket = null;
 
+var gamePhase = "lobby";
+
+
+/**
+ * Emits a ready event with the current ready state
+ */
+function setReady() {
+    socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -21,7 +31,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     socket.on("playerData", (payload) => {
         playerData = payload;
-        console.log(playerData);
+
+        // atualizar lista de jogadores prontos
+        if (gamePhase === "lobby") {
+            const readyCountEl = document.querySelector("#readyCount");
+            var playersReady = 0;
+
+            // contar quantos jogadores estão prontos
+            for (const player in playerData) {
+                if (playerData[player].isReady === true) {
+                    playersReady++;
+                }
+            }
+
+            // atualizar display
+            readyCountEl.innerHTML = `${playersReady}/4`;
+        }
     });
 
 

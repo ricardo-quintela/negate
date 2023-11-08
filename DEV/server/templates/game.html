@@ -19,4 +19,12 @@ Negate - {{ room_id }}
 <!-- room_id: str -->
 <!-- username: str -->
 <h1>{{ room_id }} - {{ username }}</h1>
+
+
+<div class="readyMenu">
+    <h1 id="readyCount">0/4</h1>
+
+    <button onclick="setReady()" id="readyButton">Ready</button>
+</div>
+
 {% endblock %}

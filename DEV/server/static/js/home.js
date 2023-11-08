@@ -1,19 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // getting the forms to join a room and creating room
-    const createRoomForm = document.querySelector("#createRoomForm");
-    const joinRoomForm = document.querySelector("#joinRoomForm");
+    const createRoomFormEl = document.querySelector("#createRoomForm");
+    const joinRoomFormEl = document.querySelector("#joinRoomForm");
     
     // necessary inputs for each query param
-    const roomIdInput = joinRoomForm.querySelector("#roomIdInput");
-    const usernameInput = document.querySelector("#usernameInput");
+    const roomIdInputEl = joinRoomFormEl.querySelector("#roomIdInput");
+    const usernameInputEl = document.querySelector("#usernameInput");
 
     // behaviour of the create room form
-    createRoomForm.addEventListener("submit", (event) => {
+    createRoomFormEl.addEventListener("submit", (event) => {
         event.preventDefault();
 
         // getting the username (common input for both forms)
-        username = usernameInput.value;
+        username = usernameInputEl.value;
         
         if (username === "") {
             return;
@@ -24,16 +24,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     
     // behaviour of the join room form
-    joinRoomForm.addEventListener("submit", (event) => {
+    joinRoomFormEl.addEventListener("submit", (event) => {
         event.preventDefault();
         
         // getting the username (common input for both forms)
-        username = usernameInput.value;
+        username = usernameInputEl.value;
         if (username === "") {
             return;
         }
 
-        roomId = roomIdInput.value;
+        roomId = roomIdInputEl.value;
         if (roomId === "") {
             return;
         }
