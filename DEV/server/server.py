@@ -103,6 +103,8 @@ def join_room():
     if room_id not in room_data:
         abort(404)
 
+    app.logger.debug("Player joined room '%s'", room_id)
+
     return redirect(f"/game/{room_id}?username={username}", code=303)
 
 
@@ -146,6 +148,50 @@ def game(room_id: str):
     return render_template("game.html", room_id=room_id, username=username)
 
 
+@app.route("/resource", methods=["GET"])
+def load_resource():
+    """Renders a component template
+
+    If the room id valid and the player is connected
+    to the socket then the resource is rendered
+
+    Returns:
+        str: the rendered template
+    """
+    # bad request
+    if request.method != "GET":
+        abort(400)
+
+    args = request.args
+
+    # resource not in params
+    if "resource" not in args:
+        abort(400)
+    resource = args["resource"]
+
+    # username not in params
+    if "roomId" not in args:
+        abort(400)
+    room_id = args["roomId"]
+
+    if "playerId" not in args:
+        abort(400)
+    player_id = args["playerId"]
+
+    player_data = room_data.get_players(room_id)
+
+    # room does not exist
+    if player_data is None:
+        abort(404)
+
+    # forbidden -> player not in game
+    if player_id not in player_data:
+        abort(403)
+
+    app.logger.debug("Rendered '%s' on '%s'", resource, room_id)
+
+    # render the template
+    return render_template(f"components/{resource}.html", room_data=room_data.get(room_id))
 
 
 #*==================================================================

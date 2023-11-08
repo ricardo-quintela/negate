@@ -1,8 +1,11 @@
 // initializing player data object
 var playerData = {};
-var username = null;
-var roomId = null;
 var socket = null;
+
+// getting username and roomId from the request
+const username = new URLSearchParams(window.location.search).get("username");
+const roomId = window.location.pathname.slice(6);
+const domain = window.location.hostname;
 
 var gamePhase = "lobby";
 
@@ -14,13 +17,7 @@ function setReady() {
     socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
-
-    // getting roomId and username from request
-    username = new URLSearchParams(window.location.search)
-                        .get("username");
-    roomId = window.location.pathname.slice(6);
 
     // connect to the socket
     socket = io();
@@ -47,13 +44,18 @@ document.addEventListener("DOMContentLoaded", () => {
             // atualizar display
             readyCountEl.innerHTML = `${playersReady}/4`;
         }
+
+        // colocar na fase de seleção de personagens
+        if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
+            gamePhase = "characterSelection";
+        }
     });
 
 
 });
 
 // disconnect from the room once the window closes
-window.addEventListener("beforeunload", (event) => {
+window.addEventListener("unload", (event) => {
     event.preventDefault();
     socket.emit("leave", { roomId: roomId });
 });
