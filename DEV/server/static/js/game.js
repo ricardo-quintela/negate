@@ -19,6 +19,8 @@ function setReady() {
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    var mainEl = document.querySelector("main");
+
     // connect to the socket
     socket = io();
 
@@ -48,6 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // colocar na fase de seleção de personagens
         if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
             gamePhase = "characterSelection";
+
+            mainEl.innerHTML = requestResource("character_selection", roomId, socket.id);
         }
     });
 
