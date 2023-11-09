@@ -16,24 +16,32 @@ Negate - {{ room_id }}
 <script src="/js/game.js"></script>
 <script src="/js/functions.js"></script>
 <script src="/js/pop_ups.js"></script>
+<script type="text/javascript">
+    setShared({{ shared }})
+</script>
 {% endblock %}
 
 {% block content %}
-<!-- URL: game/room_id?username=username -->
-<!-- Context variables -->
-<!-- room_id: str -->
-<!-- username: str -->
-<main>
+    <!-- URL: game/room_id?username=username -->
+    <!-- Context variables -->
+    <!-- room_id: str -->
+    <!-- username: str -->
+    <!-- shared: chr -->
+    <main>
+        {%if shared == "1" %}
+            <h1>{{ room_id }} - {{ username }} - Shared Space</h1>
+        {%else %}
+            <h1>{{ room_id }} - {{ username }} - Player</h1>
+        {%endif %}
 
-    <h1>{{ room_id }} - {{ username }}</h1>
-
-
-    <div class="ready-menu">
         <h1 id="readyCount">0/4</h1>
 
-        <button onclick="setReady()" id="readyButton">Ready</button>
-    </div>
-
-</main>
-
+        {%if shared == "1" %}
+            <div class="readyNames"> Ready players: </div>
+        {%else %}
+            <div class="readyMenu">
+                <button onclick="setReady()" id="readyButton">Ready</button>
+            </div>
+        {%endif %}
+    </main>
 {% endblock %}

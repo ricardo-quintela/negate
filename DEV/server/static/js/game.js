@@ -1,3 +1,6 @@
+// shared space or player device
+var shared = 0;
+
 // initializing player data object
 var playerData = {};
 var socket = null;
@@ -26,6 +29,13 @@ function setReady() {
     socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
 }
 
+/**
+ * Sets the shared boolean flag from the
+ */
+function setShared(s) {
+    console.log(typeof s);
+    shared = s;
+}
 /**
  * Sets the character number to the index of the clicked element
  * @param {Element} element the character that was clicked
@@ -91,20 +101,73 @@ document.addEventListener("DOMContentLoaded", () => {
     socket.on("playerData", (payload) => {
         playerData = payload;
 
+        var playersReady = 0;
+
+        // contar quantos jogadores estão prontos
+        for (const player in playerData) {
+            if (playerData[player].isReady === true) {
+                playersReady++;
+            }
+        }
+
         // atualizar lista de jogadores prontos
         if (gamePhase === "lobby") {
             const readyCountEl = document.querySelector("#readyCount");
-            var playersReady = 0;
-
-            // contar quantos jogadores estão prontos
-            for (const player in playerData) {
-                if (playerData[player].isReady === true) {
-                    playersReady++;
-                }
-            }
 
             // atualizar display
             readyCountEl.innerHTML = `${playersReady}/4`;
+
+            if (shared === 1) {
+                let readyNamesEl = document.getElementsByClassName("readyNames");
+                readyNamesEl = readyNamesEl[0];
+                console.log(readyNamesEl);
+                let children = readyNamesEl.getElementsByTagName('div');
+                console.log(playersReady)
+                console.log(children.length)
+                // if we're adding a row
+                if (playersReady > children.length) {
+                    for (const player in playerData) {
+                        if (!playerData[player].isReady) {
+                            continue;
+                        }
+                        console.log(playerData[player]);
+                        let present = false;
+                        for (let i = 0; i < children.length; i++) {
+                            if (children[i].innerHTML === playerData[player].username) {
+                                present = true;
+                                break;
+                            }
+                        }
+                        if (!present) {
+                            let newDiv = document.createElement("div");
+                            newDiv.appendChild(document.createTextNode(playerData[player].username));
+                            readyNamesEl.appendChild(newDiv);
+                        }
+                    }
+                }
+                //removing
+                else if (playersReady < children.length) {
+                    console.log("aqui crlh");
+                    let removed = false;
+                    for (let i = 0; i < children.length && !removed; i++) {
+                        let players = Object.values(playerData);
+                        console.log(players);
+                        for (let p in players) {
+                            console.log(players[p])
+                            let player = players[p]
+                            console.log(player.username === children[i].innerHTML)
+                            console.log(player.isReady)
+                            if (player.username === children[i].innerHTML && !player.isReady) {
+                                console.log(player);
+                                children[i].parentNode.removeChild(children[i]);
+                                removed = true;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+            }
         }
 
         // colocar na fase de seleção de personagens
