@@ -119,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // when a player selects a character
     socket.on("characterData", (payload) => {
 
+        var playersLockedIn = 0;
         const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
         for (var playerId of Object.keys(payload)) {
             const character = payload[playerId]["character"];
@@ -127,18 +128,22 @@ document.addEventListener("DOMContentLoaded", () => {
             if (character === -1) continue;
 
             characterImagesEl[character].dataset.unavailable = "true";
+            playerData[playerId]["character"] = character;
+
+            playersLockedIn += 1;
 
             // in cases someone locks in the character at the same time as other is selecting it
-            if (selectedCharacter === character) {
+            if (playerId !== socket.id && selectedCharacter === character) {
                 characterImagesEl[character].classList.remove("highlighted");
                 selectedCharacter = -1;
             }
         }
 
         // change game state
-        if (Object.keys(payload).length === 4) {
+        if (playersLockedIn === 4) {
             gamePhase = "playing";
-            console.log("GAME CAN START");
+
+            mainEl.innerHTML = requestResource("game_controller", roomId, socket.id);
         }
     });
 
