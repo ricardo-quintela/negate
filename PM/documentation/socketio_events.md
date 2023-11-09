@@ -62,6 +62,17 @@
 }
 ```
 
+## lockIn
+
+**client -> server**
+
+```json
+{
+    "roomId": "AAAAA",
+    "character": 0
+}
+```
+
 ## characterData
 
 **server -> client**

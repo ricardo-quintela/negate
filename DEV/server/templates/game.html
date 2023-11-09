@@ -5,13 +5,17 @@ Negate - {{ room_id }}
 {% endblock %}
 
 {% block styles %}
-<link rel='stylesheet' type='text/css' media='screen' href="/css/styles.css">
+<link rel='stylesheet' type='text/css' media='screen' href="/css/game_styles.css">
+<!-- icons -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
 <script src="/js/game.js"></script>
 <script src="/js/functions.js"></script>
+<script src="/js/pop_ups.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -19,13 +23,17 @@ Negate - {{ room_id }}
 <!-- Context variables -->
 <!-- room_id: str -->
 <!-- username: str -->
-<h1>{{ room_id }} - {{ username }}</h1>
+<main>
+
+    <h1>{{ room_id }} - {{ username }}</h1>
 
 
-<div class="readyMenu">
-    <h1 id="readyCount">0/4</h1>
+    <div class="ready-menu">
+        <h1 id="readyCount">0/4</h1>
 
-    <button onclick="setReady()" id="readyButton">Ready</button>
-</div>
+        <button onclick="setReady()" id="readyButton">Ready</button>
+    </div>
+
+</main>
 
 {% endblock %}

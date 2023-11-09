@@ -340,6 +340,7 @@ def event_lock_in(json: JSONDictionary):
 
     # set the player's character
     room_data.get_players(room_id)[socket_id]["character"] = character
+    app.logger.debug("Selected character '%d' for player '%s'", character, socket_id)
 
     data = room_data.get_players(room_id)
 
