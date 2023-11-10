@@ -55,9 +55,13 @@
 ```json
 {
     *socket_id*: {
-        "username": "testClient",
-        "isReady": False,
-        "character": 0
+        "username": username,
+        "isReady": false,
+        "character": -1,
+        "position": [0,0],
+        "facing": "right",
+        "isMoving": false,
+        "isInteracting": false
     }
 }
 ```
