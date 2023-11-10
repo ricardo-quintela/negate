@@ -70,7 +70,11 @@ def test_websocket_event_join(socket: SocketIOTestClient, rooms: RoomData):
         list(events[0]["args"][0].values())[0] == {
             "username": "testClient",
             "isReady": False,
-            "character": -1
+            "character": -1,
+            "position": [0,0],
+            "facing": "right",
+            "isMoving": False,
+            "isInteracting": False
         }
 
 
@@ -113,7 +117,11 @@ def test_websocket_event_ready(socket: SocketIOTestClient, rooms: RoomData):
         list(events[0]["args"][0].values())[0] == {
             "username": "testClient3",
             "isReady": True,
-            "character": -1
+            "character": -1,
+            "position": [0,0],
+            "facing": "right",
+            "isMoving": False,
+            "isInteracting": False,
         }
 
 
@@ -155,3 +163,34 @@ def test_load_resource(socket: SocketIOTestClient, rooms: RoomData, client: Flas
     assert response.status_code == 200
 
 
+
+def test_websocket_event_move_player(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerData event to
+    everyone connected after movePlayer event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient5"
+    })
+    socket.get_received()
+
+    socket.emit("movePlayer", {
+        "roomId": "AAAAA",
+        "key": "up",
+        "state": True
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "playerData" \
+        and \
+        list(events[0]["args"][0]["players"].values())[0] == {
+            "username": "testClient5",
+            "isReady": False,
+            "character": -1,
+            "position": [0,0],
+            "facing": "up",
+            "isMoving": True,
+            "isInteracting": False,
+        }
