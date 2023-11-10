@@ -87,3 +87,20 @@
     }
 }
 ```
+
+## movePlayer
+
+**client -> server**
+
+- `key` -> `"up"`, `"down"`, `"left"`, `"right"`
+The dpad key that was pressed
+
+- `state` -> `true` for key down and `false` for key up
+
+```json
+{
+    "roomId": "AAAAA",
+    "key": "up",
+    "state": true
+}
+```
