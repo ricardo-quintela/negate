@@ -2,6 +2,7 @@
 import logging
 
 from flask import Flask, render_template, redirect, request, abort, Response
+from flask.logging import default_handler
 from flask_socketio import SocketIO, join_room as sio_join_room, leave_room as sio_leave_room
 
 from json_validation import JSONDictionary, ValidateJson
@@ -21,6 +22,7 @@ socket_server = SocketIO(app, cors_allowed_origins="*")
 
 # configure logger
 gunicorn_error_logger = logging.getLogger('gunicorn.error')
+app.logger.removeHandler(default_handler)
 app.logger.handlers.extend(gunicorn_error_logger.handlers)
 app.logger.setLevel(gunicorn_error_logger.level)
 
