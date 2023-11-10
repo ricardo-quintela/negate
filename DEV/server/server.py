@@ -344,6 +344,7 @@ def event_lock_in(json: JSONDictionary):
 
     data = room_data.get_players(room_id)
 
+
     # send player data to all players
     socket_server.emit(
         "characterData",
@@ -352,6 +353,44 @@ def event_lock_in(json: JSONDictionary):
     )
     app.logger.debug("Sent character data to all in room '%s'", room_id)
 
+
+
+@socket_server.on("movePlayer")
+def event_move_player(json: JSONDictionary):
+    """MovePlayer
+
+    This event is issued whenever a player presses or
+    releases a movement button
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'movePlayer'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "key", "state"):
+        return
+
+    room_id = json["roomId"]
+    state = json["state"]
+    facing = json["key"]
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    data = room_data.set_moving_state(room_id, socket_id, state, facing)
+
+    # room doesn't exist
+    if data is None:
+        return
+
+
+    # send player data to all players
+    socket_server.emit("playerData", data, to=room_id)
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
 
 
 
