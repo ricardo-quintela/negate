@@ -1,157 +1,89 @@
-// initializing player data object
-var playerData = {};
-var socket = null;
-var selectedCharacter = -1;
-var isLockedIn = false;
-
-// getting username and roomId from the request
-const username = new URLSearchParams(window.location.search).get("username");
-const roomId = window.location.pathname.slice(6);
-const domain = window.location.hostname;
-
-var gamePhase = "lobby";
-
-const characters = {
-    tech: 0,
-    journalist: 1,
-    detective: 2,
-    mechanic: 3
-}
-
-
 /**
- * Emits a ready event with the current ready state
+ * Annotates the dpad buttons order
  */
-function setReady() {
-    socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
+const dPadMovement = {
+    0: "right",
+    1: "down",
+    2: "left",
+    3: "up",
 }
 
 /**
- * Sets the character number to the index of the clicked element
- * @param {Element} element the character that was clicked
+ * 
+ * @param {Element} mainEl the main element on the html body
+ * @returns the game app itself
  */
-function selectCharacter(element) {
-    // cannot re-select a characted when locked in
-    if (isLockedIn) return;
+function initializeApp(mainEl) {
+    app = new PIXI.Application(
+        {
+            background: "#AAAAAA",
+            resizeTo: window
+        }
+    );
 
-    // cannot select a character that is unavailable
-    const characterImageEl = element.closest(".character .character-image");
-    if (characterImageEl.dataset.unavailable === "true") return;
+    mainEl.innerHtml = "";
+    mainEl.classList.add("hidden");
 
-    // get the character name
-    const character = element.closest(".character").dataset.character;
-    const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
+    document.body.appendChild(app.view);
 
-    // remove hightlight
-    if (selectedCharacter === characters[character]) {
-        characterImagesEl[characters[character]].classList.remove("highlighted");
-        selectedCharacter = -1;
-        return;
+    return app;
+}
+
+/**
+ * Draws a controller on the screen that can be clicked
+ * @param {PIXI.Application} app the game app
+ * @returns the controller object containing all the dpad buttons
+ */
+function loadController(app) {
+
+    const CONTROLLER_SIZE = 50;
+
+    const dPadPositions = [
+        [CONTROLLER_SIZE * 3 + 10, app.screen.height - CONTROLLER_SIZE * 2],
+        [CONTROLLER_SIZE * 2, app.screen.height - CONTROLLER_SIZE + 10],
+        [CONTROLLER_SIZE - 10, app.screen.height - CONTROLLER_SIZE * 2],
+        [CONTROLLER_SIZE * 2, app.screen.height - CONTROLLER_SIZE * 3 - 10],
+    ];
+
+    var controller = {
+        up: null,
+        down: null,
+        left: null,
+        right: null
+    }
+    
+    
+    for (var i = 0; i < 4; i++) {
+        const dPadButton = new PIXI.Graphics();
+
+        // drawing the directional button
+        dPadButton.beginFill(0xFFFFFF);
+        dPadButton.drawPolygon(0,0, CONTROLLER_SIZE,CONTROLLER_SIZE/2, 0,CONTROLLER_SIZE);
+        dPadButton.endFill();
+
+        // position and rotate the dpad key
+        dPadButton.pivot.x = dPadButton.width / 2;
+        dPadButton.pivot.y = dPadButton.height / 2;
+        dPadButton.angle = 90 * i;
+        dPadButton.position = new PIXI.Point(dPadPositions[i][0], dPadPositions[i][1]);
+
+        const index = i;
+
+        // enable interaction with the dpad keys
+        dPadButton.eventMode = "static";
+        dPadButton.interactive = true;
+
+        // set touchevents
+        dPadButton.on("touchstart", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true }));
+        dPadButton.on("touchend", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false }));
+
+        // add the child to the stage
+        app.stage.addChild(dPadButton);
+
+
+        controller[dPadMovement[index]] = dPadButton;
     }
 
-    // add highlight
-    characterImagesEl.forEach(charEl => charEl.classList.remove("highlighted"));
-    characterImagesEl[characters[character]].classList.add("highlighted");
+    return controller
 
-    // update selected character
-    selectedCharacter = characters[character];
 }
-
-/**
- * Emits a lockIn event to the server to lock in the character for the player
- * @param {Element} element the button that was clicked
- * @returns if a character is not selected
- */
-function lockInCharacter(element) {
-    if (selectedCharacter === -1) return;
-
-    socket.emit("lockIn", { roomId: roomId, character: selectedCharacter });
-
-    
-    isLockedIn = true;
-    element.disabled = true;
-}
-
-
-
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    var mainEl = document.querySelector("main");
-
-    // connect to the socket
-    socket = io();
-
-    // join the room
-    socket.emit("join", { roomId: roomId, username: username });
-    
-    // player in game data
-    socket.on("playerData", (payload) => {
-        playerData = payload;
-
-        // atualizar lista de jogadores prontos
-        if (gamePhase === "lobby") {
-            const readyCountEl = document.querySelector("#readyCount");
-            var playersReady = 0;
-
-            // contar quantos jogadores estão prontos
-            for (const player in playerData) {
-                if (playerData[player].isReady === true) {
-                    playersReady++;
-                }
-            }
-
-            // atualizar display
-            readyCountEl.innerHTML = `${playersReady}/4`;
-        }
-
-        // colocar na fase de seleção de personagens
-        if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
-            gamePhase = "characterSelection";
-
-            mainEl.innerHTML = requestResource("character_selection", roomId, socket.id);
-        }
-    });
-
-
-    // when a player selects a character
-    socket.on("characterData", (payload) => {
-
-        var playersLockedIn = 0;
-        const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
-        for (var playerId of Object.keys(payload)) {
-            const character = payload[playerId]["character"];
-
-            // character wasn't selected -> an error possibly
-            if (character === -1) continue;
-
-            characterImagesEl[character].dataset.unavailable = "true";
-            playerData[playerId]["character"] = character;
-
-            playersLockedIn += 1;
-
-            // in cases someone locks in the character at the same time as other is selecting it
-            if (playerId !== socket.id && selectedCharacter === character) {
-                characterImagesEl[character].classList.remove("highlighted");
-                selectedCharacter = -1;
-            }
-        }
-
-        // change game state
-        if (playersLockedIn === 4) {
-            gamePhase = "playing";
-
-            mainEl.innerHTML = requestResource("game_controller", roomId, socket.id);
-        }
-    });
-
-
-});
-
-// disconnect from the room once the window closes
-window.addEventListener("unload", (event) => {
-    event.preventDefault();
-    socket.emit("leave", { roomId: roomId });
-});
