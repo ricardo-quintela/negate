@@ -2,6 +2,7 @@
 import logging
 
 from flask import Flask, render_template, redirect, request, abort, Response
+from flask.logging import default_handler
 from flask_socketio import SocketIO, join_room as sio_join_room, leave_room as sio_leave_room
 
 from json_validation import JSONDictionary, ValidateJson
@@ -21,6 +22,7 @@ socket_server = SocketIO(app, cors_allowed_origins="*")
 
 # configure logger
 gunicorn_error_logger = logging.getLogger('gunicorn.error')
+app.logger.removeHandler(default_handler)
 app.logger.handlers.extend(gunicorn_error_logger.handlers)
 app.logger.setLevel(gunicorn_error_logger.level)
 
@@ -180,9 +182,17 @@ def load_resource():
         abort(400)
     room_id = args["roomId"]
 
+
+    # playerId not in params
     if "playerId" not in args:
         abort(400)
     player_id = args["playerId"]
+
+
+    # isSharedSpace not in params
+    if "isSharedSpace" not in args:
+        abort(400)
+    is_shared_space = args["isSharedSpace"]
 
     player_data = room_data.get_players(room_id)
 
@@ -197,7 +207,11 @@ def load_resource():
     app.logger.debug("Rendered '%s' on '%s'", resource, room_id)
 
     # render the template
-    return render_template(f"components/{resource}.html", room_data=room_data.get(room_id))
+    return render_template(
+        f"components/{resource}.html",
+        room_data=room_data.get(room_id),
+        is_shared_space=is_shared_space
+    )
 
 
 #*==================================================================
@@ -350,6 +364,7 @@ def event_lock_in(json: JSONDictionary):
 
     data = room_data.get_players(room_id)
 
+
     # send player data to all players
     socket_server.emit(
         "characterData",
@@ -358,6 +373,44 @@ def event_lock_in(json: JSONDictionary):
     )
     app.logger.debug("Sent character data to all in room '%s'", room_id)
 
+
+
+@socket_server.on("movePlayer")
+def event_move_player(json: JSONDictionary):
+    """MovePlayer
+
+    This event is issued whenever a player presses or
+    releases a movement button
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'movePlayer'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "key", "state"):
+        return
+
+    room_id = json["roomId"]
+    state = json["state"]
+    facing = json["key"]
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    data = room_data.set_moving_state(room_id, socket_id, state, facing)
+
+    # room doesn't exist
+    if data is None:
+        return
+
+
+    # send player data to all players
+    socket_server.emit("playerData", data, to=room_id)
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
 
 
 
