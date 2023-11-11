@@ -109,17 +109,55 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
 }
 
 
-// var i = 0;
-//    var j = 0;
-//    for (const tile of Object.keys(spritesheet.textures)) {
-//     const texture = PIXI.Texture.from(tile);
-//     const sprite = new PIXI.Sprite(texture);
-//     sprite.position.set(i * sprite.width, j * sprite.height);
-//     app.stage.addChild(sprite);
-//     i++;
+
+async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpritesheet) {
+    // declare the spritesheet file path
+    PIXI.Assets.add({
+        alias: mapName,
+        src: mapFile
+    });
+
+    // load the map file to an object
+    const map = await PIXI.Assets.load(mapName);
+
+    // get the map room tiles and dimensions
+    const roomLayer = map.layers[0].data;
+    const roomWidth = map.layers[0].width;
+
+    // load each map sprite
+    var i = 0;
+    var j = 0;
+    for (const spriteIndex of roomLayer) {
+        const texture = PIXI.Texture.from(Object.keys(roomsSpritesheet.textures)[spriteIndex - 1]);
+        const sprite = new PIXI.Sprite(texture);
+        sprite.position.set(i * sprite.width, j * sprite.height);
+        app.stage.addChild(sprite);
+        
+        if (i < roomWidth - 1) {
+            i++;
+            continue;
+        }
+        i = 0;
+        j++;
+    }
+
+    // load the objects
+    const objects = map.layers[1].objects;
+    for (const object of objects) {
+        const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[object.gid - 257]);
+        const sprite = new PIXI.Sprite(texture);
+        sprite.position.set(object.x, object.y - sprite.height);
+        app.stage.addChild(sprite);
+    }
     
-//     if (i * 32 > app.screen.width) {
-//         i = 0;
-//         j ++;
-//     }
-//    }
+    // load the props
+    const props = map.layers[2].objects;
+    for (const prop of props) {
+        const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[prop.gid - 257]);
+        const sprite = new PIXI.Sprite(texture);
+        sprite.position.set(prop.x, prop.y - sprite.height);
+        app.stage.addChild(sprite);
+    }
+
+
+}
