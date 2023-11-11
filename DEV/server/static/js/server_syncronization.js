@@ -1,5 +1,6 @@
 var socket = null;
 var isSharedSpace = false;
+var loaded_resources = false;
 
 /**
  * the PIXI app
@@ -145,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // on player movement or interactions
-        if (gamePhase === "playing") {
+        if (gamePhase === "playing" && loaded_resources) {
             console.log(payload);
         }
     });
@@ -190,6 +191,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
             }
+
+            // set the state to be ready to play
+            loaded_resources = true;
         }
     });
 
