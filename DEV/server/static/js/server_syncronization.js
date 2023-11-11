@@ -1,4 +1,6 @@
 var socket = null;
+var isSharedSpace = false;
+var loaded_resources = false;
 
 /**
  * the PIXI app
@@ -118,6 +120,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // atualizar lista de jogadores prontos
         if (gamePhase === "lobby") {
+            if (Object.keys(playerData)[0] === socket.id) {
+                isSharedSpace = true;
+            }
+
             const readyCountEl = document.querySelector("#readyCount");
             var playersReady = 0;
 
@@ -136,18 +142,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
             gamePhase = "characterSelection";
 
-            mainEl.innerHTML = requestResource("character_selection", roomId, socket.id);
+            mainEl.innerHTML = requestResource("character_selection", roomId, socket.id, isSharedSpace);
         }
 
         // on player movement or interactions
-        if (gamePhase === "playing") {
+        if (gamePhase === "playing" && loaded_resources) {
             console.log(payload);
         }
     });
 
 
     // when a player selects a character
-    socket.on("characterData", (payload) => {
+    socket.on("characterData", async (payload) => {
 
         var playersLockedIn = 0;
         const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
@@ -175,8 +181,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // load the app
             app = initializeApp(mainEl);
-            // load the controller
-            controller = loadController(app);
+
+            // load the controller for the cell phone users
+            if (!isSharedSpace) {
+                controller = loadController(app);
+            } else {
+                const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
+                const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
+
+                loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+            }
+
+            // set the state to be ready to play
+            loaded_resources = true;
         }
     });
 
