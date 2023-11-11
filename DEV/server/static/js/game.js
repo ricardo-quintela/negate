@@ -91,3 +91,35 @@ function loadController(app) {
     return controller
 
 }
+
+/**
+ * Loads the spritesheet
+ * @returns the spritesheet object
+ */
+async function loadSprites(spritesheetName, spritesheetDataFile) {
+
+    // declare the spritesheet file path
+    PIXI.Assets.add({
+    alias: spritesheetName,
+    src: spritesheetDataFile
+    });
+
+    // load the spritesheet
+    return await PIXI.Assets.load(spritesheetName);
+}
+
+
+// var i = 0;
+//    var j = 0;
+//    for (const tile of Object.keys(spritesheet.textures)) {
+//     const texture = PIXI.Texture.from(tile);
+//     const sprite = new PIXI.Sprite(texture);
+//     sprite.position.set(i * sprite.width, j * sprite.height);
+//     app.stage.addChild(sprite);
+//     i++;
+    
+//     if (i * 32 > app.screen.width) {
+//         i = 0;
+//         j ++;
+//     }
+//    }
