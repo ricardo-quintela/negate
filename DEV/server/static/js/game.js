@@ -110,6 +110,14 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
 
 
 
+/**
+ * 
+ * @param {PIXI.Application} app the PIXIjs game app
+ * @param {String} mapName the name given to the map
+ * @param {String} mapFile the path to the map file
+ * @param {PIXI.Spritesheet} roomsSpritesheet the room spritesheet data
+ * @param {PIXI.Spritesheet} objectsSpritesheet the object and prop spritesheet data
+ */
 async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpritesheet) {
     // declare the spritesheet file path
     PIXI.Assets.add({
