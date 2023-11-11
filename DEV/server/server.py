@@ -176,9 +176,17 @@ def load_resource():
         abort(400)
     room_id = args["roomId"]
 
+
+    # playerId not in params
     if "playerId" not in args:
         abort(400)
     player_id = args["playerId"]
+
+
+    # isSharedSpace not in params
+    if "isSharedSpace" not in args:
+        abort(400)
+    is_shared_space = args["isSharedSpace"]
 
     player_data = room_data.get_players(room_id)
 
@@ -193,7 +201,11 @@ def load_resource():
     app.logger.debug("Rendered '%s' on '%s'", resource, room_id)
 
     # render the template
-    return render_template(f"components/{resource}.html", room_data=room_data.get(room_id))
+    return render_template(
+        f"components/{resource}.html",
+        room_data=room_data.get(room_id),
+        is_shared_space=is_shared_space
+    )
 
 
 #*==================================================================

@@ -158,7 +158,7 @@ def test_load_resource(socket: SocketIOTestClient, rooms: RoomData, client: Flas
     })
     player_id = list(socket.get_received()[0]["args"][0].keys())[0]
 
-    response = client.get(f"/resource?resource=test/test_component&roomId=AAAAA&playerId={player_id}")
+    response = client.get(f"/resource?resource=test/test_component&roomId=AAAAA&playerId={player_id}&isSharedSpace=false")
 
     assert response.status_code == 200
 
