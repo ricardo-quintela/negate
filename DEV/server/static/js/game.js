@@ -279,9 +279,6 @@ function updatePlayers(socketId, mapColliders) {
 
         }
 
-        // create the player rectangle
-        //TODO : GET THE RECT
-
         // cannot move so move to last position
         for (const collider of mapColliders) {
             if (collider.intersects(players[playerId].hitbox)) {
