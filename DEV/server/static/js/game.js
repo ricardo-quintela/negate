@@ -1,215 +1,171 @@
-// shared space or player device
-var shared = 0;
-
-// initializing player data object
-var playerData = {};
-var socket = null;
-var selectedCharacter = -1;
-var isLockedIn = false;
-
-// getting username and roomId from the request
-const username = new URLSearchParams(window.location.search).get("username");
-const roomId = window.location.pathname.slice(6);
-const domain = window.location.hostname;
-
-var gamePhase = "lobby";
-
-const characters = {
-    tech: 0,
-    journalist: 1,
-    detective: 2,
-    mechanic: 3
-}
-
-
 /**
- * Emits a ready event with the current ready state
+ * Annotates the dpad buttons order
  */
-function setReady() {
-    socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
+const dPadMovement = {
+    0: "right",
+    1: "down",
+    2: "left",
+    3: "up",
 }
 
 /**
- * Sets the shared boolean flag from the
+ *
+ * @param {Element} mainEl the main element on the html body
+ * @returns the game app itself
  */
-function setShared(s) {
-    console.log(typeof s);
-    shared = s;
+function initializeApp(mainEl) {
+    app = new PIXI.Application(
+        {
+            background: "#AAAAAA",
+            resizeTo: window
+        }
+    );
+
+    mainEl.innerHtml = "";
+    mainEl.classList.add("hidden");
+
+    document.body.appendChild(app.view);
+
+    return app;
 }
+
 /**
- * Sets the character number to the index of the clicked element
- * @param {Element} element the character that was clicked
+ * Draws a controller on the screen that can be clicked
+ * @param {PIXI.Application} app the game app
+ * @returns the controller object containing all the dpad buttons
  */
-function selectCharacter(element) {
-    // cannot re-select a characted when locked in
-    if (isLockedIn) return;
+function loadController(app) {
 
-    // cannot select a character that is unavailable
-    const characterImageEl = element.closest(".character .character-image");
-    if (characterImageEl.dataset.unavailable === "true") return;
+    const CONTROLLER_SIZE = 50;
 
-    // get the character name
-    const character = element.closest(".character").dataset.character;
-    const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
+    const dPadPositions = [
+        [CONTROLLER_SIZE * 3 + 10, app.screen.height - CONTROLLER_SIZE * 2],
+        [CONTROLLER_SIZE * 2, app.screen.height - CONTROLLER_SIZE + 10],
+        [CONTROLLER_SIZE - 10, app.screen.height - CONTROLLER_SIZE * 2],
+        [CONTROLLER_SIZE * 2, app.screen.height - CONTROLLER_SIZE * 3 - 10],
+    ];
 
-    // remove hightlight
-    if (selectedCharacter === characters[character]) {
-        characterImagesEl[characters[character]].classList.remove("highlighted");
-        selectedCharacter = -1;
-        return;
+    var controller = {
+        up: null,
+        down: null,
+        left: null,
+        right: null
     }
 
-    // add highlight
-    characterImagesEl.forEach(charEl => charEl.classList.remove("highlighted"));
-    characterImagesEl[characters[character]].classList.add("highlighted");
 
-    // update selected character
-    selectedCharacter = characters[character];
+    for (var i = 0; i < 4; i++) {
+        const dPadButton = new PIXI.Graphics();
+
+        // drawing the directional button
+        dPadButton.beginFill(0xFFFFFF);
+        dPadButton.drawPolygon(0,0, CONTROLLER_SIZE,CONTROLLER_SIZE/2, 0,CONTROLLER_SIZE);
+        dPadButton.endFill();
+
+        // position and rotate the dpad key
+        dPadButton.pivot.x = dPadButton.width / 2;
+        dPadButton.pivot.y = dPadButton.height / 2;
+        dPadButton.angle = 90 * i;
+        dPadButton.position = new PIXI.Point(dPadPositions[i][0], dPadPositions[i][1]);
+
+        const index = i;
+
+        // enable interaction with the dpad keys
+        dPadButton.eventMode = "static";
+        dPadButton.interactive = true;
+
+        // set touchevents
+        dPadButton.on("touchstart", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true }));
+        dPadButton.on("touchend", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false }));
+
+        // set mouse events
+        dPadButton.on("mousedown", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true }));
+        dPadButton.on("mouseup", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false }));
+
+        // add the child to the stage
+        app.stage.addChild(dPadButton);
+
+
+        controller[dPadMovement[index]] = dPadButton;
+    }
+
+    return controller
+
 }
 
 /**
- * Emits a lockIn event to the server to lock in the character for the player
- * @param {Element} element the button that was clicked
- * @returns if a character is not selected
+ * Loads the spritesheet
+ * @returns the spritesheet object
  */
-function lockInCharacter(element) {
-    if (selectedCharacter === -1) return;
+async function loadSprites(spritesheetName, spritesheetDataFile) {
 
-    socket.emit("lockIn", { roomId: roomId, character: selectedCharacter });
+    // declare the spritesheet file path
+    PIXI.Assets.add({
+        alias: spritesheetName,
+        src: spritesheetDataFile
+    });
 
-    
-    isLockedIn = true;
-    element.disabled = true;
+    // load the spritesheet
+    return await PIXI.Assets.load(spritesheetName);
 }
 
 
 
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    var mainEl = document.querySelector("main");
-
-    // connect to the socket
-    socket = io();
-
-    // join the room
-    socket.emit("join", { roomId: roomId, username: username });
-    
-    // player in game data
-    socket.on("playerData", (payload) => {
-        playerData = payload;
-
-        var playersReady = 0;
-
-        // contar quantos jogadores estão prontos
-        for (const player in playerData) {
-            if (playerData[player].isReady === true) {
-                playersReady++;
-            }
-        }
-
-        // atualizar lista de jogadores prontos
-        if (gamePhase === "lobby") {
-            const readyCountEl = document.querySelector("#readyCount");
-
-            // atualizar display
-            readyCountEl.innerHTML = `${playersReady}/4`;
-
-            if (shared === 1) {
-                let readyNamesEl = document.getElementsByClassName("readyNames");
-                readyNamesEl = readyNamesEl[0];
-                console.log(readyNamesEl);
-                let children = readyNamesEl.getElementsByTagName('div');
-                console.log(playersReady)
-                console.log(children.length)
-                // if we're adding a row
-                if (playersReady > children.length) {
-                    for (const player in playerData) {
-                        if (!playerData[player].isReady) {
-                            continue;
-                        }
-                        console.log(playerData[player]);
-                        let present = false;
-                        for (let i = 0; i < children.length; i++) {
-                            if (children[i].innerHTML === playerData[player].username) {
-                                present = true;
-                                break;
-                            }
-                        }
-                        if (!present) {
-                            let newDiv = document.createElement("div");
-                            newDiv.appendChild(document.createTextNode(playerData[player].username));
-                            readyNamesEl.appendChild(newDiv);
-                        }
-                    }
-                }
-                //removing
-                else if (playersReady < children.length) {
-                    console.log("aqui crlh");
-                    let removed = false;
-                    for (let i = 0; i < children.length && !removed; i++) {
-                        let players = Object.values(playerData);
-                        console.log(players);
-                        for (let p in players) {
-                            console.log(players[p])
-                            let player = players[p]
-                            console.log(player.username === children[i].innerHTML)
-                            console.log(player.isReady)
-                            if (player.username === children[i].innerHTML && !player.isReady) {
-                                console.log(player);
-                                children[i].parentNode.removeChild(children[i]);
-                                removed = true;
-                            }
-                        }
-                    }
-                }
-            }
-            else {
-            }
-        }
-
-        // colocar na fase de seleção de personagens
-        if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
-            gamePhase = "characterSelection";
-
-            mainEl.innerHTML = requestResource("character_selection", roomId, socket.id);
-        }
+/**
+ *
+ * @param {PIXI.Application} app the PIXIjs game app
+ * @param {String} mapName the name given to the map
+ * @param {String} mapFile the path to the map file
+ * @param {PIXI.Spritesheet} roomsSpritesheet the room spritesheet data
+ * @param {PIXI.Spritesheet} objectsSpritesheet the object and prop spritesheet data
+ */
+async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpritesheet) {
+    // declare the spritesheet file path
+    PIXI.Assets.add({
+        alias: mapName,
+        src: mapFile
     });
 
+    // load the map file to an object
+    const map = await PIXI.Assets.load(mapName);
 
-    // when a player selects a character
-    socket.on("characterData", (payload) => {
+    // get the map room tiles and dimensions
+    const roomLayer = map.layers[0].data;
+    const roomWidth = map.layers[0].width;
 
-        const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
-        for (var playerId of Object.keys(payload)) {
-            const character = payload[playerId]["character"];
+    // load each map sprite
+    var i = 0;
+    var j = 0;
+    for (const spriteIndex of roomLayer) {
+        const texture = PIXI.Texture.from(Object.keys(roomsSpritesheet.textures)[spriteIndex - 1]);
+        const sprite = new PIXI.Sprite(texture);
+        sprite.position.set(i * sprite.width, j * sprite.height);
+        app.stage.addChild(sprite);
 
-            // character wasn't selected -> an error possibly
-            if (character === -1) continue;
-
-            characterImagesEl[character].dataset.unavailable = "true";
-
-            // in cases someone locks in the character at the same time as other is selecting it
-            if (selectedCharacter === character) {
-                characterImagesEl[character].classList.remove("highlighted");
-                selectedCharacter = -1;
-            }
+        if (i < roomWidth - 1) {
+            i++;
+            continue;
         }
+        i = 0;
+        j++;
+    }
 
-        // change game state
-        if (Object.keys(payload).length === 4) {
-            gamePhase = "playing";
-            console.log("GAME CAN START");
-        }
-    });
+    // load the objects
+    const objects = map.layers[1].objects;
+    for (const object of objects) {
+        const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[object.gid - 257]);
+        const sprite = new PIXI.Sprite(texture);
+        sprite.position.set(object.x, object.y - sprite.height);
+        app.stage.addChild(sprite);
+    }
+
+    // load the props
+    const props = map.layers[2].objects;
+    for (const prop of props) {
+        const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[prop.gid - 257]);
+        const sprite = new PIXI.Sprite(texture);
+        sprite.position.set(prop.x, prop.y - sprite.height);
+        app.stage.addChild(sprite);
+    }
 
 
-});
-
-// disconnect from the room once the window closes
-window.addEventListener("unload", (event) => {
-    event.preventDefault();
-    socket.emit("leave", { roomId: roomId });
-});
+}
