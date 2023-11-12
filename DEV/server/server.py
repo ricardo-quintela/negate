@@ -2,6 +2,7 @@
 import logging
 
 from flask import Flask, render_template, redirect, request, abort, Response
+from flask.logging import default_handler
 from flask_socketio import SocketIO, join_room as sio_join_room, leave_room as sio_leave_room
 
 from json_validation import JSONDictionary, ValidateJson
@@ -21,6 +22,7 @@ socket_server = SocketIO(app, cors_allowed_origins="*")
 
 # configure logger
 gunicorn_error_logger = logging.getLogger('gunicorn.error')
+app.logger.removeHandler(default_handler)
 app.logger.handlers.extend(gunicorn_error_logger.handlers)
 app.logger.setLevel(gunicorn_error_logger.level)
 
@@ -70,6 +72,7 @@ def create_room():
     room_id = room_data.create_room()
 
     app.logger.debug("Opened room '%s'", room_id)
+    
     return redirect(f"/game/{room_id}?username={username}", code=303)
 
 
@@ -101,6 +104,8 @@ def join_room():
     # room doesn't exist
     if room_id not in room_data:
         abort(404)
+
+    app.logger.debug("Player joined room '%s'", room_id)
 
     return redirect(f"/game/{room_id}?username={username}", code=303)
 
@@ -145,13 +150,69 @@ def game(room_id: str):
     return render_template("game.html", room_id=room_id, username=username)
 
 
+@app.route("/resource", methods=["GET"])
+def load_resource():
+    """Renders a component template
+
+    If the room id valid and the player is connected
+    to the socket then the resource is rendered
+
+    Returns:
+        str: the rendered template
+    """
+    # bad request
+    if request.method != "GET":
+        abort(400)
+
+    args = request.args
+
+    # resource not in params
+    if "resource" not in args:
+        abort(400)
+    resource = args["resource"]
+
+    # username not in params
+    if "roomId" not in args:
+        abort(400)
+    room_id = args["roomId"]
+
+
+    # playerId not in params
+    if "playerId" not in args:
+        abort(400)
+    player_id = args["playerId"]
+
+
+    # isSharedSpace not in params
+    if "isSharedSpace" not in args:
+        abort(400)
+    is_shared_space = args["isSharedSpace"]
+
+    player_data = room_data.get_players(room_id)
+
+    # room does not exist
+    if player_data is None:
+        abort(404)
+
+    # forbidden -> player not in game
+    if player_id not in player_data:
+        abort(403)
+
+    app.logger.debug("Rendered '%s' on '%s'", resource, room_id)
+
+    # render the template
+    return render_template(
+        f"components/{resource}.html",
+        room_id=room_id,
+        player_id=player_id,
+        room_data=room_data.get(room_id),
+        is_shared_space=is_shared_space
+    )
 
 
 #*==================================================================
 #*                      WEBSOCKET EVENTS
 #*==================================================================
-
-
 
 @socket_server.on("join")
 def event_join(json: JSONDictionary):
@@ -295,8 +356,10 @@ def event_lock_in(json: JSONDictionary):
 
     # set the player's character
     room_data.get_players(room_id)[socket_id]["character"] = character
+    app.logger.debug("Selected character '%d' for player '%s'", character, socket_id)
 
     data = room_data.get_players(room_id)
+
 
     # send player data to all players
     socket_server.emit(
@@ -306,6 +369,44 @@ def event_lock_in(json: JSONDictionary):
     )
     app.logger.debug("Sent character data to all in room '%s'", room_id)
 
+
+
+@socket_server.on("movePlayer")
+def event_move_player(json: JSONDictionary):
+    """MovePlayer
+
+    This event is issued whenever a player presses or
+    releases a movement button
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'movePlayer'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "key", "state"):
+        return
+
+    room_id = json["roomId"]
+    state = json["state"]
+    facing = json["key"]
+
+    # get the socket id
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    data = room_data.set_moving_state(room_id, socket_id, state, facing)
+
+    # room doesn't exist
+    if data is None:
+        return
+
+
+    # send player data to all players
+    socket_server.emit("playerData", data, to=room_id)
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
 
 
 

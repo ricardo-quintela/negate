@@ -4,18 +4,26 @@
 Negate - Home
 {% endblock %}
 {% block styles %}
-<link rel='stylesheet' type='text/css' media='screen' href="css/styles.css">
+<link rel='stylesheet' type='text/css' media='screen' href="/css/styles.css">
 {% endblock %}
 {% block scripts %}
+<script src="/js/home.js"></script>
 {% endblock %}
 
 {% block content %}
 
-<form action="create-room" method="get" class="roomCreation">
+<div id="main-menu">
 
-    <input type="text" name="username" id="username-input">
-    <input type="submit" value="Create Room">
+    <input type="text" id="usernameInput" placeholder="Enter your username">
+    <form id="createRoomForm">
+        <input type="submit" value="Create Room">
+    </form>
 
-</form>
+    <form id="joinRoomForm">
+        <input type="text" placeholder="Enter room code" id="roomIdInput">
+        <input type="submit" value="Join Room">
+    </form>
+
+</div>
 
 {% endblock %}

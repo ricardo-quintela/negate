@@ -1,0 +1,8 @@
+<h1>{{ room_id }} - {{ room_data["players"][player_id]["username"] }}</h1>
+<div class="ready-menu">
+    <h1 id="readyCount">0/4</h1>
+
+    {% if not is_shared_space %}
+    <button onclick="setReady()" id="readyButton">Ready</button>
+    {% endif %}
+</div>

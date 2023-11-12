@@ -1,7 +1,7 @@
 """A generator for new room Ids and a room data storage
 """
 from random import randint
-from typing import TypedDict, Dict, List, Union
+from typing import TypedDict, Dict, List, Union, Tuple
 
 # configure rooms
 ROOM_ID_LEN = 5
@@ -12,6 +12,10 @@ class PlayerInfo(TypedDict):
     username: str
     isReady: bool
     character: int
+    position: List[int]
+    facing: str
+    isMoving: bool
+    isInteracting: bool
 
 class RoomInfo(TypedDict):
     """Annotates information about how the room info
@@ -101,7 +105,11 @@ class RoomData:
         self._rooms[room_id]["players"][player_id] = {
             "username": username,
             "isReady": False,
-            "character": -1
+            "character": -1,
+            "position": [0,0],
+            "facing": "right",
+            "isMoving": False,
+            "isInteracting": False
         }
         self._rooms[room_id]["playerCount"] += 1
         return True
@@ -175,6 +183,53 @@ class RoomData:
         )
 
         return ascii_id
+
+
+    def set_moving_state(self, room_id: str, player_id: str, state: bool, facing: str) -> RoomInfo:
+        """Moves the player on the given room by a given movement vector
+
+        Args:
+            room_id (str): the room id
+            player_id (str): the player's id
+            state (bool): weather the player is moving or not
+            key (str): the direction the player is facing
+
+        Returns:
+            RoomInfo: the room info object
+        """
+        if room_id not in self._rooms:
+            return None
+
+        if player_id not in self._rooms[room_id]["players"]:
+            return None
+
+        self._rooms[room_id]["players"][player_id]["isMoving"] = state
+        self._rooms[room_id]["players"][player_id]["facing"] = facing
+
+        return self._rooms[room_id]
+
+
+    def move_player(self, room_id: str, player_id: str, movement_vector: Union[List[int], Tuple[int]]) -> RoomInfo:
+        """Moves the player on the given room by a given movement vector
+
+        Args:
+            room_id (str): the room id
+            player_id (str): the player's id
+            movement_vector (Union[List[int], Tuple[int]]): the vector on which the movement is going to be calculated
+
+        Returns:
+            RoomInfo: the room info object
+        """
+        if room_id not in self._rooms:
+            return None
+
+        if player_id not in self._rooms[room_id]:
+            return None
+
+        self._rooms[room_id][player_id]["position"][0] = movement_vector[0]
+        self._rooms[room_id][player_id]["position"][1] = movement_vector[1]
+
+        return self._rooms[room_id]
 
     def __repr__(self) -> str:
         return f"RoomData('rooms': {len(self._rooms)})"

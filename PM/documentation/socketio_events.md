@@ -55,10 +55,25 @@
 ```json
 {
     *socket_id*: {
-        "username": "testClient",
-        "isReady": False,
-        "character": 0
+        "username": username,
+        "isReady": false,
+        "character": -1,
+        "position": [0,0],
+        "facing": "right",
+        "isMoving": false,
+        "isInteracting": false
     }
+}
+```
+
+## lockIn
+
+**client -> server**
+
+```json
+{
+    "roomId": "AAAAA",
+    "character": 0
 }
 ```
 
@@ -74,5 +89,22 @@
     *socket_id*: {
         "character": 0
     }
+}
+```
+
+## movePlayer
+
+**client -> server**
+
+- `key` -> `"up"`, `"down"`, `"left"`, `"right"`
+The dpad key that was pressed
+
+- `state` -> `true` for key down and `false` for key up
+
+```json
+{
+    "roomId": "AAAAA",
+    "key": "up",
+    "state": true
 }
 ```

@@ -1,7 +1,7 @@
 # pylint: skip-file
 # gunicorn config file
 loglevel = "debug"
-errorlog = 'logs/error_log.txt'
+errorlog = "logs/error_log.txt"
 accesslog = '-'
 
 workers = 1
