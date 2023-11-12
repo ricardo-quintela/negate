@@ -149,7 +149,6 @@ def game(room_id: str):
 
     return render_template("game.html", room_id=room_id, username=username)
 
-
 @app.route("/resource", methods=["GET"])
 def load_resource():
     """Renders a component template
@@ -203,6 +202,8 @@ def load_resource():
     # render the template
     return render_template(
         f"components/{resource}.html",
+        room_id=room_id,
+        player_id=player_id,
         room_data=room_data.get(room_id),
         is_shared_space=is_shared_space
     )

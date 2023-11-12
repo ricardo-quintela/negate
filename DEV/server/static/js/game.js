@@ -9,7 +9,7 @@ const dPadMovement = {
 }
 
 /**
- * 
+ *
  * @param {Element} mainEl the main element on the html body
  * @returns the game app itself
  */
@@ -51,8 +51,8 @@ function loadController(app) {
         left: null,
         right: null
     }
-    
-    
+
+
     for (var i = 0; i < 4; i++) {
         const dPadButton = new PIXI.Graphics();
 
@@ -100,8 +100,8 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
 
     // declare the spritesheet file path
     PIXI.Assets.add({
-    alias: spritesheetName,
-    src: spritesheetDataFile
+        alias: spritesheetName,
+        src: spritesheetDataFile
     });
 
     // load the spritesheet
@@ -111,7 +111,7 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
 
 
 /**
- * 
+ *
  * @param {PIXI.Application} app the PIXIjs game app
  * @param {String} mapName the name given to the map
  * @param {String} mapFile the path to the map file
@@ -140,7 +140,7 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
         const sprite = new PIXI.Sprite(texture);
         sprite.position.set(i * sprite.width, j * sprite.height);
         app.stage.addChild(sprite);
-        
+
         if (i < roomWidth - 1) {
             i++;
             continue;
@@ -157,7 +157,7 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
         sprite.position.set(object.x, object.y - sprite.height);
         app.stage.addChild(sprite);
     }
-    
+
     // load the props
     const props = map.layers[2].objects;
     for (const prop of props) {

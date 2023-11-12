@@ -13,11 +13,10 @@ Negate - {{ room_id }}
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
-<script src="/js/server_syncronization.js"></script>
+<script src="/js/game.js"></script>
 <script src="/js/functions.js"></script>
 <script src="/js/pop_ups.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
-<script src="/js/game.js"></script>
+<script src="/js/server_syncronization.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -31,10 +30,8 @@ Negate - {{ room_id }}
             <div class = "player_info"><h1>Hello {{username}}</h1></div>
             <h1>{{room_id}}</h1>
             <div class = "title">One Hit Wonder</div>
-            <button onclick="setReady()" class = "ready_button" id ="readyButton">Ready</button>
             <h1 id="readyCount">0/4</h1>
         </div>
       </main>
     
-
 {% endblock %}

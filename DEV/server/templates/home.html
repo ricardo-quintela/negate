@@ -5,25 +5,36 @@ Negate - Home
 {% endblock %}
 {% block styles %}
 <link rel='stylesheet' type='text/css' media='screen' href="/css/styles.css">
+    <link rel='stylesheet' type='text/css' media='screen' href="/css/game_styles.css">
 {% endblock %}
 {% block scripts %}
 <script src="/js/home.js"></script>
 {% endblock %}
 
 {% block content %}
-
-<div id="main-menu">
-
-    <input type="text" id="usernameInput" placeholder="Enter your username">
-    <form id="createRoomForm">
-        <input type="submit" value="Create Room">
-    </form>
-
-    <form id="joinRoomForm">
-        <input type="text" placeholder="Enter room code" id="roomIdInput">
-        <input type="submit" value="Join Room">
-    </form>
-
-</div>
+<main>
+    <div id="main-menu" class="mainMenu">
+        <div id="title" class="title"> One Hit Wonder </div>
+        <input type="text" id="usernameInput" class="inputField" placeholder="Enter your username">
+        <div id="create-join" class="create-join">
+            <form id="createRoomForm">
+                <input type="submit" class="room_button" value="Create Room">
+            </form>
+            <button class="room_button" onclick=openPopup()> Join Room </button>
+        </div>
+    </div>
+    <div id="join-popup" class="join-popup">
+        <div id="join-room-title" class="join-room-title">Join Room</div>
+        <span id="close-join-popup" class="close-join-popup" onclick=closePopup()> &times </span>
+        <form id="joinRoomForm" class="joinRoomForm">
+            <div class="roomIdInput">
+                <input type="text" placeholder="Room ID" id="roomIdInput" class="inputField">
+            </div>
+            <div id="join-room-button" class="join-room-button">
+                <input type="submit" class="room_button" value="Join">
+            </div>
+        </form>
+    </div>
+ </main>
 
 {% endblock %}
