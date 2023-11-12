@@ -20,11 +20,18 @@ Negate - {{ room_id }}
 {% endblock %}
 
 {% block content %}
-    <!-- URL: game/room_id?username=username -->
-    <!-- Context variables -->
-    <!-- room_id: str -->
-    <!-- username: str -->
-    <!-- is_shared_space: chr -->
-    <main>
-    </main>
+<!-- URL: game/room_id?username=username -->
+<!-- Context variables -->
+<!-- room_id: str -->
+<!-- username: str -->
+      <main>
+        <div class = 'ready_menu'>
+            <div class = "lobby_title">Lobby</div>
+            <div class = "player_info"><h1>Hello {{username}}</h1></div>
+            <h1>{{room_id}}</h1>
+            <div class = "title">One Hit Wonder</div>
+            <h1 id="readyCount">0/4</h1>
+        </div>
+      </main>
+    
 {% endblock %}
