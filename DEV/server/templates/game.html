@@ -25,17 +25,16 @@ Negate - {{ room_id }}
 <!-- Context variables -->
 <!-- room_id: str -->
 <!-- username: str -->
-<main>
-
-    <h1>{{ room_id }} - {{ username }}</h1>
-
-
-    <div class="ready-menu">
-        <h1 id="readyCount">0/4</h1>
-
-        <button onclick="setReady()" id="readyButton">Ready</button>
-    </div>
-
-</main>
+      <main>
+        <div class = 'ready_menu'>
+            <div class = "lobby_title">Lobby</div>
+            <div class = "player_info"><h1>Hello {{username}}</h1></div>
+            <h1>{{room_id}}</h1>
+            <div class = "title">One Hit Wonder</div>
+            <button onclick="setReady()" class = "ready_button" id ="readyButton">Ready</button>
+            <h1 id="readyCount">0/4</h1>
+        </div>
+      </main>
+    
 
 {% endblock %}
