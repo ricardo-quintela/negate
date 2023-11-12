@@ -4,7 +4,6 @@
  * @param {String} resource the resource name to load
  * @param {String} roomId the id of the room
  * @param {String} playerId the id of the player
- * @param {Boolean} isSharedSpace weather the client is the shared space or not
  * @returns the server side rendered component
  */
 function requestResource(resource, roomId, playerId, isSharedSpace) {

@@ -149,7 +149,6 @@ def game(room_id: str):
 
     return render_template("game.html", room_id=room_id, username=username)
 
-
 @app.route("/resource", methods=["GET"])
 def load_resource():
     """Renders a component template

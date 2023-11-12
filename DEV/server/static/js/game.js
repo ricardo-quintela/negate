@@ -13,7 +13,7 @@ const PLAYER_SPEED = 5;
 
 
 /**
- * 
+ *
  * @param {Element} mainEl the main element on the html body
  * @returns the game app itself
  */
@@ -115,7 +115,7 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
 
 
 /**
- * 
+ *
  * @param {PIXI.Application} app the PIXIjs game app
  * @param {String} mapName the name given to the map
  * @param {String} mapFile the path to the map file

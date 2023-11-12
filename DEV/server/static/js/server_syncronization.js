@@ -99,7 +99,7 @@ function lockInCharacter(element) {
 
     socket.emit("lockIn", { roomId: roomId, character: selectedCharacter });
 
-    
+
     isLockedIn = true;
     element.disabled = true;
 }
@@ -131,7 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // load the lobby menu
             mainEl.innerHTML = requestResource("lobby_menu", roomId, socket.id, isSharedSpace);
-
+            console.log(mainEl)
+            console.log(mainEl.innerHTML)
             const readyCountEl = document.querySelector("#readyCount");
             var playersReady = 0;
 
@@ -144,6 +145,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // atualizar display
             readyCountEl.innerHTML = `${playersReady}/4`;
+
+            if (isSharedSpace === true) {
+                let readyNamesEl = document.getElementsByClassName("readyNames");
+                readyNamesEl = readyNamesEl[0];
+                let children = readyNamesEl.getElementsByTagName('div');
+
+                // if we're adding a row
+                if (playersReady > children.length) {
+                    for (const player in playerData) {
+                        if (!playerData[player].isReady) {
+                            continue;
+                        }
+                        let present = false;
+                        for (let i = 0; i < children.length; i++) {
+                            if (children[i].innerHTML === playerData[player].username) {
+                                present = true;
+                                break;
+                            }
+                        }
+                        if (!present) {
+                            let newDiv = document.createElement("div");
+                            newDiv.appendChild(document.createTextNode(playerData[player].username));
+                            readyNamesEl.appendChild(newDiv);
+                        }
+                    }
+                }
+                //removing
+                else if (playersReady < children.length) {
+                    let removed = false;
+                    for (let i = 0; i < children.length && !removed; i++) {
+                        let players = Object.values(playerData);
+                        for (let p in players) {
+                            let player = players[p]
+                            if (player.username === children[i].innerHTML && !player.isReady) {
+                                children[i].parentNode.removeChild(children[i]);
+                                removed = true;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // colocar na fase de seleção de personagens
