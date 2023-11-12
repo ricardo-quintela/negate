@@ -1,1 +1,118 @@
+/*Title font*/
+@import url('https://fonts.cdnfonts.com/css/modak');
 
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.title {
+    font-family: 'Modak', sans-serif;
+    font-size: 80px;
+    color: white;
+}
+.join-popup {
+    visibility: hidden;
+    position: absolute;
+    justify-content: center;
+    align-content: center;
+    background-color: var(--canvas);
+    width: 50%;
+    height: 50%;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+}
+
+.join-popup-visible {
+    visibility: visible;
+    box-shadow: 0 0 0 999999px rgba(0, 0, 0, 0.5);
+}
+.mainMenu {
+    position: absolute;
+    justify-content: center;
+    align-content: center;
+    background-color: var(--canvas);
+    width: 60%;
+    height: 80%;
+    border-radius: 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+}
+.room_button {
+    margin: 0 50px;
+    border-radius: 50px;
+    outline: none;
+    border: none;
+    background-color: var(--button);
+    color: var(--light-text);
+    font-size: 30px;
+    padding: 1rem;
+    font-weight: 500;
+    min-width: 250px;
+    cursor: pointer;
+}
+
+.create-join {
+    display: flex;
+    justify-content: space-between;
+    margin-left: -50px;
+    margin-right: -50px;
+}
+
+.inputField {
+    text-align: center;
+    background-color: var(--input-field);
+    color: var(--light-text);
+    border: 7px solid var(--input-field);
+    font-size: 30px;
+}
+
+.inputField::placeholder {
+    color: var(--light-text);
+    font-size: 24px;
+}
+
+.join-room-button {
+    display: flex;
+    justify-content: center;
+}
+
+.joinRoomForm {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.close-join-popup {
+    font-weight: bold;
+    font-size: 24px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: scale(2) translate(-75%, 40%);
+    cursor: pointer;
+    color: var(--light-text);
+}
+
+.join-room-title {
+    font-size: 30px;
+    font-weight: 600;
+}
