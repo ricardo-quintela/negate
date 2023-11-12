@@ -404,7 +404,7 @@ def event_move_player(json: JSONDictionary):
 
 
     # send player data to all players
-    socket_server.emit("playerData", data, to=room_id)
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
     app.logger.debug("Sent player data to all in room '%s'", room_id)
 
 

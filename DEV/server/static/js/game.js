@@ -121,6 +121,7 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
  * @param {String} mapFile the path to the map file
  * @param {PIXI.Spritesheet} roomsSpritesheet the room spritesheet data
  * @param {PIXI.Spritesheet} objectsSpritesheet the object and prop spritesheet data
+ * @returns the map colliders
  */
 async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpritesheet) {
     // declare the spritesheet file path
@@ -171,7 +172,26 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
         app.stage.addChild(sprite);
     }
 
+    // load the colliders
+    const colliders = map.layers[3].objects;
 
+    // initialize a colliders array
+    var mapColliders = [];
+
+    // create and fill the colliders array with collider objects
+    for (const collider of colliders) {
+        const mapCollider = new PIXI.Rectangle(
+            collider.x,
+            collider.y,
+            collider.width,
+            collider.height
+        );
+
+        mapColliders.push(mapCollider);
+    }
+
+
+    return mapColliders;
 }
 
 
@@ -195,6 +215,8 @@ async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
         // create the player sprite and add it to the object
         const playerTexture = PIXI.Texture.from("char_1_idle_1.png");
         const player = new PIXI.Sprite(playerTexture);
+        player.x = 100;
+        player.y = 100;
         playerSprites[playerId] = player;
 
         // add sprite to the stage
@@ -211,21 +233,26 @@ async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
  * 
  * @param {String} socketId the socket id to ignore
  * @param {Object} playerSprites the player sprites object to control individually
+ * @param {Array} mapColliders the map colliders
  */
-function updatePlayers(socketId, playerSprites) {
+function updatePlayers(socketId, playerSprites, mapColliders) {
 
-    for (const playerId of Object.keys(playerData.players)) {
+    for (const playerId of Object.keys(playerData)) {
 
         // ignore shared space socket
         if (playerId === socketId) continue;
 
         // ignore not moving players
-        if (!playerData.players[playerId].isMoving) {
+        if (!playerData[playerId].isMoving) {
             continue;
         }
 
+
+        const previousX = playerSprites[playerId].x;
+        const previousY = playerSprites[playerId].y;
+
         // move the player
-        switch (playerData.players[playerId].facing) {
+        switch (playerData[playerId].facing) {
 
             case "up":
                 playerSprites[playerId].y -= PLAYER_SPEED;
@@ -240,6 +267,23 @@ function updatePlayers(socketId, playerSprites) {
                 playerSprites[playerId].x += PLAYER_SPEED;
                 break;
 
+        }
+
+        // create the player rectangle
+        const playerCollider = new PIXI.Rectangle(
+            playerSprites[playerId].x,
+            playerSprites[playerId].y,
+            playerSprites[playerId].width,
+            playerSprites[playerId].height
+        );
+
+        // cannot move so move to last position
+        for (const collider of mapColliders) {
+            if (collider.intersects(playerCollider)) {
+                playerSprites[playerId].x = previousX;
+                playerSprites[playerId].y = previousY;
+                break;
+            }
         }
     }
 }
