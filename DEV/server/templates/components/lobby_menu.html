@@ -1,15 +1,21 @@
+<main>
 {%if is_shared_space == "true" %}
-    <h1>{{ room_id }} - {{ room_data["players"][player_id]["username"] }} - Shared Space </h1>
-{%else %}
-    <h1>{{ room_id }} - {{ room_data["players"][player_id]["username"] }} - Player </h1>
-{%endif %}
-
-<h1 id="readyCount">0/4</h1>
-
-{%if is_shared_space == "true" %}
-    <div class="readyNames"> Ready players: </div>
-{%else %}
-    <div class="readyMenu">
-        <button onclick="setReady()" id="readyButton">Ready</button>
+    <div class = 'ready_menu'>
+        <div class = "lobby_title">Lobby</div>
+        <div class = "player_info"><h1>You are the host</div>
+        <h1>{{room_id}}</h1>
+        <div class = "title">One Hit Wonder</div>
+        <h1 id="readyCount">0/4</h1>     
+        <div class="readyNames"> Ready players: </div>
     </div>
-{%endif %}
+  {%else %}
+    <div class = 'ready_menu'>
+        <div class = "lobby_title">Lobby</div>
+        <div class = "player_info"><h1>Welcome{{username}}</h1></div>
+        <h1>{{room_id}}</h1>
+        <div class = "title">One Hit Wonder</div>
+        <h1 id="readyCount">0/4</h1>
+        <button onclick="setReady()" class = "ready_button" id ="readyButton">Ready</button>    
+    </div>
+    {%endif %}
+</main>
