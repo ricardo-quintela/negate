@@ -5,8 +5,8 @@ const TICK_SPEED = 16.67;
 var socket = null;
 var isSharedSpace = false;
 var loadedResources = false;
-var playerSprites = null;
 var mapColliders = null;
+var players = null;
 
 /**
  * the PIXI app
@@ -241,14 +241,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 const playerSpritesheet = await loadSprites("players", "/sprites/spritesheet_player.json");
 
                 mapColliders = await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
-                playerSprites = await loadPlayers(app, playerData, socket.id, playerSpritesheet);
+                players = await loadPlayers(app, playerData, socket.id, playerSpritesheet);
             }
 
             // set the state to be ready to play
             loadedResources = true;
 
             // update positions
-            setInterval(updatePlayers, TICK_SPEED, socket.id, playerSprites, mapColliders);
+            setInterval(updatePlayers, TICK_SPEED, socket.id, mapColliders);
         }
     });
 

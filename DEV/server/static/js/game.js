@@ -201,11 +201,11 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
  * @param {Object} playerData the current playerData
  * @param {String} socketId the id of the socket to ignore shared space rendering
  * @param {String} playerSpritesFile the file where the player sprites are located
- * @returns the player sprites
+ * @returns the players object
  */
 async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
 
-    var playerSprites = {}
+    var players = {}
 
     for (const playerId of Object.keys(playerData)) {
 
@@ -217,14 +217,24 @@ async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
         const player = new PIXI.Sprite(playerTexture);
         player.x = 100;
         player.y = 100;
-        playerSprites[playerId] = player;
+        const playerCollider = new PIXI.Rectangle(
+            player.x,
+            player.y,
+            player.width,
+            player.height
+        );
+
+        players[playerId] = {
+            sprite: player,
+            hitbox: playerCollider,
+        }
 
         // add sprite to the stage
         app.stage.addChild(player);
 
     }
 
-    return playerSprites;
+    return players;
 
 }
 
@@ -232,10 +242,10 @@ async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
 /**
  * 
  * @param {String} socketId the socket id to ignore
- * @param {Object} playerSprites the player sprites object to control individually
+ * @param {Object} players the players objects
  * @param {Array} mapColliders the map colliders
  */
-function updatePlayers(socketId, playerSprites, mapColliders) {
+function updatePlayers(socketId, mapColliders) {
 
     for (const playerId of Object.keys(playerData)) {
 
@@ -248,42 +258,39 @@ function updatePlayers(socketId, playerSprites, mapColliders) {
         }
 
 
-        const previousX = playerSprites[playerId].x;
-        const previousY = playerSprites[playerId].y;
+        const previousX = players[playerId].hitbox.x;
+        const previousY = players[playerId].hitbox.y;
 
         // move the player
         switch (playerData[playerId].facing) {
 
             case "up":
-                playerSprites[playerId].y -= PLAYER_SPEED;
+                players[playerId].hitbox.y -= PLAYER_SPEED;
                 break;
             case "down":
-                playerSprites[playerId].y += PLAYER_SPEED;
+                players[playerId].hitbox.y += PLAYER_SPEED;
                 break;
             case "left":
-                playerSprites[playerId].x -= PLAYER_SPEED;
+                players[playerId].hitbox.x -= PLAYER_SPEED;
                 break;
             case "right":
-                playerSprites[playerId].x += PLAYER_SPEED;
+                players[playerId].hitbox.x += PLAYER_SPEED;
                 break;
 
         }
 
         // create the player rectangle
-        const playerCollider = new PIXI.Rectangle(
-            playerSprites[playerId].x,
-            playerSprites[playerId].y,
-            playerSprites[playerId].width,
-            playerSprites[playerId].height
-        );
+        //TODO : GET THE RECT
 
         // cannot move so move to last position
         for (const collider of mapColliders) {
-            if (collider.intersects(playerCollider)) {
-                playerSprites[playerId].x = previousX;
-                playerSprites[playerId].y = previousY;
+            if (collider.intersects(players[playerId].hitbox)) {
+                players[playerId].hitbox.x = previousX;
+                players[playerId].hitbox.y = previousY;
                 break;
             }
+            players[playerId].sprite.x = previousX;
+            players[playerId].sprite.y = previousY;
         }
     }
 }
