@@ -186,7 +186,7 @@ def load_resource():
     # isSharedSpace not in params
     if "isSharedSpace" not in args:
         abort(400)
-    is_shared_space = args["isSharedSpace"]
+    is_shared_space = True if args["isSharedSpace"] == "true" else False
 
     player_data = room_data.get_players(room_id)
 
