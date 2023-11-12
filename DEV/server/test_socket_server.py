@@ -185,7 +185,7 @@ def test_websocket_event_move_player(socket: SocketIOTestClient, rooms: RoomData
 
     assert events[0]["name"] == "playerData" \
         and \
-        list(events[0]["args"][0]["players"].values())[0] == {
+        list(events[0]["args"][0].values())[0] == {
             "username": "testClient5",
             "isReady": False,
             "character": -1,
