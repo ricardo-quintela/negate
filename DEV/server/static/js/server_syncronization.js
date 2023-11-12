@@ -1,6 +1,11 @@
+/**
+ * How fast the game updates -> 60fps is 16.67
+ */
+const TICK_SPEED = 16.67;
 var socket = null;
 var isSharedSpace = false;
-var loaded_resources = false;
+var loadedResources = false;
+var playerSprites = null;
 
 /**
  * the PIXI app
@@ -191,8 +196,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // on player movement or interactions
-        if (gamePhase === "playing" && loaded_resources) {
-            console.log(payload);
+        if (gamePhase === "playing" && loadedResources) {
+
         }
     });
 
@@ -233,12 +238,17 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
+                const playerSpritesheet = await loadSprites("players", "/sprites/spritesheet_player.json");
 
-                loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                playerSprites = await loadPlayers(app, playerData, socket.id, playerSpritesheet);
             }
 
             // set the state to be ready to play
-            loaded_resources = true;
+            loadedResources = true;
+
+            // update positions
+            setInterval(updatePlayers, TICK_SPEED, socket.id, playerSprites);
         }
     });
 

@@ -8,6 +8,10 @@ const dPadMovement = {
     3: "up",
 }
 
+const PLAYER_SPEED = 5;
+
+
+
 /**
  *
  * @param {Element} mainEl the main element on the html body
@@ -58,7 +62,7 @@ function loadController(app) {
 
         // drawing the directional button
         dPadButton.beginFill(0xFFFFFF);
-        dPadButton.drawPolygon(0,0, CONTROLLER_SIZE,CONTROLLER_SIZE/2, 0,CONTROLLER_SIZE);
+        dPadButton.drawPolygon(0, 0, CONTROLLER_SIZE, CONTROLLER_SIZE / 2, 0, CONTROLLER_SIZE);
         dPadButton.endFill();
 
         // position and rotate the dpad key
@@ -169,3 +173,75 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
 
 
 }
+
+
+/**
+ * Loads all the player sprites and displays them on stage
+ * @param {PIXI.Application} app the PIXI game app
+ * @param {Object} playerData the current playerData
+ * @param {String} socketId the id of the socket to ignore shared space rendering
+ * @param {String} playerSpritesFile the file where the player sprites are located
+ * @returns the player sprites
+ */
+async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
+
+    var playerSprites = {}
+
+    for (const playerId of Object.keys(playerData)) {
+
+        // ignore shared space socket
+        if (playerId === socketId) continue;
+
+        // create the player sprite and add it to the object
+        const playerTexture = PIXI.Texture.from("char_1_idle_1.png");
+        const player = new PIXI.Sprite(playerTexture);
+        playerSprites[playerId] = player;
+
+        // add sprite to the stage
+        app.stage.addChild(player);
+
+    }
+
+    return playerSprites;
+
+}
+
+
+/**
+ * 
+ * @param {String} socketId the socket id to ignore
+ * @param {Object} playerSprites the player sprites object to control individually
+ */
+function updatePlayers(socketId, playerSprites) {
+
+    for (const playerId of Object.keys(playerData.players)) {
+
+        // ignore shared space socket
+        if (playerId === socketId) continue;
+
+        // ignore not moving players
+        if (!playerData.players[playerId].isMoving) {
+            continue;
+        }
+
+        // move the player
+        switch (playerData.players[playerId].facing) {
+
+            case "up":
+                playerSprites[playerId].y -= PLAYER_SPEED;
+                break;
+            case "down":
+                playerSprites[playerId].y += PLAYER_SPEED;
+                break;
+            case "left":
+                playerSprites[playerId].x -= PLAYER_SPEED;
+                break;
+            case "right":
+                playerSprites[playerId].x += PLAYER_SPEED;
+                break;
+
+        }
+    }
+}
+
+
