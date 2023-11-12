@@ -124,6 +124,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 isSharedSpace = true;
             }
 
+            // load the lobby menu
+            mainEl.innerHTML = requestResource("lobby_menu", roomId, socket.id, isSharedSpace);
+
             const readyCountEl = document.querySelector("#readyCount");
             var playersReady = 0;
 
