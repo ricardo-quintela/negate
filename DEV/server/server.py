@@ -203,6 +203,8 @@ def load_resource():
     # render the template
     return render_template(
         f"components/{resource}.html",
+        room_id=room_id,
+        player_id=player_id,
         room_data=room_data.get(room_id),
         is_shared_space=is_shared_space
     )
