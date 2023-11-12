@@ -6,6 +6,7 @@ var socket = null;
 var isSharedSpace = false;
 var loadedResources = false;
 var playerSprites = null;
+var mapColliders = null;
 
 /**
  * the PIXI app
@@ -239,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
                 const playerSpritesheet = await loadSprites("players", "/sprites/spritesheet_player.json");
 
-                await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                mapColliders = await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
                 playerSprites = await loadPlayers(app, playerData, socket.id, playerSpritesheet);
             }
 
@@ -247,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
             loadedResources = true;
 
             // update positions
-            setInterval(updatePlayers, TICK_SPEED, socket.id, playerSprites);
+            setInterval(updatePlayers, TICK_SPEED, socket.id, playerSprites, mapColliders);
         }
     });
 
