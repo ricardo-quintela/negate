@@ -63,7 +63,7 @@ main {
     color: var(--light-text);
     font-size: 30px;
     padding: 1rem;
-    font-weight: 500;
+    font-weight: 600;
     min-width: 250px;
     cursor: pointer;
 }
@@ -91,6 +91,7 @@ main {
 .join-room-button {
     display: flex;
     justify-content: center;
+    font-weight: 600;
 }
 
 .joinRoomForm {
@@ -115,4 +116,50 @@ main {
 .join-room-title {
     font-size: 30px;
     font-weight: 600;
+}
+
+/* *MEDIA QUERIES* */
+@media screen and (max-height: 480px){
+    .close-join-popup {
+        font-size: 22px;
+        transform: translate(-75%, 40%);
+    }
+
+    .join-popup {
+        gap: 1rem;
+    }
+
+    .mainMenu {
+        gap: 1rem;
+    }
+
+    .inputField {
+        font-size: 16px;
+    }
+
+    .inputField::placeholder {
+        font-size: 14px;
+    }
+
+    .joinRoomForm {
+        gap: 1.5rem;
+    }
+
+    .join-room-button {
+        font-size: 18px;
+        min-width: 175px;
+    }
+    .room_button {
+        margin: 0 30px;
+        border-radius: 30px;
+        font-size: 16px;
+        min-width: 125px;
+    }
+    .title {
+        font-size: 40px !important;
+    }
+
+    .join-room-title {
+        font-size: 16px !important;
+    }
 }
