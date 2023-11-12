@@ -131,8 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // load the lobby menu
             mainEl.innerHTML = requestResource("lobby_menu", roomId, socket.id, isSharedSpace);
-            console.log(mainEl)
-            console.log(mainEl.innerHTML)
+
             const readyCountEl = document.querySelector("#readyCount");
             var playersReady = 0;
 
