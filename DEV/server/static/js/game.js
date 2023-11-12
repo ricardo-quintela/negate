@@ -18,6 +18,8 @@ const PLAYER_SPEED = 5;
  * @returns the game app itself
  */
 function initializeApp(mainEl) {
+    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+
     app = new PIXI.Application(
         {
             background: "#AAAAAA",
@@ -194,16 +196,52 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
     return mapColliders;
 }
 
+/**
+ * Loads the character animation for each one of the characters
+ * @param {Array} characterSpritesheetFiles the character sprites file names
+ * @returns an array with the animation set for each one of the characters
+ */
+async function loadCharacterSpritesheets(characterSpritesheetFiles) {
+
+    const characterAnimations = [];
+
+    // load the sprites for each character
+    for (var charNum = 0; charNum < 4; charNum++) {
+        const spritesheet = await loadSprites(`char${charNum + 1}`, characterSpritesheetFiles[charNum]);
+
+        const textureArray = [];
+        for (const textureFile of Object.keys(spritesheet.textures)) {
+            textureArray.push(PIXI.Texture.from(textureFile));
+        }
+
+        // getting the texture arrays
+        const characterSprites = {
+            idleR: [textureArray[0]],
+            idleU: [textureArray[1]],
+            idleL: [textureArray[2]],
+            idleD: [textureArray[3]],
+            walkR: textureArray.slice(4, 10),
+            walkU: textureArray.slice(10, 16),
+            walkL: textureArray.slice(16, 22),
+            walkD: textureArray.slice(22, 28)
+        }
+
+        characterAnimations.push(characterSprites);
+    }
+
+    return characterAnimations;
+}
+
 
 /**
  * Loads all the player sprites and displays them on stage
  * @param {PIXI.Application} app the PIXI game app
  * @param {Object} playerData the current playerData
  * @param {String} socketId the id of the socket to ignore shared space rendering
- * @param {String} playerSpritesFile the file where the player sprites are located
+ * @param {String} characterAnimations the animation set for each one of the characters
  * @returns the players object
  */
-async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
+async function loadPlayers(app, playerData, socketId, characterAnimations) {
 
     var players = {}
 
@@ -213,8 +251,14 @@ async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
         if (playerId === socketId) continue;
 
         // create the player sprite and add it to the object
-        const playerTexture = PIXI.Texture.from("char_1_idle_1.png");
-        const player = new PIXI.Sprite(playerTexture);
+        const player = new PIXI.AnimatedSprite(characterAnimations[playerData[playerId].character].idleR);
+        player.animationSpeed = 0.1;
+        player.loop = false;
+
+        // scale by 2x
+        player.setTransform(0, 0, 2, 2, 0, 0, 0, 0, 0);
+
+        // position
         player.x = 100;
         player.y = 100;
         const playerCollider = new PIXI.Rectangle(
@@ -245,7 +289,7 @@ async function loadPlayers(app, playerData, socketId, playerSpritesheet) {
  * @param {Object} players the players objects
  * @param {Array} mapColliders the map colliders
  */
-function updatePlayers(socketId, mapColliders) {
+function updatePlayers(socketId, mapColliders, characterAnimations) {
 
     for (const playerId of Object.keys(playerData)) {
 
@@ -254,10 +298,26 @@ function updatePlayers(socketId, mapColliders) {
 
         // ignore not moving players
         if (!playerData[playerId].isMoving) {
+
+            // idle animations
+            switch (playerData[playerId].facing) {
+                case "up":
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].idleU;
+                    break;
+                case "down":
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].idleD;
+                    break;
+                case "left":
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].idleL;
+                    break;
+                case "right":
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].idleR;
+                    break;
+            }
             continue;
         }
 
-
+        // save the hitbox position
         const previousX = players[playerId].hitbox.x;
         const previousY = players[playerId].hitbox.y;
 
@@ -266,17 +326,37 @@ function updatePlayers(socketId, mapColliders) {
 
             case "up":
                 players[playerId].hitbox.y -= PLAYER_SPEED;
+
+                if (!players[playerId].sprite.playing) {
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].walkU;
+                }
                 break;
             case "down":
                 players[playerId].hitbox.y += PLAYER_SPEED;
+
+                if (!players[playerId].sprite.playing) {
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].walkD;
+                }
                 break;
             case "left":
                 players[playerId].hitbox.x -= PLAYER_SPEED;
+
+                if (!players[playerId].sprite.playing) {
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].walkL;
+                }
                 break;
             case "right":
                 players[playerId].hitbox.x += PLAYER_SPEED;
-                break;
 
+                if (!players[playerId].sprite.playing) {
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].walkR;
+                }
+                break;
+        }
+
+        // play the animation
+        if (!players[playerId].sprite.playing) {
+            players[playerId].sprite.play();
         }
 
         // cannot move so move to last position
@@ -286,8 +366,8 @@ function updatePlayers(socketId, mapColliders) {
                 players[playerId].hitbox.y = previousY;
                 break;
             }
-            players[playerId].sprite.x = previousX;
-            players[playerId].sprite.y = previousY;
+            players[playerId].sprite.x = players[playerId].hitbox.x;
+            players[playerId].sprite.y = players[playerId].hitbox.y;
         }
     }
 }
