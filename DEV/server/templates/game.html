@@ -26,20 +26,5 @@ Negate - {{ room_id }}
     <!-- username: str -->
     <!-- is_shared_space: chr -->
     <main>
-        {%if is_shared_space == "1" %}
-            <h1>{{ room_id }} - {{ username }} - Shared Space</h1>
-        {%else %}
-            <h1>{{ room_id }} - {{ username }} - Player</h1>
-        {%endif %}
-
-        <h1 id="readyCount">0/4</h1>
-
-        {%if is_shared_space == "1" %}
-            <div class="readyNames"> Ready players: </div>
-        {%else %}
-            <div class="readyMenu">
-                <button onclick="setReady()" id="readyButton">Ready</button>
-            </div>
-        {%endif %}
     </main>
 {% endblock %}

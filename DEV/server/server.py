@@ -73,7 +73,7 @@ def create_room():
 
     app.logger.debug("Opened room '%s'", room_id)
     
-    return redirect(f"/game/{room_id}?username={username}&is_shared_space=1", code=303)
+    return redirect(f"/game/{room_id}?username={username}", code=303)
 
 
 
@@ -107,7 +107,7 @@ def join_room():
 
     app.logger.debug("Player joined room '%s'", room_id)
 
-    return redirect(f"/game/{room_id}?username={username}&is_shared_space=0", code=303)
+    return redirect(f"/game/{room_id}?username={username}", code=303)
 
 
 @app.route("/game/<room_id>", methods=["GET"])
@@ -139,12 +139,6 @@ def game(room_id: str):
 
     username = args["username"]
 
-    # shared not in params
-    if "is_shared_space" not in args:
-        abort(400)
-
-    is_shared_space = args["is_shared_space"]
-
     # room does not exist
     if room_id not in room_data:
         abort(404)
@@ -153,7 +147,7 @@ def game(room_id: str):
     if room_data.get_player_count(room_id) == 5:
         abort(403)
 
-    return render_template("game.html", room_id=room_id, username=username, is_shared_space=is_shared_space)
+    return render_template("game.html", room_id=room_id, username=username)
 
 @app.route("/resource", methods=["GET"])
 def load_resource():
@@ -208,6 +202,8 @@ def load_resource():
     # render the template
     return render_template(
         f"components/{resource}.html",
+        room_id=room_id,
+        player_id=player_id,
         room_data=room_data.get(room_id),
         is_shared_space=is_shared_space
     )
