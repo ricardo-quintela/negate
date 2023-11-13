@@ -108,3 +108,18 @@ The dpad key that was pressed
     "state": true
 }
 ```
+
+
+## setInteractionPermission
+
+**client -> server**
+
+Fired whenever a player is near something they can interact
+
+```json
+{
+    "roomId": "AAAAA",
+    "playerId": "jaoiwd89awd_dawuj",
+    "state": true
+}
+```
