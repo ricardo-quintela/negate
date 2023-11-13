@@ -266,3 +266,31 @@ def test_websocket_event_set_interact_permission_item(socket: SocketIOTestClient
                 "img": "test img url"
             }
         }
+    
+
+def test_websocket_event_set_interact_permission_empty(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerData event to
+    everyone connected after setInteractPermission event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient6"
+    })
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]
+
+    socket.emit("setInteractPermission", {
+        "roomId": "AAAAA",
+        "playerId": player_id,
+        "state": False,
+        "target": None
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "itemData" \
+        and \
+        list(events[0]["args"][0].values())[0] == {
+            "isInteracting": False,
+            "target": None
+        }
