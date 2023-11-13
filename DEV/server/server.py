@@ -493,12 +493,20 @@ def event_interact(json: JSONDictionary):
 
     room_id = json["roomId"]
     interactable_id = json["interactableId"]
+    socket_id = request.sid
 
     if room_id not in room_data:
         return
 
     # send player data to all players
-    socket_server.emit("playerInteraction", {"interactableId": interactable_id}, to=room_id)
+    socket_server.emit(
+        "playerInteraction",
+        {
+            "playerId": socket_id,
+            "interactableId": interactable_id
+        },
+        to=room_id
+    )
     app.logger.debug("Sent interaction data to all in room '%s'", room_id)
 
 

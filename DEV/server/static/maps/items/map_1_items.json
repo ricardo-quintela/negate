@@ -2,8 +2,8 @@
     "targets": [
         {
             "type": "item",
-            "name": "Bolo",
-            "content": "Um bolo delicioso",
+            "name": "Cake",
+            "content": "A delicious cake!",
             "img": "/maps/items/img/cake.png"
         }
     ]

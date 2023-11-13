@@ -127,13 +127,8 @@ function lockInCharacter(element) {
 function interact() {
 
     if (targetInteractable === null) return;
-
-    itemInventory.push(targetInteractable);
     
     socket.emit("interact", { roomId: roomId, interactableId: targetInteractableId });
-    
-    targetInteractable = null;
-    targetInteractableId = -1;
 
 }
 
@@ -236,8 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const keys = Object.keys(playerData);
                 let i = keys.indexOf(playerId) - 1;
                 characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[character]})`;
-                characterImagesEl[i].style.backgroundRepeat = "no-repeat";
-                characterImagesEl[i].style.backgroundSize = "cover";
                 let str = getKeyByValue(characters, character);
                 str = str.charAt(0).toUpperCase() + str.slice(1);
                 let characterNameEl = characterImagesEl[i].parentElement.getElementsByTagName("h2")[0];
@@ -306,9 +299,34 @@ document.addEventListener("DOMContentLoaded", () => {
     // handle player interaction data event
     socket.on("playerInteraction", (payload) => {
 
-        if (!isSharedSpace) return;
+        // deactivate interactable
+        if (isSharedSpace) {
+            mapInfo.interactables[payload.interactableId].active = false;
+            return;
+        }
 
-        mapInfo.interactables[payload.interactableId].active = false;
+        // ignore if not the correct player
+        if (socket.id !== payload.playerId) return;
+
+        // add the item to the inventory
+        itemInventory.push(targetInteractable);
+        
+        // get the inventory slot elements
+        if (targetInteractable.type === "item") {
+            const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
+            const itemDescriptionEl = document.querySelector(".item-description");
+            const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+            const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+            inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = `url(${targetInteractable.img})`;
+            itemTitleEl.innerHTML = targetInteractable.name;
+            itemTextEl.innerHTML = targetInteractable.content;
+        }
+        
+        targetInteractable = null;
+        targetInteractableId = -1;
+
+
     });
 
 
