@@ -438,8 +438,13 @@ function calcultateInteractions(socketId, interactables) {
     // iterate through all the interactables and check player interactability
     for (const interactable of interactables) {
 
+        // skip if unavailable
+        if (!interactable.active) continue;
+
+        // to save interactions of each player and prioritize the ones that are true
         var interactGroup = [];
 
+        // check interact distance for every player
         for (const playerId of Object.keys(playerData)) {
 
             // ignore shared space socket
