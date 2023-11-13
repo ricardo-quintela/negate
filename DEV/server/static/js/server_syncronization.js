@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
             gamePhase = "playing";
 
             // load the app
-            app = initializeApp(mainEl);
+            app = initializeApp(mainEl, roomId, playerId, isSharedSpace);
 
             // load the controller for the cell phone users
             if (!isSharedSpace) {
