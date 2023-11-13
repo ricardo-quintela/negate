@@ -5,7 +5,7 @@ const TICK_SPEED = 16.67;
 var socket = null;
 var isSharedSpace = false;
 var loadedResources = false;
-var mapColliders = null;
+var mapInfo = null;
 var players = null;
 var characterAnimations = null;
 
@@ -203,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
                 for (let i = 0; i < characterImgs.length; i++) {
                     characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[i]})`;
-                    console.log(characterImagesEl[i].style.backgroundImage);
                     characterImagesEl[i].style.backgroundRepeat = "no-repeat";
                     characterImagesEl[i].style.backgroundSize = "cover";
                 }
@@ -212,8 +211,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const charactersEl = Array.from(document.querySelectorAll(".characters > .character > .name-info > h2"));
                 let keys = Object.keys(playerData);
                 for (let i = 1; i < keys.length; i++) {
-                    console.log(charactersEl[i - 1].innerHTML)
-                    console.log(playerData[keys[i]].username)
                     charactersEl[i - 1].innerHTML = playerData[keys[i]].username;
                 }
             }
@@ -282,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
-                mapColliders = await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                mapInfo = await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
                 
                 characterAnimations = await loadCharacterSpritesheets([
                     "/sprites/characters/spritesheet_tech.json",
@@ -297,7 +294,8 @@ document.addEventListener("DOMContentLoaded", () => {
             loadedResources = true;
 
             // update positions
-            setInterval(updatePlayers, TICK_SPEED, socket.id, mapColliders, characterAnimations);
+            setInterval(updatePlayers, TICK_SPEED, socket.id, mapInfo.colliders, characterAnimations);
+            setInterval(calcultateInteractions, TICK_SPEED, socket.id, mapInfo.interactables);
         }
     });
 
