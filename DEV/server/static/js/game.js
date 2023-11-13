@@ -11,14 +11,28 @@ const dPadMovement = {
 const PLAYER_SPEED = 5;
 
 
+function openInventory() {
+    let inventoryEl = document.getElementsByClassName("inventory")[0];
+    inventoryEl.classList.remove("hidden");
+}
+
+
+function closeInventory() {
+    let inventoryEl = document.getElementsByClassName("inventory")[0];
+    inventoryEl.classList.add("hidden");
+}
 
 /**
  *
  * @param {Element} mainEl the main element on the html body
+ * @param roomId
+ * @param playerId
+ * @param isSharedSpace
  * @returns the game app itself
  */
-function initializeApp(mainEl) {
+function initializeApp(mainEl, roomId, playerId, isSharedSpace) {
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+    console.log("entrar no initialize");
 
     app = new PIXI.Application(
         {
@@ -26,12 +40,13 @@ function initializeApp(mainEl) {
             resizeTo: window
         }
     );
-
-    mainEl.innerHtml = "";
+    mainEl.innerHTML = "";
     mainEl.classList.add("hidden");
-
+    if (!isSharedSpace) {
+        document.body.innerHTML += requestResource("canvas_overlay", roomId, playerId, isSharedSpace);
+    }
     document.body.appendChild(app.view);
-
+    console.log("sair do initialize");
     return app;
 }
 
