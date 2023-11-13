@@ -4,7 +4,7 @@
 
 
 :root {
-    --canvas: #D9D9D9;
+    --canvas: #d1c6c6;
     --button: #FFE279;
     --pop-up: #000000;
     --text: #000000;
@@ -67,7 +67,6 @@ h1 {
     cursor: pointer;
 }
 
-
 /* *LOBBY (READY)* */
 .ready_menu {
     position: absolute;
@@ -80,36 +79,60 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3rem;
+    gap: 1rem; 
 }
 
 .ready_button {
-    margin: 0 50px;
-    border-radius: 50px;
+    margin: 0.5rem 0;
+    border-radius: 3.125rem;
     outline: none;
     border: none;
     background-color: var(--button);
     color: var(--light-text);
-    font-size: 30px;
+    font-size: 1.5rem;
     padding: 1rem;
     font-weight: 500;
-    min-width: 250px;
+    min-width: 12rem;
     cursor: pointer;
 }
 
-.lobby_title{
-	color:rgba(0, 0, 0, 1);
-	width:89px;
-	height:36px;
-	font-size:30px;
-	letter-spacing:0;
+.lobby_title {
+    color: rgba(0, 0, 0, 1);
+    width: 100%;
+    font-size: 1.5rem;
+    text-align: center;
 }
 
 .title {
     font-family: 'Modak', sans-serif;
-    font-size: 80px;
+    font-size: 3rem;
     color: white;
 }
+
+.player_info {
+    margin-bottom: 0.5rem;
+}
+
+.readyNames {
+    font-size: 1rem; 
+}
+
+/* *MEDIA QUERIES* */
+@media screen and (max-height: 480px) {
+    .ready_menu {
+        gap: 1rem;
+    }
+
+    .title {
+        font-size: 40px;
+    }
+
+    .readyNames {
+        font-size: 0.8rem; /* Further adjusted font size for smaller screens */
+    }
+}
+
+
 
 
 /* *CHARACTER SELECTION* */
