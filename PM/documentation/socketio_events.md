@@ -108,3 +108,43 @@ The dpad key that was pressed
     "state": true
 }
 ```
+
+
+## setInteractionPermission
+
+**client -> server**
+
+Fired whenever a player is near something they can interact
+
+```json
+{
+    "roomId": "AAAAA",
+    "playerId": "jaoiwd89awd_dawuj",
+    "state": true,
+    "target": {
+            "type": "item" | "document",
+            "name": "target's name",
+            "content" | "img": "document content" | "img url"
+        }
+}
+```
+
+## itemData
+
+**server -> client**
+
+- Sent as a response to:
+    - `setInteractionPermission`
+
+```json
+{
+    *socket_id*: {
+        "isInteracting": true,
+        "target": {
+            "type": "item" | "document",
+            "name": "target's name",
+            "content" | "img": "document content" | "img url"
+        }
+    }
+}
+```

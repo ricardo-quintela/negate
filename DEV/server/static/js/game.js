@@ -9,6 +9,7 @@ const dPadMovement = {
 }
 
 const PLAYER_SPEED = 5;
+const INTERACT_REACH = 50;
 
 
 function openInventory() {
@@ -135,20 +136,25 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
  *
  * @param {PIXI.Application} app the PIXIjs game app
  * @param {String} mapName the name given to the map
- * @param {String} mapFile the path to the map file
  * @param {PIXI.Spritesheet} roomsSpritesheet the room spritesheet data
  * @param {PIXI.Spritesheet} objectsSpritesheet the object and prop spritesheet data
- * @returns the map colliders
+ * @returns the map colliders and interactables
  */
-async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpritesheet) {
+async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
     // declare the spritesheet file path
     PIXI.Assets.add({
         alias: mapName,
-        src: mapFile
+        src: `/maps/${mapName}.json`
+    });
+
+    PIXI.Assets.add({
+        alias: `${mapName}_items`,
+        src: `/maps/items/${mapName}_items.json`
     });
 
     // load the map file to an object
     const map = await PIXI.Assets.load(mapName);
+    const mapInteractables = await PIXI.Assets.load(`${mapName}_items`);
 
     // get the map room tiles and dimensions
     const roomLayer = map.layers[0].data;
@@ -180,13 +186,44 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
         app.stage.addChild(sprite);
     }
 
+    const interactables = []
     // load the props
     const props = map.layers[2].objects;
     for (const prop of props) {
         const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[prop.gid - 257]);
         const sprite = new PIXI.Sprite(texture);
+
+        // create the highlighted sprite
+        const highlight = new PIXI.Graphics();
+        highlight.beginFill(0xFFFFFF);
+        highlight.drawRect(0,0, prop.width, prop.height);
+        highlight.endFill();
+        const mask = new PIXI.Sprite(texture);
+        highlight.addChild(mask);
+        highlight.mask = mask;
+        mask.anchor.set(0.5);
+        mask.setTransform(prop.width/2, prop.height/2, 1.3,1.3, 0,0,0,0);
+
+        // set the sprite position
+        highlight.position.set(prop.x, prop.y - sprite.height);
         sprite.position.set(prop.x, prop.y - sprite.height);
+
+        app.stage.addChild(highlight);
         app.stage.addChild(sprite);
+
+        // set the target item to the corresponding one on the array
+        var target = null;
+        if (prop.properties[0].value !== -1) {
+            target = mapInteractables.targets[prop.properties[0].value];
+        }
+
+        interactables.push({
+            highlight: highlight,
+            position: highlight.position,
+            active: true,
+            target: target
+        });
+
     }
 
     // load the colliders
@@ -208,7 +245,7 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
     }
 
 
-    return mapColliders;
+    return {colliders: mapColliders, interactables: interactables};
 }
 
 /**
@@ -301,8 +338,8 @@ async function loadPlayers(app, playerData, socketId, characterAnimations) {
 /**
  * 
  * @param {String} socketId the socket id to ignore
- * @param {Object} players the players objects
  * @param {Array} mapColliders the map colliders
+ * @param {Object} characterAnimations the character animated sprites
  */
 function updatePlayers(socketId, mapColliders, characterAnimations) {
 
@@ -388,3 +425,77 @@ function updatePlayers(socketId, mapColliders, characterAnimations) {
 }
 
 
+/**
+ * Calculates the distance between players and interactables and
+ * sets the player to be able to interact
+ * @param {String} socketId the socket id to ignore
+ * @param {Array} interactables the map colliders
+ */
+function calcultateInteractions(socketId, interactables) {
+
+    var playerInteractGroup = {};
+
+    // iterate through all the interactables and check player interactability
+    var interactableId = 0;
+    for (const interactable of interactables) {
+
+        // skip if unavailable
+        if (!interactable.active) {
+            interactable.highlight.visible = false;
+            interactableId++;
+            continue;
+        };
+
+        // to save interactions of each player and prioritize the ones that are true
+        var interactGroup = [];
+
+        // check interact distance for every player
+        for (const playerId of Object.keys(playerData)) {
+
+            // ignore shared space socket
+            if (playerId === socketId) continue;
+
+            // set the interactable to visible or not
+            const distance = calculateDistance(players[playerId].hitbox, interactable.position);
+            const canInteract = distance < INTERACT_REACH;
+
+            // push the interaction to the array to register all of the players
+            interactGroup.push(canInteract);
+
+            if (playerId in playerInteractGroup) {
+                playerInteractGroup[playerId] = playerInteractGroup[playerId] ? true : canInteract;
+            } else {
+                playerInteractGroup[playerId] = canInteract;
+            }
+
+
+            // set the target
+            const target = canInteract ? interactable.target : null;
+            
+            // allow the event to be called only once
+            if (playerData[playerId].isInteracting !== playerInteractGroup[playerId]) {
+                playerData[playerId].isInteracting = playerInteractGroup[playerId];
+
+                // send interact data to the server
+                socket.emit("setInteractPermission", {
+                    roomId: roomId,
+                    playerId: playerId,
+                    state: playerInteractGroup[playerId],
+                    interactableId: interactableId,
+                    target: target
+                });
+            }
+
+        }
+
+        // update the interact highlight
+        var totalInteractions = false;
+        for (const inter of interactGroup){
+            totalInteractions = totalInteractions || inter;
+        }
+        interactable.highlight.visible = totalInteractions;
+
+        interactableId++;
+
+    }
+}

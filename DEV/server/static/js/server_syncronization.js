@@ -5,9 +5,18 @@ const TICK_SPEED = 16.67;
 var socket = null;
 var isSharedSpace = false;
 var loadedResources = false;
-var mapColliders = null;
+
+// map and players related
+var mapInfo = null;
 var players = null;
 var characterAnimations = null;
+var mapInteractables = null;
+
+// client related -> inventories
+var documentInventory = [];
+var itemInventory = [];
+var targetInteractable = null;
+var targetInteractableId = -1;
 
 /**
  * the PIXI app
@@ -112,6 +121,23 @@ function lockInCharacter(element) {
 }
 
 
+/**
+ * Fires an interact event whenever the player clicks on the button
+ */
+function interact() {
+
+    if (targetInteractable === null) return;
+
+    itemInventory.push(targetInteractable);
+    
+    socket.emit("interact", { roomId: roomId, interactableId: targetInteractableId });
+    
+    targetInteractable = null;
+    targetInteractableId = -1;
+
+}
+
+
 
 
 
@@ -150,47 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // atualizar display
             readyCountEl.innerHTML = `${playersReady}/4`;
-            /*
-            if (isSharedSpace === true) {
-                let readyNamesEl = document.getElementsByClassName("readyNames");
-                readyNamesEl = readyNamesEl[0];
-                let children = readyNamesEl.getElementsByTagName('div');
-
-                // if we're adding a row
-                if (playersReady > children.length) {
-                    for (const player in playerData) {
-                        if (!playerData[player].isReady) {
-                            continue;
-                        }
-                        let present = false;
-                        for (let i = 0; i < children.length; i++) {
-                            if (children[i].innerHTML === playerData[player].username) {
-                                present = true;
-                                break;
-                            }
-                        }
-                        if (!present) {
-                            let newDiv = document.createElement("div");
-                            newDiv.appendChild(document.createTextNode(playerData[player].username));
-                            readyNamesEl.appendChild(newDiv);
-                        }
-                    }
-                }
-                //removing
-                else if (playersReady < children.length) {
-                    let removed = false;
-                    for (let i = 0; i < children.length && !removed; i++) {
-                        let players = Object.values(playerData);
-                        for (let p in players) {
-                            let player = players[p]
-                            if (player.username === children[i].innerHTML && !player.isReady) {
-                                children[i].parentNode.removeChild(children[i]);
-                                removed = true;
-                            }
-                        }
-                    }
-                }
-            }*/
         }
 
         // colocar na fase de seleção de personagens
@@ -203,7 +188,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
                 for (let i = 0; i < characterImgs.length; i++) {
                     characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[i]})`;
-                    console.log(characterImagesEl[i].style.backgroundImage);
                     characterImagesEl[i].style.backgroundRepeat = "no-repeat";
                     characterImagesEl[i].style.backgroundSize = "cover";
                 }
@@ -212,15 +196,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 const charactersEl = Array.from(document.querySelectorAll(".characters > .character > .name-info > h2"));
                 let keys = Object.keys(playerData);
                 for (let i = 1; i < keys.length; i++) {
-                    console.log(charactersEl[i - 1].innerHTML)
-                    console.log(playerData[keys[i]].username)
                     charactersEl[i - 1].innerHTML = playerData[keys[i]].username;
                 }
             }
         }
 
-        // on player movement or interactions
+        // on player interactions
         if (gamePhase === "playing" && loadedResources) {
+            
+            //TODO: REMOVE THIS IF NOT NEEDED
 
         }
     });
@@ -282,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
-                mapColliders = await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                mapInfo = await loadMap(app, "map_1", roomsSpriteSheet, objectsSpriteSheet);
                 
                 characterAnimations = await loadCharacterSpritesheets([
                     "/sprites/characters/spritesheet_tech.json",
@@ -291,15 +275,43 @@ document.addEventListener("DOMContentLoaded", () => {
                     "/sprites/characters/spritesheet_mechanic.json"
                 ]);
                 players = await loadPlayers(app, playerData, socket.id, characterAnimations);
+
+                // update positions
+                setInterval(updatePlayers, TICK_SPEED, socket.id, mapInfo.colliders, characterAnimations);
+                setInterval(calcultateInteractions, TICK_SPEED, socket.id, mapInfo.interactables);
             }
 
             // set the state to be ready to play
             loadedResources = true;
 
-            // update positions
-            setInterval(updatePlayers, TICK_SPEED, socket.id, mapColliders, characterAnimations);
         }
     });
+
+
+    // handle item data event
+    socket.on("itemData", (payload) => {
+
+        if (socket.id in payload) {
+            playerData[socket.id].isInteracting = payload[socket.id].isInteracting;
+            targetInteractable = payload[socket.id].target;
+            targetInteractableId = payload[socket.id].interactableId;
+
+            const interactButton = document.querySelector(".interact-button");
+            interactButton.disabled = !payload[socket.id].isInteracting;
+        }
+
+    });
+
+
+    // handle player interaction data event
+    socket.on("playerInteraction", (payload) => {
+
+        if (!isSharedSpace) return;
+
+        mapInfo.interactables[payload.interactableId].active = false;
+    });
+
+
 
 });
 
