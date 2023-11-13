@@ -23,9 +23,9 @@ function requestResource(resource, roomId, playerId, isSharedSpace) {
  */
 function calculateDistance(player, interactable) {
 
-    const playerPos = [player.x, player.y];
+    const playerPos = [player.x + player.width / 2, player.y + player.height / 2];
     const intPos = [interactable.x, interactable.y];
-
+    
     return Math.sqrt(Math.pow(playerPos[0] - intPos[0], 2) + Math.pow(playerPos[1] - intPos[1], 2));
 
 }

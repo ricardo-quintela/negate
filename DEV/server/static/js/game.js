@@ -9,7 +9,7 @@ const dPadMovement = {
 }
 
 const PLAYER_SPEED = 5;
-const INTERACT_REACH = 100;
+const INTERACT_REACH = 50;
 
 
 function openInventory() {
@@ -422,6 +422,9 @@ function calcultateInteractions(socketId, interactables) {
 
     // iterate through all the interactables and check player interactability
     for (const interactable of interactables) {
+
+        const playersInteract = {};
+
         for (const playerId of Object.keys(playerData)) {
 
             // ignore shared space socket
@@ -430,10 +433,27 @@ function calcultateInteractions(socketId, interactables) {
             // set the interactable to visible or not
             const distance = calculateDistance(players[playerId].hitbox, interactable.position);
             const canInteract = distance < INTERACT_REACH;
-            interactable.highlight.visible = canInteract;
 
-            if (canInteract) break;
+            playersInteract[playerId] = canInteract;
         }
+
+        // set highlightVisible to true if only one true appears
+        var highlightVisible = false;
+        for (const playerId of Object.keys(playersInteract)) {
+            highlightVisible = highlightVisible || playersInteract[playerId];
+
+            // check if the player changes of state and fire an event
+            if (playerData[playerId].isInteracting !== playersInteract[playerId]){
+                playerData[playerId].isInteracting = playersInteract[playerId];
+                
+                // fire the event
+                socket.emit("setInteractPermission", { roomId: roomId, playerId: playerId, state: playersInteract[playerId] });
+            }
+        }
+        // set the prop as interatable
+        interactable.highlight.visible = highlightVisible;
+
+
     }
 }
 
