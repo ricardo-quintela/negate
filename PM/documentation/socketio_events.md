@@ -120,6 +120,31 @@ Fired whenever a player is near something they can interact
 {
     "roomId": "AAAAA",
     "playerId": "jaoiwd89awd_dawuj",
-    "state": true
+    "state": true,
+    "target": {
+            "type": "item" | "document",
+            "name": "target's name",
+            "content" | "img": "document content" | "img url"
+        }
+}
+```
+
+## itemData
+
+**server -> client**
+
+- Sent as a response to:
+    - `setInteractionPermission`
+
+```json
+{
+    *socket_id*: {
+        "isInteracting": true,
+        "target": {
+            "type": "item" | "document",
+            "name": "target's name",
+            "content" | "img": "document content" | "img url"
+        }
+    }
 }
 ```
