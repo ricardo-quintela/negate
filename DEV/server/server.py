@@ -431,21 +431,23 @@ def event_set_interact_permission(json: JSONDictionary):
     state = json["state"]
     target = json["target"]
 
-    # validate the target json data
-    if not ValidateJson.validate_keys(target, "type", "name"):
-        return
+    # vallidating the json payload on the target -> the target can be None
+    if target is not None:
+        # validate the target json data
+        if not ValidateJson.validate_keys(target, "type", "name"):
+            return
 
-    # validate target format
-    if target["type"] not in {"item", "document"}:
-        return
+        # validate target format
+        if target["type"] not in {"item", "document"}:
+            return
 
-    # validate the target content and format
-    if target["type"] == "item" and "img" not in target:
-        return
+        # validate the target content and format
+        if target["type"] == "item" and "img" not in target:
+            return
 
-    # validate the target content and format
-    if target["type"] == "document" and "content" not in target:
-        return
+        # validate the target content and format
+        if target["type"] == "document" and "content" not in target:
+            return
 
     if room_id not in room_data:
         return
@@ -459,10 +461,10 @@ def event_set_interact_permission(json: JSONDictionary):
     player_data = room_data.get_players(room_id)
 
     item_data = {
-        pl_id: {
-            "isInteracting": player_data[pl_id]["isInteracting"],
+        player_id: {
+            "isInteracting": player_data[player_id]["isInteracting"],
             "target": target
-        } for pl_id in player_data
+        }
     }
 
     # send player data to all players

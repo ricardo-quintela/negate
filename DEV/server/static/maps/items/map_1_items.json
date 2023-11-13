@@ -1,0 +1,9 @@
+{
+    "targets": [
+        {
+            "type": "document",
+            "name": "documento1",
+            "content": "era uma vez um cavalo"
+        }
+    ]
+}

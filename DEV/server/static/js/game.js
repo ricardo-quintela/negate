@@ -136,20 +136,25 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
  *
  * @param {PIXI.Application} app the PIXIjs game app
  * @param {String} mapName the name given to the map
- * @param {String} mapFile the path to the map file
  * @param {PIXI.Spritesheet} roomsSpritesheet the room spritesheet data
  * @param {PIXI.Spritesheet} objectsSpritesheet the object and prop spritesheet data
  * @returns the map colliders and interactables
  */
-async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpritesheet) {
+async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
     // declare the spritesheet file path
     PIXI.Assets.add({
         alias: mapName,
-        src: mapFile
+        src: `/maps/${mapName}.json`
+    });
+
+    PIXI.Assets.add({
+        alias: `${mapName}_items`,
+        src: `/maps/items/${mapName}_items.json`
     });
 
     // load the map file to an object
     const map = await PIXI.Assets.load(mapName);
+    const mapInteractables = await PIXI.Assets.load(`${mapName}_items`);
 
     // get the map room tiles and dimensions
     const roomLayer = map.layers[0].data;
@@ -206,11 +211,19 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
         app.stage.addChild(highlight);
         app.stage.addChild(sprite);
 
+        // set the target item to the corresponding one on the array
+        var target = null;
+        if (prop.properties[0].value !== -1) {
+            target = mapInteractables.targets[prop.properties[0].value];
+        }
+
         interactables.push({
             highlight: highlight,
             position: highlight.position,
-            active: true
+            active: true,
+            target: target
         });
+
     }
 
     // load the colliders
@@ -420,10 +433,12 @@ function updatePlayers(socketId, mapColliders, characterAnimations) {
  */
 function calcultateInteractions(socketId, interactables) {
 
+    var playerInteractGroup = {};
+
     // iterate through all the interactables and check player interactability
     for (const interactable of interactables) {
 
-        const playersInteract = {};
+        var interactGroup = [];
 
         for (const playerId of Object.keys(playerData)) {
 
@@ -434,27 +449,40 @@ function calcultateInteractions(socketId, interactables) {
             const distance = calculateDistance(players[playerId].hitbox, interactable.position);
             const canInteract = distance < INTERACT_REACH;
 
-            playersInteract[playerId] = canInteract;
-        }
+            // push the interaction to the array to register all of the players
+            interactGroup.push(canInteract);
 
-        // set highlightVisible to true if only one true appears
-        var highlightVisible = false;
-        for (const playerId of Object.keys(playersInteract)) {
-            highlightVisible = highlightVisible || playersInteract[playerId];
-
-            // check if the player changes of state and fire an event
-            if (playerData[playerId].isInteracting !== playersInteract[playerId]){
-                playerData[playerId].isInteracting = playersInteract[playerId];
-                
-                // fire the event
-                socket.emit("setInteractPermission", { roomId: roomId, playerId: playerId, state: playersInteract[playerId] });
+            if (playerId in playerInteractGroup) {
+                playerInteractGroup[playerId] = playerInteractGroup[playerId] ? true : canInteract;
+            } else {
+                playerInteractGroup[playerId] = canInteract;
             }
-        }
-        // set the prop as interatable
-        interactable.highlight.visible = highlightVisible;
 
+
+            // set the target
+            const target = canInteract ? interactable.target : null;
+            
+            // allow the event to be called only once
+            if (playerData[playerId].isInteracting !== playerInteractGroup[playerId]) {
+                playerData[playerId].isInteracting = playerInteractGroup[playerId];
+
+                // send interact data to the server
+                socket.emit("setInteractPermission", {
+                    roomId: roomId,
+                    playerId: playerId,
+                    state: playerInteractGroup[playerId],
+                    target: target
+                });
+            }
+
+        }
+
+        // update the interact highlight
+        var totalInteractions = false;
+        for (const inter of interactGroup){
+            totalInteractions = totalInteractions || inter;
+        }
+        interactable.highlight.visible = totalInteractions;
 
     }
 }
-
-
