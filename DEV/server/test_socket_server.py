@@ -194,3 +194,35 @@ def test_websocket_event_move_player(socket: SocketIOTestClient, rooms: RoomData
             "isMoving": True,
             "isInteracting": False,
         }
+    
+
+def test_websocket_event_set_interact_permission(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerData event to
+    everyone connected after setInteractPermission event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient6"
+    })
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]
+
+    socket.emit("setInteractPermission", {
+        "roomId": "AAAAA",
+        "playerId": player_id,
+        "state": True
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "playerData" \
+        and \
+        list(events[0]["args"][0].values())[0] == {
+            "username": "testClient6",
+            "isReady": False,
+            "character": -1,
+            "position": [0,0],
+            "facing": "right",
+            "isMoving": False,
+            "isInteracting": True,
+        }
