@@ -10,6 +10,7 @@ var loadedResources = false;
 var mapInfo = null;
 var players = null;
 var characterAnimations = null;
+var mapInteractables = null;
 
 // client related -> inventories
 var documentInventory = [];
@@ -247,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
-                mapInfo = await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                mapInfo = await loadMap(app, "map_1", roomsSpriteSheet, objectsSpriteSheet);
                 
                 characterAnimations = await loadCharacterSpritesheets([
                     "/sprites/characters/spritesheet_tech.json",
@@ -274,13 +275,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (socket.id in payload) {
             playerData[socket.id].isInteracting = payload[socket.id].isInteracting;
-            targetInteractable = payload.target;
+            targetInteractable = payload[socket.id].target;
+
+            console.log("GOT A NEW TARGET:", targetInteractable);
         }
 
     });
-
-
-
 
 });
 
