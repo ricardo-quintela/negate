@@ -14,3 +14,18 @@ function requestResource(resource, roomId, playerId, isSharedSpace) {
     if (http.status === 200) return http.responseText;
     return null;
 }
+
+/**
+ * Calculates the distance between two points
+ * @param {Object} player the player's hitbox
+ * @param {Object} interactable the interactable's hitbox
+ * @returns the distance between both
+ */
+function calculateDistance(player, interactable) {
+
+    const playerPos = [player.x, player.y];
+    const intPos = [interactable.x, interactable.y];
+
+    return Math.sqrt(Math.pow(playerPos[0] - intPos[0], 2) + Math.pow(playerPos[1] - intPos[1], 2));
+
+}
