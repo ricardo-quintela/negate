@@ -314,7 +314,7 @@ def test_websocket_event_interact(socket: SocketIOTestClient, rooms: RoomData):
         "username": "testClient7"
     })
 
-    socket.get_received()    
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]  
 
     socket.emit("interact", {
         "roomId": "AAAAA",
@@ -326,5 +326,6 @@ def test_websocket_event_interact(socket: SocketIOTestClient, rooms: RoomData):
     assert events[0]["name"] == "playerInteraction" \
         and \
         events[0]["args"][0] == {
+            "playerId": player_id,
             "interactableId": 1
         }
