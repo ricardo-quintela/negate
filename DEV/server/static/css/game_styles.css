@@ -46,8 +46,19 @@ button {
 h1 {
     font-size: 2.6rem;
 }
+
+
 .hidden {
     display: none !important;
+}
+
+.main-absolute {
+    position: absolute;
+    z-index: -1;
+}
+
+.main-absolute * {
+    z-index: 1;
 }
 
 .highlighted {
@@ -284,6 +295,44 @@ h1 {
     visibility: hidden;
 }
 
+
+.inventory {
+    visibility: visible;
+    position: absolute;
+    top: 25%;
+    right: 25%;
+    justify-content: center;
+    align-content: center;
+    background-color: var(--pop-up);
+    width: 50%;
+    height: 50%;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    box-shadow: 0 0 0 999999px rgba(0, 0, 0, 0.5);
+}
+
+.inventory-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: scale(2) translate(-75%, 75%);
+}
+
+.grid {
+    width: 60%;
+    display: flex;
+    flex-flow: row wrap;
+}
+.grid-item {
+    border-style: solid;
+    border-color: var(--light-outlines);
+    color: var(--light-text);
+    flex: 1 0 auto;
+    width: 30%;
+}
 
 /* *MEDIA QUERIES* */
 @media screen and (max-height: 480px){
