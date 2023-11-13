@@ -1,17 +1,27 @@
-<button class="inventory-button" onclick="openInventory()"> Inventory </button>
+
+<span class="material-symbols-outlined inventory-button" onclick="openInventory()">
+backpack
+</span>
 <button class="interact-button" onclick="interact()"> Interact </button>
 
 <div class="inventory hidden">
-    <span class="close-join-popup" id="close-inventory" onclick="closeInventory()"> &times </span>
-    <div class="grid">
-        <div class="grid-item">item </div>
-        <div class="grid-item">item </div>
-        <div class="grid-item">item </div>
-        <div class="grid-item">item </div>
-        <div class="grid-item">item </div>
-        <div class="grid-item">item </div>
-        <div class="grid-item">item </div>
-        <div class="grid-item">item </div>
-        <div class="grid-item">item </div>
+    <span class="close-inventory" id="close-inventory" onclick="closeInventory()"> &times </span>
+    <div class="submenu-title"> Inventory </div>
+    <div class="side-by-side-inventory">
+        <div class="grid">
+            <div class="grid-item">item </div>
+            <div class="grid-item">item </div>
+            <div class="grid-item">item </div>
+            <div class="grid-item">item </div>
+            <div class="grid-item">item </div>
+            <div class="grid-item">item </div>
+            <div class="grid-item">item </div>
+            <div class="grid-item">item </div>
+            <div class="grid-item">item </div>
+        </div>
+        <div class="item-description">
+            <div class="item-desc-title"> Placeholder </div>
+            <div class="item-desc-text"> This is placeholder. woohoo.</div>
+        </div>
     </div>
 </div>
