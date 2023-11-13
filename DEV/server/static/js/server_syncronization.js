@@ -216,8 +216,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // on player movement or interactions
+        // on player interactions
         if (gamePhase === "playing" && loadedResources) {
+            
+            if (!isSharedSpace) {
+                console.log(`INTERACT: ${playerData[socket.id].isInteracting}`);
+            }
 
         }
     });
@@ -288,14 +292,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     "/sprites/characters/spritesheet_mechanic.json"
                 ]);
                 players = await loadPlayers(app, playerData, socket.id, characterAnimations);
+
+                // update positions
+                setInterval(updatePlayers, TICK_SPEED, socket.id, mapInfo.colliders, characterAnimations);
+                setInterval(calcultateInteractions, TICK_SPEED, socket.id, mapInfo.interactables);
             }
 
             // set the state to be ready to play
             loadedResources = true;
 
-            // update positions
-            setInterval(updatePlayers, TICK_SPEED, socket.id, mapInfo.colliders, characterAnimations);
-            setInterval(calcultateInteractions, TICK_SPEED, socket.id, mapInfo.interactables);
         }
     });
 
