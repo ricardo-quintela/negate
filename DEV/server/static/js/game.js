@@ -9,6 +9,7 @@ const dPadMovement = {
 }
 
 const PLAYER_SPEED = 5;
+const INTERACT_REACH = 100;
 
 
 
@@ -123,7 +124,7 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
  * @param {String} mapFile the path to the map file
  * @param {PIXI.Spritesheet} roomsSpritesheet the room spritesheet data
  * @param {PIXI.Spritesheet} objectsSpritesheet the object and prop spritesheet data
- * @returns the map colliders
+ * @returns the map colliders and interactables
  */
 async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpritesheet) {
     // declare the spritesheet file path
@@ -165,13 +166,36 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
         app.stage.addChild(sprite);
     }
 
+    const interactables = []
     // load the props
     const props = map.layers[2].objects;
     for (const prop of props) {
         const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[prop.gid - 257]);
         const sprite = new PIXI.Sprite(texture);
+
+        // create the highlighted sprite
+        const highlight = new PIXI.Graphics();
+        highlight.beginFill(0xFFFFFF);
+        highlight.drawRect(0,0, prop.width, prop.height);
+        highlight.endFill();
+        const mask = new PIXI.Sprite(texture);
+        highlight.addChild(mask);
+        highlight.mask = mask;
+        mask.anchor.set(0.5);
+        mask.setTransform(prop.width/2, prop.height/2, 1.3,1.3, 0,0,0,0);
+
+        // set the sprite position
+        highlight.position.set(prop.x, prop.y - sprite.height);
         sprite.position.set(prop.x, prop.y - sprite.height);
+
+        app.stage.addChild(highlight);
         app.stage.addChild(sprite);
+
+        interactables.push({
+            highlight: highlight,
+            position: highlight.position,
+            active: true
+        });
     }
 
     // load the colliders
@@ -193,7 +217,7 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
     }
 
 
-    return mapColliders;
+    return {colliders: mapColliders, interactables: interactables};
 }
 
 /**
@@ -286,8 +310,8 @@ async function loadPlayers(app, playerData, socketId, characterAnimations) {
 /**
  * 
  * @param {String} socketId the socket id to ignore
- * @param {Object} players the players objects
  * @param {Array} mapColliders the map colliders
+ * @param {Object} characterAnimations the character animated sprites
  */
 function updatePlayers(socketId, mapColliders, characterAnimations) {
 
@@ -368,6 +392,32 @@ function updatePlayers(socketId, mapColliders, characterAnimations) {
             }
             players[playerId].sprite.x = players[playerId].hitbox.x;
             players[playerId].sprite.y = players[playerId].hitbox.y;
+        }
+    }
+}
+
+
+/**
+ * Calculates the distance between players and interactables and
+ * sets the player to be able to interact
+ * @param {String} socketId the socket id to ignore
+ * @param {Array} interactables the map colliders
+ */
+function calcultateInteractions(socketId, interactables) {
+
+    // iterate through all the interactables and check player interactability
+    for (const interactable of interactables) {
+        for (const playerId of Object.keys(playerData)) {
+
+            // ignore shared space socket
+            if (playerId === socketId) continue;
+
+            // set the interactable to visible or not
+            const distance = calculateDistance(players[playerId].hitbox, interactable.position);
+            const canInteract = distance < INTERACT_REACH;
+            interactable.highlight.visible = canInteract;
+
+            if (canInteract) break;
         }
     }
 }
