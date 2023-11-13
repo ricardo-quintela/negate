@@ -43,7 +43,9 @@ main {
 button {
     font-weight: 600;
 }
-
+h1 {
+    font-size: 2.6rem;
+}
 .hidden {
     display: none !important;
 }
@@ -120,7 +122,7 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3rem;
+    gap: 5rem;
 }
 
 .characters {
@@ -250,18 +252,28 @@ button {
     left: -1rem;
 }
 
+.greyed-out {
+    background-color: rgba(128, 128, 128, 0.9);
+    background-blend-mode: luminosity;
+}
 
+.character-name-hidden {
+    visibility: hidden;
+}
 
 
 /* *MEDIA QUERIES* */
 @media screen and (max-height: 480px){
+    h1 {
+        font-size: 1.5rem;
+    }
     .close {
         transform: translate(-75%, 75%);
     }
 
 
     .character-selection {
-        gap: 0.5rem;
+        gap: 1.5rem;
     }
 
     .lock-in {
@@ -277,6 +289,7 @@ button {
 
     .character{
         font-size: 10px;
+        gap: 0.5rem;
     }
 
     .character > .character-image {
