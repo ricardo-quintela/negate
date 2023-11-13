@@ -8,12 +8,18 @@ const dPadMovement = {
     3: "up",
 }
 
+const PLAYER_SPEED = 5;
+
+
+
 /**
  *
  * @param {Element} mainEl the main element on the html body
  * @returns the game app itself
  */
 function initializeApp(mainEl) {
+    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+
     app = new PIXI.Application(
         {
             background: "#AAAAAA",
@@ -58,7 +64,7 @@ function loadController(app) {
 
         // drawing the directional button
         dPadButton.beginFill(0xFFFFFF);
-        dPadButton.drawPolygon(0,0, CONTROLLER_SIZE,CONTROLLER_SIZE/2, 0,CONTROLLER_SIZE);
+        dPadButton.drawPolygon(0, 0, CONTROLLER_SIZE, CONTROLLER_SIZE / 2, 0, CONTROLLER_SIZE);
         dPadButton.endFill();
 
         // position and rotate the dpad key
@@ -117,6 +123,7 @@ async function loadSprites(spritesheetName, spritesheetDataFile) {
  * @param {String} mapFile the path to the map file
  * @param {PIXI.Spritesheet} roomsSpritesheet the room spritesheet data
  * @param {PIXI.Spritesheet} objectsSpritesheet the object and prop spritesheet data
+ * @returns the map colliders
  */
 async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpritesheet) {
     // declare the spritesheet file path
@@ -167,5 +174,202 @@ async function loadMap(app, mapName, mapFile, roomsSpritesheet, objectsSpriteshe
         app.stage.addChild(sprite);
     }
 
+    // load the colliders
+    const colliders = map.layers[3].objects;
+
+    // initialize a colliders array
+    var mapColliders = [];
+
+    // create and fill the colliders array with collider objects
+    for (const collider of colliders) {
+        const mapCollider = new PIXI.Rectangle(
+            collider.x,
+            collider.y,
+            collider.width,
+            collider.height
+        );
+
+        mapColliders.push(mapCollider);
+    }
+
+
+    return mapColliders;
+}
+
+/**
+ * Loads the character animation for each one of the characters
+ * @param {Array} characterSpritesheetFiles the character sprites file names
+ * @returns an array with the animation set for each one of the characters
+ */
+async function loadCharacterSpritesheets(characterSpritesheetFiles) {
+
+    const characterAnimations = [];
+
+    // load the sprites for each character
+    for (var charNum = 0; charNum < 4; charNum++) {
+        const spritesheet = await loadSprites(`char${charNum + 1}`, characterSpritesheetFiles[charNum]);
+
+        const textureArray = [];
+        for (const textureFile of Object.keys(spritesheet.textures)) {
+            textureArray.push(PIXI.Texture.from(textureFile));
+        }
+
+        // getting the texture arrays
+        const characterSprites = {
+            idleR: [textureArray[0]],
+            idleU: [textureArray[1]],
+            idleL: [textureArray[2]],
+            idleD: [textureArray[3]],
+            walkR: textureArray.slice(4, 10),
+            walkU: textureArray.slice(10, 16),
+            walkL: textureArray.slice(16, 22),
+            walkD: textureArray.slice(22, 28)
+        }
+
+        characterAnimations.push(characterSprites);
+    }
+
+    return characterAnimations;
+}
+
+
+/**
+ * Loads all the player sprites and displays them on stage
+ * @param {PIXI.Application} app the PIXI game app
+ * @param {Object} playerData the current playerData
+ * @param {String} socketId the id of the socket to ignore shared space rendering
+ * @param {String} characterAnimations the animation set for each one of the characters
+ * @returns the players object
+ */
+async function loadPlayers(app, playerData, socketId, characterAnimations) {
+
+    var players = {}
+
+    for (const playerId of Object.keys(playerData)) {
+
+        // ignore shared space socket
+        if (playerId === socketId) continue;
+
+        // create the player sprite and add it to the object
+        const player = new PIXI.AnimatedSprite(characterAnimations[playerData[playerId].character].idleR);
+        player.animationSpeed = 0.1;
+        player.loop = false;
+
+        // scale by 2x
+        player.setTransform(0, 0, 2, 2, 0, 0, 0, 0, 0);
+
+        // position
+        player.x = 100;
+        player.y = 100;
+        const playerCollider = new PIXI.Rectangle(
+            player.x,
+            player.y,
+            player.width,
+            player.height
+        );
+
+        players[playerId] = {
+            sprite: player,
+            hitbox: playerCollider,
+        }
+
+        // add sprite to the stage
+        app.stage.addChild(player);
+
+    }
+
+    return players;
 
 }
+
+
+/**
+ * 
+ * @param {String} socketId the socket id to ignore
+ * @param {Object} players the players objects
+ * @param {Array} mapColliders the map colliders
+ */
+function updatePlayers(socketId, mapColliders, characterAnimations) {
+
+    for (const playerId of Object.keys(playerData)) {
+
+        // ignore shared space socket
+        if (playerId === socketId) continue;
+
+        // ignore not moving players
+        if (!playerData[playerId].isMoving) {
+
+            // idle animations
+            switch (playerData[playerId].facing) {
+                case "up":
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].idleU;
+                    break;
+                case "down":
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].idleD;
+                    break;
+                case "left":
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].idleL;
+                    break;
+                case "right":
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].idleR;
+                    break;
+            }
+            continue;
+        }
+
+        // save the hitbox position
+        const previousX = players[playerId].hitbox.x;
+        const previousY = players[playerId].hitbox.y;
+
+        // move the player
+        switch (playerData[playerId].facing) {
+
+            case "up":
+                players[playerId].hitbox.y -= PLAYER_SPEED;
+
+                if (!players[playerId].sprite.playing) {
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].walkU;
+                }
+                break;
+            case "down":
+                players[playerId].hitbox.y += PLAYER_SPEED;
+
+                if (!players[playerId].sprite.playing) {
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].walkD;
+                }
+                break;
+            case "left":
+                players[playerId].hitbox.x -= PLAYER_SPEED;
+
+                if (!players[playerId].sprite.playing) {
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].walkL;
+                }
+                break;
+            case "right":
+                players[playerId].hitbox.x += PLAYER_SPEED;
+
+                if (!players[playerId].sprite.playing) {
+                    players[playerId].sprite.textures = characterAnimations[playerData[playerId].character].walkR;
+                }
+                break;
+        }
+
+        // play the animation
+        if (!players[playerId].sprite.playing) {
+            players[playerId].sprite.play();
+        }
+
+        // cannot move so move to last position
+        for (const collider of mapColliders) {
+            if (collider.intersects(players[playerId].hitbox)) {
+                players[playerId].hitbox.x = previousX;
+                players[playerId].hitbox.y = previousY;
+                break;
+            }
+            players[playerId].sprite.x = players[playerId].hitbox.x;
+            players[playerId].sprite.y = players[playerId].hitbox.y;
+        }
+    }
+}
+
+

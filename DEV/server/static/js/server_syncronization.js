@@ -1,6 +1,13 @@
+/**
+ * How fast the game updates -> 60fps is 16.67
+ */
+const TICK_SPEED = 16.67;
 var socket = null;
 var isSharedSpace = false;
-var loaded_resources = false;
+var loadedResources = false;
+var mapColliders = null;
+var players = null;
+var characterAnimations = null;
 
 /**
  * the PIXI app
@@ -45,7 +52,12 @@ const characters = {
     mechanic: 3
 }
 
+//character image filename (in static/img folder)
+const characterImgs = ["derp.jpg", "eks_dee.jpg", "red.jpg", "brock.jpg"]
 
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}
 /**
  * Emits a ready event with the current ready state
  */
@@ -105,7 +117,6 @@ function lockInCharacter(element) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-
     var mainEl = document.querySelector("main");
 
     // connect to the socket
@@ -126,8 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // load the lobby menu
             mainEl.innerHTML = requestResource("lobby_menu", roomId, socket.id, isSharedSpace);
-            console.log(mainEl)
-            console.log(mainEl.innerHTML)
+
             const readyCountEl = document.querySelector("#readyCount");
             var playersReady = 0;
 
@@ -140,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // atualizar display
             readyCountEl.innerHTML = `${playersReady}/4`;
-
+            /*
             if (isSharedSpace === true) {
                 let readyNamesEl = document.getElementsByClassName("readyNames");
                 readyNamesEl = readyNamesEl[0];
@@ -180,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }
                 }
-            }
+            }*/
         }
 
         // colocar na fase de seleção de personagens
@@ -188,11 +198,30 @@ document.addEventListener("DOMContentLoaded", () => {
             gamePhase = "characterSelection";
 
             mainEl.innerHTML = requestResource("character_selection", roomId, socket.id, isSharedSpace);
+
+            if (isSharedSpace === false) {
+                const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
+                for (let i = 0; i < characterImgs.length; i++) {
+                    characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[i]})`;
+                    console.log(characterImagesEl[i].style.backgroundImage);
+                    characterImagesEl[i].style.backgroundRepeat = "no-repeat";
+                    characterImagesEl[i].style.backgroundSize = "cover";
+                }
+            }
+            else {
+                const charactersEl = Array.from(document.querySelectorAll(".characters > .character > .name-info > h2"));
+                let keys = Object.keys(playerData);
+                for (let i = 1; i < keys.length; i++) {
+                    console.log(charactersEl[i - 1].innerHTML)
+                    console.log(playerData[keys[i]].username)
+                    charactersEl[i - 1].innerHTML = playerData[keys[i]].username;
+                }
+            }
         }
 
         // on player movement or interactions
-        if (gamePhase === "playing" && loaded_resources) {
-            console.log(payload);
+        if (gamePhase === "playing" && loadedResources) {
+
         }
     });
 
@@ -218,6 +247,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 characterImagesEl[character].classList.remove("highlighted");
                 selectedCharacter = -1;
             }
+
+            if (isSharedSpace === true) {
+                const keys = Object.keys(playerData);
+                let i = keys.indexOf(playerId) - 1;
+                characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[character]})`;
+                characterImagesEl[i].style.backgroundRepeat = "no-repeat";
+                characterImagesEl[i].style.backgroundSize = "cover";
+                let str = getKeyByValue(characters, character);
+                str = str.charAt(0).toUpperCase() + str.slice(1);
+                let characterNameEl = characterImagesEl[i].parentElement.getElementsByTagName("h2")[0];
+                characterNameEl.innerHTML = str;
+                characterNameEl.classList.remove("character-name-hidden");
+
+            }
+
+            else {
+                if (playerId !== socket.id) {
+                    characterImagesEl[character].classList.add("greyed-out");
+                }
+            }
         }
 
         // change game state
@@ -233,12 +282,22 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
-
-                loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                mapColliders = await loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                
+                characterAnimations = await loadCharacterSpritesheets([
+                    "/sprites/characters/spritesheet_tech.json",
+                    "/sprites/characters/spritesheet_journalist.json",
+                    "/sprites/characters/spritesheet_detective.json",
+                    "/sprites/characters/spritesheet_mechanic.json"
+                ]);
+                players = await loadPlayers(app, playerData, socket.id, characterAnimations);
             }
 
             // set the state to be ready to play
-            loaded_resources = true;
+            loadedResources = true;
+
+            // update positions
+            setInterval(updatePlayers, TICK_SPEED, socket.id, mapColliders, characterAnimations);
         }
     });
 

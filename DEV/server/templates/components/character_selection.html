@@ -1,119 +1,154 @@
-<div class="character-selection">
+{% if is_shared_space == "false" %}
+    <div class="character-selection">
 
-    <h1>Select Your Character</h1>
+        <h1>Select Your Character</h1>
 
-    <div class="characters">
+        <div class="characters">
+            <div class="character" data-character="tech">
+                <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
+                <div class="name-info">
+                    <h2 class="character-name">Tech</h2>
+                    <button onclick="characterInfo(this)" class="material-symbols-outlined">info</button>
+                </div>
 
-        <div class="character" data-character="tech">
-            <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
-            <div class="name-info">
-                <h2 class="character-name">Tech</h2>
-                <button onclick="characterInfo(this)" class="material-symbols-outlined">info</button>
-            </div>
+                <div class="character-info pop-up hidden">
+                    <button onclick="closePopUp(this)" class="material-symbols-outlined close">close</button>
+                    <h1>Tech</h1>
 
-            <div class="character-info pop-up hidden">
-                <button onclick="closePopUp(this)" class="material-symbols-outlined close">close</button>
-                <h1>Tech</h1>
+                    <div class="content">
+                        <div class="character-image"></div>
 
-                <div class="content">
-                    <div class="character-image"></div>
-
-                    <div class="character-introduction">
-                        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-                            unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
-                            voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
-                            quasi.</p>
-                        <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
-                            sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
-                            temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        <div class="character-introduction">
+                            <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
+                                unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
+                                voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
+                                quasi.</p>
+                            <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
+                                sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
+                                temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="character" data-character="journalist">
-            <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
-            <div class="name-info">
-                <h2 class="character-name">Journalist</h2>
-                <button onclick="characterInfo(this)" class="material-symbols-outlined">info</button>
-            </div>
+            <div class="character" data-character="journalist">
+                <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
+                <div class="name-info">
+                    <h2 class="character-name">Journalist</h2>
+                    <button onclick="characterInfo(this)" class="material-symbols-outlined">info</button>
+                </div>
 
-            <div class="character-info pop-up hidden">
-                <button onclick="closePopUp(this)" class="material-symbols-outlined close">close</button>
-                <h1>Journalist</h1>
+                <div class="character-info pop-up hidden">
+                    <button onclick="closePopUp(this)" class="material-symbols-outlined close">close</button>
+                    <h1>Journalist</h1>
 
-                <div class="content">
-                    <div class="character-image"></div>
+                    <div class="content">
+                        <div class="character-image"></div>
 
-                    <div class="character-introduction">
-                        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-                            unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
-                            voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
-                            quasi.</p>
-                        <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
-                            sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
-                            temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        <div class="character-introduction">
+                            <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
+                                unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
+                                voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
+                                quasi.</p>
+                            <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
+                                sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
+                                temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="character" data-character="detective">
-            <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
-            <div class="name-info">
-                <h2 class="character-name">Detective</h2>
-                <button onclick="characterInfo(this)" class="material-symbols-outlined">info</button>
-            </div>
+            <div class="character" data-character="detective">
+                <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
+                <div class="name-info">
+                    <h2 class="character-name">Detective</h2>
+                    <button onclick="characterInfo(this)" class="material-symbols-outlined">info</button>
+                </div>
 
-            <div class="character-info pop-up hidden">
-                <button onclick="closePopUp(this)" class="material-symbols-outlined close">close</button>
-                <h1>Detective</h1>
+                <div class="character-info pop-up hidden">
+                    <button onclick="closePopUp(this)" class="material-symbols-outlined close">close</button>
+                    <h1>Detective</h1>
 
-                <div class="content">
-                    <div class="character-image"></div>
+                    <div class="content">
+                        <div class="character-image"></div>
 
-                    <div class="character-introduction">
-                        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-                            unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
-                            voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
-                            quasi.</p>
-                        <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
-                            sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
-                            temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        <div class="character-introduction">
+                            <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
+                                unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
+                                voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
+                                quasi.</p>
+                            <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
+                                sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
+                                temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="character" data-character="mechanic">
-            <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
-            <div class="name-info">
-                <h2 class="character-name">Mechanic</h2>
-                <button onclick="characterInfo(this)" class="material-symbols-outlined">info</button>
-            </div>
+            <div class="character" data-character="mechanic">
+                <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
+                <div class="name-info">
+                    <h2 class="character-name">Mechanic</h2>
+                    <button onclick="characterInfo(this)" class="material-symbols-outlined">info</button>
+                </div>
 
-            <div class="character-info pop-up hidden">
-                <button onclick="closePopUp(this)" class="material-symbols-outlined close">close</button>
-                <h1>Mechanic</h1>
+                <div class="character-info pop-up hidden">
+                    <button onclick="closePopUp(this)" class="material-symbols-outlined close">close</button>
+                    <h1>Mechanic</h1>
 
-                <div class="content">
-                    <div class="character-image"></div>
+                    <div class="content">
+                        <div class="character-image"></div>
 
-                    <div class="character-introduction">
-                        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-                            unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
-                            voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
-                            quasi.</p>
-                        <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
-                            sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
-                            temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        <div class="character-introduction">
+                            <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
+                                unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
+                                voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
+                                quasi.</p>
+                            <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
+                                sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
+                                temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
+
+        <button onclick="lockInCharacter(this)" class="lock-in">Lock In</button>
 
     </div>
-
-    <button onclick="lockInCharacter(this)" class="lock-in">Lock In</button>
-
-</div>
+{% else %}
+    <div class="character-selection">
+        <h1>Characters Selected:</h1>
+        <div class="characters">
+            <div class="character">
+                <h2 class="character-name-hidden"> Unselected </h2>
+                <div class="character-image" data-unavailable="false"></div>
+                <div class="name-info">
+                    <h2 class="character-name"></h2>
+                </div>
+            </div>
+            <div class="character">
+                <h2 class="character-name-hidden"> Unselected </h2>
+                <div class="character-image" data-unavailable="false"></div>
+                <div class="name-info">
+                    <h2 class="character-name"></h2>
+                </div>
+            </div>
+            <div class="character">
+                <h2 class="character-name-hidden"> Unselected </h2>
+                <div class="character-image" data-unavailable="false"></div>
+                <div class="name-info">
+                    <h2 class="character-name"></h2>
+                </div>
+            </div>
+            <div class="character">
+                <h2 class="character-name-hidden"> Unselected </h2>
+                <div class="character-image" data-unavailable="false"></div>
+                <div class="name-info">
+                    <h2 class="character-name"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
