@@ -432,7 +432,15 @@ function calcultateInteractions(socketId, interactables) {
                 playerData[playerId].isInteracting = playersInteract[playerId];
                 
                 // fire the event
-                socket.emit("setInteractPermission", { roomId: roomId, playerId: playerId, state: playersInteract[playerId] });
+                socket.emit(
+                    "setInteractPermission",
+                    {
+                        roomId: roomId,
+                        playerId: playerId,
+                        state: playersInteract[playerId], 
+                        arget: null
+                    }
+                );
             }
         }
         // set the prop as interatable

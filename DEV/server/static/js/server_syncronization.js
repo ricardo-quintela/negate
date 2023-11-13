@@ -5,9 +5,16 @@ const TICK_SPEED = 16.67;
 var socket = null;
 var isSharedSpace = false;
 var loadedResources = false;
+
+// map and players related
 var mapInfo = null;
 var players = null;
 var characterAnimations = null;
+
+// client related -> inventories
+var documentInventory = [];
+var itemInventory = [];
+var targetInteractable = null;
 
 /**
  * the PIXI app
@@ -150,47 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // atualizar display
             readyCountEl.innerHTML = `${playersReady}/4`;
-            /*
-            if (isSharedSpace === true) {
-                let readyNamesEl = document.getElementsByClassName("readyNames");
-                readyNamesEl = readyNamesEl[0];
-                let children = readyNamesEl.getElementsByTagName('div');
-
-                // if we're adding a row
-                if (playersReady > children.length) {
-                    for (const player in playerData) {
-                        if (!playerData[player].isReady) {
-                            continue;
-                        }
-                        let present = false;
-                        for (let i = 0; i < children.length; i++) {
-                            if (children[i].innerHTML === playerData[player].username) {
-                                present = true;
-                                break;
-                            }
-                        }
-                        if (!present) {
-                            let newDiv = document.createElement("div");
-                            newDiv.appendChild(document.createTextNode(playerData[player].username));
-                            readyNamesEl.appendChild(newDiv);
-                        }
-                    }
-                }
-                //removing
-                else if (playersReady < children.length) {
-                    let removed = false;
-                    for (let i = 0; i < children.length && !removed; i++) {
-                        let players = Object.values(playerData);
-                        for (let p in players) {
-                            let player = players[p]
-                            if (player.username === children[i].innerHTML && !player.isReady) {
-                                children[i].parentNode.removeChild(children[i]);
-                                removed = true;
-                            }
-                        }
-                    }
-                }
-            }*/
         }
 
         // colocar na fase de seleção de personagens
@@ -219,9 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // on player interactions
         if (gamePhase === "playing" && loadedResources) {
             
-            if (!isSharedSpace) {
-                console.log(`INTERACT: ${playerData[socket.id].isInteracting}`);
-            }
+            //TODO: REMOVE THIS IF NOT NEEDED
 
         }
     });
@@ -303,6 +267,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
     });
+
+
+    // handle item data event
+    socket.on("itemData", (payload) => {
+
+        if (socket.id in payload) {
+            playerData[socket.id].isInteracting = payload[socket.id].isInteracting;
+            targetInteractable = payload.target;
+        }
+
+    });
+
+
+
 
 });
 
