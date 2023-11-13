@@ -423,12 +423,29 @@ def event_set_interact_permission(json: JSONDictionary):
     app.logger.debug("Triggered event 'setInteractPermission'")
 
     # validates the dict
-    if not ValidateJson.validate_keys(json, "roomId", "playerId", "state"):
+    if not ValidateJson.validate_keys(json, "roomId", "playerId", "state", "target"):
         return
 
     room_id = json["roomId"]
     player_id = json["playerId"]
     state = json["state"]
+    target = json["target"]
+
+    # validate the target json data
+    if not ValidateJson.validate_keys(target, "type", "name"):
+        return
+
+    # validate target format
+    if target["type"] not in {"item", "document"}:
+        return
+
+    # validate the target content and format
+    if target["type"] == "item" and "img" not in target:
+        return
+
+    # validate the target content and format
+    if target["type"] == "document" and "content" not in target:
+        return
 
     if room_id not in room_data:
         return
@@ -439,9 +456,18 @@ def event_set_interact_permission(json: JSONDictionary):
     if data is None:
         return
 
+    player_data = room_data.get_players(room_id)
+
+    item_data = {
+        pl_id: {
+            "isInteracting": player_data[pl_id]["isInteracting"],
+            "target": target
+        } for pl_id in player_data
+    }
+
     # send player data to all players
-    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
-    app.logger.debug("Sent player data to all in room '%s'", room_id)
+    socket_server.emit("itemData", item_data, to=room_id)
+    app.logger.debug("Sent item data to all in room '%s'", room_id)
 
 
 
