@@ -423,12 +423,13 @@ def event_set_interact_permission(json: JSONDictionary):
     app.logger.debug("Triggered event 'setInteractPermission'")
 
     # validates the dict
-    if not ValidateJson.validate_keys(json, "roomId", "playerId", "state", "target"):
+    if not ValidateJson.validate_keys(json, "roomId", "playerId", "state", "interactableId", "target"):
         return
 
     room_id = json["roomId"]
     player_id = json["playerId"]
     state = json["state"]
+    interactable_id = json["interactableId"]
     target = json["target"]
 
     # vallidating the json payload on the target -> the target can be None
@@ -442,11 +443,11 @@ def event_set_interact_permission(json: JSONDictionary):
             return
 
         # validate the target content and format
-        if target["type"] == "item" and "img" not in target:
+        if target["type"] == "document" and "content" not in target:
             return
 
         # validate the target content and format
-        if target["type"] == "document" and "content" not in target:
+        if target["type"] == "item" and "content" not in target and "img" not in target:
             return
 
     if room_id not in room_data:
@@ -463,6 +464,7 @@ def event_set_interact_permission(json: JSONDictionary):
     item_data = {
         player_id: {
             "isInteracting": player_data[player_id]["isInteracting"],
+            "interactableId": interactable_id,
             "target": target
         }
     }
@@ -473,6 +475,31 @@ def event_set_interact_permission(json: JSONDictionary):
 
 
 
+
+@socket_server.on("interact")
+def event_interact(json: JSONDictionary):
+    """Interact
+
+    This event is fired whenever a player clicks on the interact button
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'interact'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "interactableId"):
+        return
+
+    room_id = json["roomId"]
+    interactable_id = json["interactableId"]
+
+    if room_id not in room_data:
+        return
+
+    # send player data to all players
+    socket_server.emit("playerInteraction", {"interactableId": interactable_id}, to=room_id)
+    app.logger.debug("Sent interaction data to all in room '%s'", room_id)
 
 
 

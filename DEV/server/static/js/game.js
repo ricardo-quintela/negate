@@ -436,10 +436,15 @@ function calcultateInteractions(socketId, interactables) {
     var playerInteractGroup = {};
 
     // iterate through all the interactables and check player interactability
+    var interactableId = 0;
     for (const interactable of interactables) {
 
         // skip if unavailable
-        if (!interactable.active) continue;
+        if (!interactable.active) {
+            interactable.highlight.visible = false;
+            interactableId++;
+            continue;
+        };
 
         // to save interactions of each player and prioritize the ones that are true
         var interactGroup = [];
@@ -476,6 +481,7 @@ function calcultateInteractions(socketId, interactables) {
                     roomId: roomId,
                     playerId: playerId,
                     state: playerInteractGroup[playerId],
+                    interactableId: interactableId,
                     target: target
                 });
             }
@@ -488,6 +494,8 @@ function calcultateInteractions(socketId, interactables) {
             totalInteractions = totalInteractions || inter;
         }
         interactable.highlight.visible = totalInteractions;
+
+        interactableId++;
 
     }
 }
