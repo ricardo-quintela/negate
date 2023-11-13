@@ -211,6 +211,7 @@ def test_websocket_event_set_interact_permission_document(socket: SocketIOTestCl
         "roomId": "AAAAA",
         "playerId": player_id,
         "state": True,
+        "interactableId": 1,
         "target": {
             "type": "document",
             "name": "test document",
@@ -224,6 +225,7 @@ def test_websocket_event_set_interact_permission_document(socket: SocketIOTestCl
         and \
         list(events[0]["args"][0].values())[0] == {
             "isInteracting": True,
+            "interactableId": 1,
             "target": {
                 "type": "document",
                 "name": "test document",
@@ -247,10 +249,12 @@ def test_websocket_event_set_interact_permission_item(socket: SocketIOTestClient
         "roomId": "AAAAA",
         "playerId": player_id,
         "state": True,
+        "interactableId": 1,
         "target": {
             "type": "item",
             "name": "test item",
-            "img": "test img url"
+            "content": "test content",
+            "img": "test img url",
         }
     })
 
@@ -260,10 +264,12 @@ def test_websocket_event_set_interact_permission_item(socket: SocketIOTestClient
         and \
         list(events[0]["args"][0].values())[0] == {
             "isInteracting": True,
+            "interactableId": 1,
             "target": {
                 "type": "item",
                 "name": "test item",
-                "img": "test img url"
+                "content": "test content",
+                "img": "test img url",
             }
         }
     
@@ -283,6 +289,7 @@ def test_websocket_event_set_interact_permission_empty(socket: SocketIOTestClien
         "roomId": "AAAAA",
         "playerId": player_id,
         "state": False,
+        "interactableId": 1,
         "target": None
     })
 
@@ -292,5 +299,32 @@ def test_websocket_event_set_interact_permission_empty(socket: SocketIOTestClien
         and \
         list(events[0]["args"][0].values())[0] == {
             "isInteracting": False,
+            "interactableId": 1,
             "target": None
+        }
+    
+
+def test_websocket_event_interact(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerInteraction event to
+    everyone connected after interact event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient7"
+    })
+
+    socket.get_received()    
+
+    socket.emit("interact", {
+        "roomId": "AAAAA",
+        "interactableId": 1
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "playerInteraction" \
+        and \
+        events[0]["args"][0] == {
+            "interactableId": 1
         }
