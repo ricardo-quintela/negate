@@ -16,6 +16,7 @@ var mapInteractables = null;
 var documentInventory = [];
 var itemInventory = [];
 var targetInteractable = null;
+var targetInteractableId = -1;
 
 /**
  * the PIXI app
@@ -117,6 +118,23 @@ function lockInCharacter(element) {
 
     isLockedIn = true;
     element.disabled = true;
+}
+
+
+/**
+ * Fires an interact event whenever the player clicks on the button
+ */
+function interact() {
+
+    if (targetInteractable === null) return;
+
+    itemInventory.push(targetInteractable);
+    
+    socket.emit("interact", { roomId: roomId, interactableId: targetInteractableId });
+    
+    targetInteractable = null;
+    targetInteractableId = -1;
+
 }
 
 
@@ -276,11 +294,24 @@ document.addEventListener("DOMContentLoaded", () => {
         if (socket.id in payload) {
             playerData[socket.id].isInteracting = payload[socket.id].isInteracting;
             targetInteractable = payload[socket.id].target;
+            targetInteractableId = payload[socket.id].interactableId;
 
-            console.log("GOT A NEW TARGET:", targetInteractable);
+            const interactButton = document.querySelector(".interact-button");
+            interactButton.disabled = !payload[socket.id].isInteracting;
         }
 
     });
+
+
+    // handle player interaction data event
+    socket.on("playerInteraction", (payload) => {
+
+        if (!isSharedSpace) return;
+
+        mapInfo.interactables[payload.interactableId].active = false;
+    });
+
+
 
 });
 
