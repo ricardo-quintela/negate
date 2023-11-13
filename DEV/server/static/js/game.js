@@ -33,7 +33,6 @@ function closeInventory() {
  */
 function initializeApp(mainEl, roomId, playerId, isSharedSpace) {
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-    console.log("entrar no initialize");
 
     app = new PIXI.Application(
         {
@@ -47,7 +46,6 @@ function initializeApp(mainEl, roomId, playerId, isSharedSpace) {
         document.body.innerHTML += requestResource("canvas_overlay", roomId, playerId, isSharedSpace);
     }
     document.body.appendChild(app.view);
-    console.log("sair do initialize");
     return app;
 }
 

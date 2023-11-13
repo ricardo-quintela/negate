@@ -184,6 +184,8 @@ h1 {
     border: 2px solid var(--outlines);
     border-radius: 20px;
     cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .name-info {
@@ -326,6 +328,18 @@ h1 {
     border-radius: 0.4rem;
 }
 
+.interact-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: scale(3) translate(-50%, -100%);
+    cursor: pointer;
+    background-color: var(--button);
+    color: var(--light-text);
+    border-radius: 0.4rem;
+}
+
+
 .close-inventory {
     font-weight: bold;
     font-size: 24px;
@@ -364,6 +378,8 @@ h1 {
     border-radius: 20px;
 }
 .grid-item {
+    background-repeat: no-repeat;
+    background-size: cover;
     border-style: solid;
     border-color: var(--light-outlines);
     color: var(--light-text);
@@ -393,6 +409,7 @@ h1 {
 }
 
 .item-desc-title {
+    text-align: center;
     color: var(--light-text);
 }
 
