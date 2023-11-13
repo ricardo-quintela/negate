@@ -186,13 +186,13 @@ class RoomData:
 
 
     def set_moving_state(self, room_id: str, player_id: str, state: bool, facing: str) -> RoomInfo:
-        """Moves the player on the given room by a given movement vector
+        """Sets the player state as moving or standing still
 
         Args:
             room_id (str): the room id
             player_id (str): the player's id
             state (bool): weather the player is moving or not
-            key (str): the direction the player is facing
+            facing (str): the direction the player is facing
 
         Returns:
             RoomInfo: the room info object
@@ -209,13 +209,37 @@ class RoomData:
         return self._rooms[room_id]
 
 
+    def set_interaction_state(self, room_id: str, player_id: str, state: bool) -> RoomInfo:
+        """Sets the player interaction state
+
+        Args:
+            room_id (str): the room id
+            player_id (str): the player's id
+            state (bool): weather the player is moving or not
+
+        Returns:
+            RoomInfo: the room info object
+        """
+        if room_id not in self._rooms:
+            return None
+
+        if player_id not in self._rooms[room_id]["players"]:
+            return None
+
+        self._rooms[room_id]["players"][player_id]["isInteracting"] = state
+
+        return self._rooms[room_id]
+
+
+
     def move_player(self, room_id: str, player_id: str, movement_vector: Union[List[int], Tuple[int]]) -> RoomInfo:
         """Moves the player on the given room by a given movement vector
 
         Args:
             room_id (str): the room id
             player_id (str): the player's id
-            movement_vector (Union[List[int], Tuple[int]]): the vector on which the movement is going to be calculated
+            movement_vector (Union[List[int], Tuple[int]]): the vector on which the
+            movement is going to be calculated
 
         Returns:
             RoomInfo: the room info object

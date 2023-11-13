@@ -410,6 +410,44 @@ def event_move_player(json: JSONDictionary):
 
 
 
+@socket_server.on("setInteractPermission")
+def event_set_interact_permission(json: JSONDictionary):
+    """SetInteractPermission
+
+    This event is issued whenever a player is near an interactable
+    or whenerer they leave the interactable area
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'setInteractPermission'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "playerId", "state"):
+        return
+
+    room_id = json["roomId"]
+    player_id = json["playerId"]
+    state = json["state"]
+
+    if room_id not in room_data:
+        return
+
+    data = room_data.set_interaction_state(room_id, player_id, state)
+
+    # room doesn't exist
+    if data is None:
+        return
+
+    # send player data to all players
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
+    app.logger.debug("Sent player data to all in room '%s'", room_id)
+
+
+
+
+
+
 #*==================================================================
 #*                      TESTING ENDPOINTS
 #*==================================================================
