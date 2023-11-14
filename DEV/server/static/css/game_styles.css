@@ -131,7 +131,7 @@ h1 {
 /* *MEDIA QUERIES* */
 @media screen and (max-height: 480px) {
     .ready_menu {
-        gap: 1rem;
+        gap: 0;
     }
 
     .title {
@@ -407,6 +407,11 @@ h1 {
 @media screen and (max-height: 480px){
     h1 {
         font-size: 1.5rem;
+        margin: 0.5rem;
+    }
+
+    h2 {
+        margin: 0.5rem;
     }
     .close {
         transform: translate(-75%, 75%);
