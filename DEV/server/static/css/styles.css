@@ -17,6 +17,7 @@ main {
 }
 
 .title {
+    text-align: center;
     font-family: 'Modak', sans-serif;
     font-size: 80px;
     color: white;
@@ -162,4 +163,26 @@ main {
     .join-room-title {
         font-size: 16px !important;
     }
+}
+
+
+/* *MEDIA QUERIES* */
+@media screen and (max-width: 480px) {
+    .title {
+        font-size: 3rem !important;
+    }
+
+    .mainMenu {
+        width: 90%;
+    }
+
+    .inputField {
+        width: calc(100% - 3rem);
+    }
+
+    .create-join {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
 }
