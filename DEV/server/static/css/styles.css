@@ -185,4 +185,14 @@ main {
         gap: 1rem;
     }
 
+    .join-popup {
+        width: 90%;
+    }
+
+    .roomIdInput {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
 }

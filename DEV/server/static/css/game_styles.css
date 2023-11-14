@@ -186,6 +186,13 @@ h1 {
     cursor: pointer;
     background-repeat: no-repeat;
     background-size: cover;
+    image-rendering: pixelated;
+}
+
+.character-image > img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    image-rendering: pixelated;
 }
 
 .name-info {
@@ -323,6 +330,7 @@ h1 {
 }
 
 .inventory-button {
+    user-select: none;
     position: absolute;
     top: 0;
     right: 0;
@@ -334,6 +342,7 @@ h1 {
 }
 
 .interact-button {
+    user-select: none;
     position: absolute;
     bottom: 0;
     right: 0;
@@ -342,10 +351,13 @@ h1 {
     background-color: var(--button);
     color: var(--light-text);
     border-radius: 0.4rem;
+    outline: none;
+    border: none;
+    padding: 0;
 }
 
 .interact-button:disabled {
-    color: var(--disabled);
+    background-color: var(--disabled);
 }
 
 .char-symbol {
@@ -471,6 +483,7 @@ h1 {
 
     .character > .character-image {
         width: 100px;
+        image-rendering: pixelated;
     }
 
     .character-info > h1 {

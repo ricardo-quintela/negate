@@ -62,7 +62,7 @@ const characters = {
 }
 
 //character image filename (in static/img folder)
-const characterImgs = ["derp.jpg", "eks_dee.jpg", "red.jpg", "brock.jpg"]
+const characterImgs = ["tech.png", "journalist.png", "detective.png", "mechanic.png"]
 
 function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value);
