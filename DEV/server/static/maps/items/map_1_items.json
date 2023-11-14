@@ -1,0 +1,10 @@
+{
+    "targets": [
+        {
+            "type": "item",
+            "name": "Bolo",
+            "content": "Um bolo delicioso",
+            "img": "/maps/items/img/cake.png"
+        }
+    ]
+}
