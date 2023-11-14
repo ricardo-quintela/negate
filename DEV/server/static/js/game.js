@@ -23,6 +23,18 @@ function closeInventory() {
     inventoryEl.classList.add("hidden");
 }
 
+function openDocuments() {
+    let document1 = document.getElementsByClassName("document")[0];
+    document1.classList.remove("hidden");
+}
+
+
+function closeDocuments() {
+    let document1 = document.getElementsByClassName("document")[0];
+    document1.classList.add("hidden");
+}
+
+
 /**
  *
  * @param {Element} mainEl the main element on the html body
