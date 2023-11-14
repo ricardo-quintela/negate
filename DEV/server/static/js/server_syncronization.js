@@ -308,11 +308,12 @@ document.addEventListener("DOMContentLoaded", () => {
         // ignore if not the correct player
         if (socket.id !== payload.playerId) return;
 
-        // add the item to the inventory
-        itemInventory.push(targetInteractable);
+
+        if(targetInteractable.type == "item"){
+            // add the item to the inventory
+            itemInventory.push(targetInteractable);
         
-        // get the inventory slot elements
-        if (targetInteractable.type === "item") {
+            // get the inventory slot elements
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
             const itemDescriptionEl = document.querySelector(".item-description");
             const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
@@ -321,6 +322,14 @@ document.addEventListener("DOMContentLoaded", () => {
             inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = `url(${targetInteractable.img})`;
             itemTitleEl.innerHTML = targetInteractable.name;
             itemTextEl.innerHTML = targetInteractable.content;
+        }
+        else if(targetInteractable.type == "document"){
+            documentInventory.push(targetInteractable);
+
+            const documentSlotsE1 = Array.from(document.querySelector(".document-content > .document-list > .document-item"));
+            const documentDescriptionE1 = document.querySelector(".document-description");
+            const documentTitleE1 = documentDescriptionE1.querySelector(".document-desc-title");
+            const documentTextE1 = documentDescriptionE1.querySelector(".document-desc-text");
         }
         
         targetInteractable = null;
