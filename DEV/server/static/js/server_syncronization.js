@@ -1,6 +1,22 @@
+/**
+ * How fast the game updates -> 60fps is 16.67
+ */
+const TICK_SPEED = 16.67;
 var socket = null;
 var isSharedSpace = false;
-var loaded_resources = false;
+var loadedResources = false;
+
+// map and players related
+var mapInfo = null;
+var players = null;
+var characterAnimations = null;
+var mapInteractables = null;
+
+// client related -> inventories
+var documentInventory = [];
+var itemInventory = [];
+var targetInteractable = null;
+var targetInteractableId = -1;
 
 /**
  * the PIXI app
@@ -45,7 +61,12 @@ const characters = {
     mechanic: 3
 }
 
+//character image filename (in static/img folder)
+const characterImgs = ["tech.png", "journalist.png", "detective.png", "mechanic.png"]
 
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+}
 /**
  * Emits a ready event with the current ready state
  */
@@ -94,9 +115,21 @@ function lockInCharacter(element) {
 
     socket.emit("lockIn", { roomId: roomId, character: selectedCharacter });
 
-    
+
     isLockedIn = true;
     element.disabled = true;
+}
+
+
+/**
+ * Fires an interact event whenever the player clicks on the button
+ */
+function interact() {
+
+    if (targetInteractable === null) return;
+    
+    socket.emit("interact", { roomId: roomId, interactableId: targetInteractableId });
+
 }
 
 
@@ -105,7 +138,6 @@ function lockInCharacter(element) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-
     var mainEl = document.querySelector("main");
 
     // connect to the socket
@@ -146,11 +178,29 @@ document.addEventListener("DOMContentLoaded", () => {
             gamePhase = "characterSelection";
 
             mainEl.innerHTML = requestResource("character_selection", roomId, socket.id, isSharedSpace);
+
+            if (isSharedSpace === false) {
+                const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
+                for (let i = 0; i < characterImgs.length; i++) {
+                    characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[i]})`;
+                    characterImagesEl[i].style.backgroundRepeat = "no-repeat";
+                    characterImagesEl[i].style.backgroundSize = "cover";
+                }
+            }
+            else {
+                const charactersEl = Array.from(document.querySelectorAll(".characters > .character > .name-info > h2"));
+                let keys = Object.keys(playerData);
+                for (let i = 1; i < keys.length; i++) {
+                    charactersEl[i - 1].innerHTML = playerData[keys[i]].username;
+                }
+            }
         }
 
-        // on player movement or interactions
-        if (gamePhase === "playing" && loaded_resources) {
-            console.log(payload);
+        // on player interactions
+        if (gamePhase === "playing" && loadedResources) {
+            
+            //TODO: REMOVE THIS IF NOT NEEDED
+
         }
     });
 
@@ -176,6 +226,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 characterImagesEl[character].classList.remove("highlighted");
                 selectedCharacter = -1;
             }
+
+            if (isSharedSpace === true) {
+                const keys = Object.keys(playerData);
+                let i = keys.indexOf(playerId) - 1;
+                characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[character]})`;
+                let str = getKeyByValue(characters, character);
+                str = str.charAt(0).toUpperCase() + str.slice(1);
+                let characterNameEl = characterImagesEl[i].parentElement.getElementsByTagName("h2")[0];
+                characterNameEl.innerHTML = str;
+                characterNameEl.classList.remove("character-name-hidden");
+
+            }
+
+            else {
+                if (playerId !== socket.id) {
+                    characterImagesEl[character].classList.add("greyed-out");
+                }
+            }
         }
 
         // change game state
@@ -183,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
             gamePhase = "playing";
 
             // load the app
-            app = initializeApp(mainEl);
+            app = initializeApp(mainEl, roomId, playerId, isSharedSpace);
 
             // load the controller for the cell phone users
             if (!isSharedSpace) {
@@ -191,14 +259,77 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
+                mapInfo = await loadMap(app, "map_1", roomsSpriteSheet, objectsSpriteSheet);
+                
+                characterAnimations = await loadCharacterSpritesheets([
+                    "/sprites/characters/spritesheet_tech.json",
+                    "/sprites/characters/spritesheet_journalist.json",
+                    "/sprites/characters/spritesheet_detective.json",
+                    "/sprites/characters/spritesheet_mechanic.json"
+                ]);
+                players = await loadPlayers(app, playerData, socket.id, characterAnimations);
 
-                loadMap(app, "map1", "/maps/map_1.json", roomsSpriteSheet, objectsSpriteSheet);
+                // update positions
+                setInterval(updatePlayers, TICK_SPEED, socket.id, mapInfo.colliders, characterAnimations);
+                setInterval(calcultateInteractions, TICK_SPEED, socket.id, mapInfo.interactables);
             }
 
             // set the state to be ready to play
-            loaded_resources = true;
+            loadedResources = true;
+
         }
     });
+
+
+    // handle item data event
+    socket.on("itemData", (payload) => {
+
+        if (socket.id in payload) {
+            playerData[socket.id].isInteracting = payload[socket.id].isInteracting;
+            targetInteractable = payload[socket.id].target;
+            targetInteractableId = payload[socket.id].interactableId;
+
+            const interactButton = document.querySelector(".interact-button");
+            interactButton.disabled = !payload[socket.id].isInteracting;
+        }
+
+    });
+
+
+    // handle player interaction data event
+    socket.on("playerInteraction", (payload) => {
+
+        // deactivate interactable
+        if (isSharedSpace) {
+            mapInfo.interactables[payload.interactableId].active = false;
+            return;
+        }
+
+        // ignore if not the correct player
+        if (socket.id !== payload.playerId) return;
+
+        // add the item to the inventory
+        itemInventory.push(targetInteractable);
+        
+        // get the inventory slot elements
+        if (targetInteractable.type === "item") {
+            const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
+            const itemDescriptionEl = document.querySelector(".item-description");
+            const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+            const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+            inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = `url(${targetInteractable.img})`;
+            itemTitleEl.innerHTML = targetInteractable.name;
+            itemTextEl.innerHTML = targetInteractable.content;
+        }
+        
+        targetInteractable = null;
+        targetInteractableId = -1;
+
+
+    });
+
+
 
 });
 

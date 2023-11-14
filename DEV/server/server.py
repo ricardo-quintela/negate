@@ -149,7 +149,6 @@ def game(room_id: str):
 
     return render_template("game.html", room_id=room_id, username=username)
 
-
 @app.route("/resource", methods=["GET"])
 def load_resource():
     """Renders a component template
@@ -186,7 +185,7 @@ def load_resource():
     # isSharedSpace not in params
     if "isSharedSpace" not in args:
         abort(400)
-    is_shared_space = args["isSharedSpace"]
+    is_shared_space = True if args["isSharedSpace"] == "true" else False
 
     player_data = room_data.get_players(room_id)
 
@@ -405,9 +404,110 @@ def event_move_player(json: JSONDictionary):
 
 
     # send player data to all players
-    socket_server.emit("playerData", data, to=room_id)
+    socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
     app.logger.debug("Sent player data to all in room '%s'", room_id)
 
+
+
+
+@socket_server.on("setInteractPermission")
+def event_set_interact_permission(json: JSONDictionary):
+    """SetInteractPermission
+
+    This event is issued whenever a player is near an interactable
+    or whenerer they leave the interactable area
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'setInteractPermission'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "playerId", "state", "interactableId", "target"):
+        return
+
+    room_id = json["roomId"]
+    player_id = json["playerId"]
+    state = json["state"]
+    interactable_id = json["interactableId"]
+    target = json["target"]
+
+    # vallidating the json payload on the target -> the target can be None
+    if target is not None:
+        # validate the target json data
+        if not ValidateJson.validate_keys(target, "type", "name"):
+            return
+
+        # validate target format
+        if target["type"] not in {"item", "document"}:
+            return
+
+        # validate the target content and format
+        if target["type"] == "document" and "content" not in target:
+            return
+
+        # validate the target content and format
+        if target["type"] == "item" and "content" not in target and "img" not in target:
+            return
+
+    if room_id not in room_data:
+        return
+
+    data = room_data.set_interaction_state(room_id, player_id, state)
+
+    # room doesn't exist
+    if data is None:
+        return
+
+    player_data = room_data.get_players(room_id)
+
+    item_data = {
+        player_id: {
+            "isInteracting": player_data[player_id]["isInteracting"],
+            "interactableId": interactable_id,
+            "target": target
+        }
+    }
+
+    # send player data to all players
+    socket_server.emit("itemData", item_data, to=room_id)
+    app.logger.debug("Sent item data to all in room '%s'", room_id)
+
+
+
+
+@socket_server.on("interact")
+def event_interact(json: JSONDictionary):
+    """Interact
+
+    This event is fired whenever a player clicks on the interact button
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+    app.logger.debug("Triggered event 'interact'")
+
+    # validates the dict
+    if not ValidateJson.validate_keys(json, "roomId", "interactableId"):
+        return
+
+    room_id = json["roomId"]
+    interactable_id = json["interactableId"]
+    socket_id = request.sid
+
+    if room_id not in room_data:
+        return
+
+    # send player data to all players
+    socket_server.emit(
+        "playerInteraction",
+        {
+            "playerId": socket_id,
+            "interactableId": interactable_id
+        },
+        to=room_id
+    )
+    app.logger.debug("Sent interaction data to all in room '%s'", room_id)
 
 
 

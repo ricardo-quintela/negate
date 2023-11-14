@@ -1,9 +1,9 @@
+{% if not is_shared_space %}
 <div class="character-selection">
 
     <h1>Select Your Character</h1>
 
     <div class="characters">
-
         <div class="character" data-character="tech">
             <div class="character-image" onclick="selectCharacter(this)" data-unavailable="false"></div>
             <div class="name-info">
@@ -16,16 +16,17 @@
                 <h1>Tech</h1>
 
                 <div class="content">
-                    <div class="character-image"></div>
+                    <div class="character-image">
+                        <img src="/img/tech.png" alt="">
+                    </div>
 
                     <div class="character-introduction">
-                        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-                            unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
-                            voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
-                            quasi.</p>
-                        <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
-                            sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
-                            temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        <p class="description">You're the group's techie, extremely profficient with handling
+                            software of all kinds. You were assigned to this group because of these skills,
+                            allowing you to access information that others might not be able to, break digital
+                            locks, and many other abilities in the digital realm.</p>
+                        <p class="skills"> <span class="material-symbols-outlined char-symbol">devices</span>
+                            Data Dynamo</p>
                     </div>
                 </div>
             </div>
@@ -43,16 +44,16 @@
                 <h1>Journalist</h1>
 
                 <div class="content">
-                    <div class="character-image"></div>
+                    <div class="character-image">
+                        <img src="/img/journalist.png" alt="">
+                    </div>
 
                     <div class="character-introduction">
-                        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-                            unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
-                            voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
-                            quasi.</p>
-                        <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
-                            sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
-                            temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        <p class="description">You're here because you were sent to document this investigation,
+                            however you are still useful to it. Due to your background you have read up on a lot
+                            of information regarding cases like this, and you are to recognise patterns ot trace
+                            back information to similar cases you have read in the past.</p>
+                        <p class="skills"> <span class="material-symbols-outlined char-symbol">menu_book</span> Fact Falcon</p>
                     </div>
                 </div>
             </div>
@@ -70,16 +71,16 @@
                 <h1>Detective</h1>
 
                 <div class="content">
-                    <div class="character-image"></div>
+                    <div class="character-image">
+                        <img src="/img/detective.png" alt="">
+                    </div>
 
                     <div class="character-introduction">
-                        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-                            unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
-                            voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
-                            quasi.</p>
-                        <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
-                            sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
-                            temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        <p class="description">You have a lot of training on where to find clues, and have the
+                            techniques to get them if need. You were trained to pick locks, collect
+                            fingerprints, and other forms of tracking. You are the jack of all trades of the
+                            group.</p>
+                        <p class="skills"> <span class="material-symbols-outlined char-symbol">mystery</span> Cipher Sage</p>
                     </div>
                 </div>
             </div>
@@ -97,16 +98,16 @@
                 <h1>Mechanic</h1>
 
                 <div class="content">
-                    <div class="character-image"></div>
+                    <div class="character-image">
+                        <img src="/img/mechanic.png" alt="">
+                    </div>
 
                     <div class="character-introduction">
-                        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-                            unde provident, iusto magni, consequuntur rerum illo minima sequi expedita
-                            voluptatibus ex. Repellat dolorem voluptate nostrum quam sapiente, sint voluptas
-                            quasi.</p>
-                        <p class="skills">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate,
-                            sed dolores quos sint tempora neque ullam ex rerum corporis nemo culpa, placeat
-                            temporibus labore totam. Atque aliquam a voluptatibus quos?</p>
+                        <p class="description">You serve the purpose of tackling everything hardware related in
+                            this operation, since that's what you would be doing outside of it anyway. You have
+                            a great knowledge about engineering, allowing you to repair any machine you might
+                            find, or dismantle them if the need for such arises.</p>
+                        <p class="skills"> <span class="material-symbols-outlined char-symbol">plumbing</span> Metal Maestro</p>
                     </div>
                 </div>
             </div>
@@ -117,3 +118,38 @@
     <button onclick="lockInCharacter(this)" class="lock-in">Lock In</button>
 
 </div>
+{% else %}
+<div class="character-selection">
+    <h1>Characters Selected:</h1>
+    <div class="characters">
+        <div class="character">
+            <h2 class="character-name-hidden"> Unselected </h2>
+            <div class="character-image" data-unavailable="false"></div>
+            <div class="name-info">
+                <h2 class="character-name"></h2>
+            </div>
+        </div>
+        <div class="character">
+            <h2 class="character-name-hidden"> Unselected </h2>
+            <div class="character-image" data-unavailable="false"></div>
+            <div class="name-info">
+                <h2 class="character-name"></h2>
+            </div>
+        </div>
+        <div class="character">
+            <h2 class="character-name-hidden"> Unselected </h2>
+            <div class="character-image" data-unavailable="false"></div>
+            <div class="name-info">
+                <h2 class="character-name"></h2>
+            </div>
+        </div>
+        <div class="character">
+            <h2 class="character-name-hidden"> Unselected </h2>
+            <div class="character-image" data-unavailable="false"></div>
+            <div class="name-info">
+                <h2 class="character-name"></h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

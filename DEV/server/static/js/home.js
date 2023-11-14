@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.replace(`/create-room?username=${username}`);
         
     });
-    
+
     // behaviour of the join room form
     joinRoomFormEl.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -43,3 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+function closePopup() {
+    let popup = document.getElementById("close-join-popup").parentElement;
+    popup.classList.remove("join-popup-visible");
+}
+
+function openPopup() {
+    const usernameInputEl = document.querySelector("#usernameInput");
+
+    if (usernameInputEl.value === "") {
+        return;
+    }
+    let popup = document.getElementById("join-popup");
+    popup.classList.add("join-popup-visible");
+}
