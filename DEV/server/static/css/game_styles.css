@@ -288,6 +288,11 @@ h1 {
     left: -1rem;
 }
 
+.character-info > .content > .character-introduction > .skills {
+    font-size: 2em;
+    font-weight: 600;
+}
+
 .greyed-out {
     background-color: rgba(128, 128, 128, 0.9);
     background-blend-mode: luminosity;
@@ -337,6 +342,15 @@ h1 {
     background-color: var(--button);
     color: var(--light-text);
     border-radius: 0.4rem;
+}
+
+.interact-button:disabled {
+    color: var(--disabled);
+}
+
+.char-symbol {
+    transform: scale(2);
+    padding-right: 1rem;
 }
 
 
@@ -470,6 +484,7 @@ h1 {
         width: calc(100% + 0.5rem);
         left: -0.25rem;
     }
+
 
     .inventory {
         gap: 1.5rem;
