@@ -15,6 +15,7 @@ var mapInteractables = null;
 // client related -> inventories
 var documentInventory = [];
 var itemInventory = [];
+var selectedItem = 0;
 var targetInteractable = null;
 var targetInteractableId = -1;
 
@@ -92,7 +93,8 @@ function openTradeMenu() {
         j++;
     }
 
-    document.getElementsByClassName("submenu-title")[0].innerHTML = "Choose who to send *item* to."; //TODO: METER O NOME DO ITEM AQUI
+    const item = itemInventory[selectedItem];
+    document.getElementsByClassName("submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
     document.getElementsByClassName("side-by-side-inventory")[0].classList.add("hidden");
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.remove("hidden");
@@ -352,6 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
             const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
 
+            // set the item slot properties
             inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = `url(${targetInteractable.img})`;
             itemTitleEl.innerHTML = targetInteractable.name;
             itemTextEl.innerHTML = targetInteractable.content;
@@ -359,14 +362,21 @@ document.addEventListener("DOMContentLoaded", () => {
         else if(targetInteractable.type == "document"){
             documentInventory.push(targetInteractable);
 
-            const documentSlotsE1 = Array.from(document.querySelector(".document-content > .document-list > .document-item"));
-            const documentDescriptionE1 = document.querySelector(".document-description");
-            const documentTitleE1 = documentDescriptionE1.querySelector(".document-desc-title");
-            const documentTextE1 = documentDescriptionE1.querySelector(".document-desc-text");
+            // get the document slot elements
+            const documentSlotsEl = Array.from(document.querySelectorAll(".document-content > .document-list > .document-item"));
+            const documentDescriptionEl = document.querySelector(".document-description");
+            const documentTitleEl = documentDescriptionEl.querySelector(".document-desc-title");
+            const documentTextEl = documentDescriptionEl.querySelector(".document-desc-text");
+
+            // set the document
+            documentSlotsEl[documentInventory.length - 1].innerHTML = targetInteractable.name;
+            documentTitleEl.innerHTML = targetInteractable.name;
+            documentTextEl.innerHTML = targetInteractable.content;
         }
         
         targetInteractable = null;
         targetInteractableId = -1;
+        selectedItem = itemInventory.length - 1;
 
 
     });

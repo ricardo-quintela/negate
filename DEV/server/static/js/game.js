@@ -185,7 +185,7 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
     var i = 0;
     var j = 0;
     for (const spriteIndex of roomLayer) {
-        const texture = PIXI.Texture.from(Object.keys(roomsSpritesheet.textures)[spriteIndex - 1]);
+        const texture = PIXI.Texture.from(Object.keys(roomsSpritesheet.textures)[spriteIndex - map.tilesets[0].firstgid]);
         const sprite = new PIXI.Sprite(texture);
         sprite.position.set(i * sprite.width, j * sprite.height);
         app.stage.addChild(sprite);
@@ -201,7 +201,7 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
     // load the objects
     const objects = map.layers[1].objects;
     for (const object of objects) {
-        const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[object.gid - 257]);
+        const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[object.gid - map.tilesets[1].firstgid]);
         const sprite = new PIXI.Sprite(texture);
         sprite.position.set(object.x, object.y - sprite.height);
         app.stage.addChild(sprite);
@@ -211,7 +211,7 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
     // load the props
     const props = map.layers[2].objects;
     for (const prop of props) {
-        const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[prop.gid - 257]);
+        const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[prop.gid - map.tilesets[1].firstgid]);
         const sprite = new PIXI.Sprite(texture);
 
         // create the highlighted sprite
