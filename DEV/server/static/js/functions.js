@@ -27,5 +27,4 @@ function calculateDistance(player, interactable) {
     const intPos = [interactable.x, interactable.y];
     
     return Math.sqrt(Math.pow(playerPos[0] - intPos[0], 2) + Math.pow(playerPos[1] - intPos[1], 2));
-
 }
