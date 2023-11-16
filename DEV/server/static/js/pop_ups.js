@@ -24,9 +24,9 @@ function characterInfo(element) {
  * Opens the inventory pop-up and closes the documents menu
  */
 function openInventory() {
-    const inventoryEl = document.querySelector(".inventory")[0];
+    const inventoryEl = document.querySelector(".inventory");
     inventoryEl.classList.remove("hidden");
-    const documentInventoryEl = document.querySelector(".document")[0];
+    const documentInventoryEl = document.querySelector(".document");
     documentInventoryEl.classList.add("hidden");
 }
 
@@ -40,12 +40,12 @@ function closeInventory() {
     let tradeMenuEl = document.querySelector("#tradeMenu");
     if (!tradeMenuEl.classList.contains("hidden")) tradeMenuEl.classList.add("hidden");
 
-    let sideBySideEl = document.querySelector(".side-by-side-inventory")[0];
+    let sideBySideEl = document.querySelector(".side-by-side-inventory");
     if (sideBySideEl.classList.contains("hidden")) sideBySideEl.classList.remove("hidden");
 
-    document.querySelector(".submenu-title")[0].innerHTML = "Inventory";
+    document.querySelector(".submenu-title").innerHTML = "Inventory";
 
-    let inventoryEl = document.querySelector(".inventory")[0];
+    let inventoryEl = document.querySelector(".inventory");
     inventoryEl.classList.add("hidden");
 }
 
@@ -53,10 +53,10 @@ function closeInventory() {
  * Opens document inventory and closes item inventory
  */
 function openDocuments() {
-    const documentInventoryEl = document.querySelector(".document")[0];
+    const documentInventoryEl = document.querySelector(".document");
     documentInventoryEl.classList.remove("hidden");
 
-    const inventoryEl = document.querySelector(".inventory")[0];
+    const inventoryEl = document.querySelector(".inventory");
     inventoryEl.classList.add("hidden");
 }
 
@@ -65,7 +65,7 @@ function openDocuments() {
  * Closes the documents pop up menu
  */
 function closeDocuments() {
-    let document1 = document.querySelector(".document")[0];
+    let document1 = document.querySelector(".document");
     document1.classList.add("hidden");
 }
 
@@ -94,8 +94,8 @@ function openTradeMenu() {
     }
 
     const item = itemInventory[selectedItem];
-    document.querySelector(".submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
-    document.querySelector(".side-by-side-inventory")[0].classList.add("hidden");
+    document.querySelector(".submenu-title").innerHTML = `Choose who to send ${item.name} to.`;
+    document.querySelector(".side-by-side-inventory").classList.add("hidden");
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.remove("hidden");
     tradeMenuEl.classList.remove("hidden");
@@ -109,8 +109,8 @@ function closeTradeMenu() {
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.add("hidden");
     tradeMenuEl.classList.add("hidden");
-    document.querySelector(".submenu-title")[0].innerHTML = "Inventory";
-    document.querySelector(".side-by-side-inventory")[0].classList.remove("hidden");
+    document.querySelector(".submenu-title").innerHTML = "Inventory";
+    document.querySelector(".side-by-side-inventory").classList.remove("hidden");
 }
 
 /**
