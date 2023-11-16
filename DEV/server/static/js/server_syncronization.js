@@ -74,6 +74,39 @@ function setReady() {
     socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
 }
 
+function openTradeMenu() {
+    let characterEls = Array.from(document.getElementsByClassName("character"));
+    let j = 0;
+    let players = Object.keys(playerData);
+    console.log(players)
+    for (let i = 1; i < players.length; i++) {
+        let player = players[i];
+        if (player === socket.id) {
+            continue;
+        }
+        let el = characterEls[j];
+        console.log(playerData[player]);
+        console.log(`url(../img/${characterImgs[playerData[player]["character"]]})`);
+        el.querySelector(".character-image").style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
+        el.querySelector(".name-info").innerHTML = playerData[player]["username"];
+        j++;
+    }
+
+    document.getElementsByClassName("submenu-title")[0].innerHTML = "Choose who to send *item* to."; //TODO: METER O NOME DO ITEM AQUI
+    document.getElementsByClassName("side-by-side-inventory")[0].classList.add("hidden");
+    let tradeMenuEl = document.getElementById("tradeMenu");
+    document.getElementById("goBackArrow").classList.remove("hidden");
+    tradeMenuEl.classList.remove("hidden");
+}
+
+function closeTradeMenu() {
+    let tradeMenuEl = document.getElementById("tradeMenu");
+    document.getElementById("goBackArrow").classList.add("hidden");
+    tradeMenuEl.classList.add("hidden");
+    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
+    document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
+}
+
 /**
  * Sets the character number to the index of the clicked element
  * @param {Element} element the character that was clicked
