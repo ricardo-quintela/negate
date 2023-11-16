@@ -76,7 +76,7 @@ function setReady() {
 }
 
 function openTradeMenu() {
-    let characterEls = Array.from(document.getElementsByClassName("character"));
+    let characterEls = Array.from(document.querySelector(".character"));
     let j = 0;
     let players = Object.keys(playerData);
     console.log(players)
@@ -94,8 +94,8 @@ function openTradeMenu() {
     }
 
     const item = itemInventory[selectedItem];
-    document.getElementsByClassName("submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
-    document.getElementsByClassName("side-by-side-inventory")[0].classList.add("hidden");
+    document.querySelector(".submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
+    document.querySelector(".side-by-side-inventory")[0].classList.add("hidden");
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.remove("hidden");
     tradeMenuEl.classList.remove("hidden");
@@ -105,8 +105,8 @@ function closeTradeMenu() {
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.add("hidden");
     tradeMenuEl.classList.add("hidden");
-    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
-    document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
+    document.querySelector(".submenu-title")[0].innerHTML = "Inventory";
+    document.querySelector(".side-by-side-inventory")[0].classList.remove("hidden");
 }
 
 /**
@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (socket.id !== payload.playerId) return;
 
 
-        if(targetInteractable.type == "item"){
+        if(targetInteractable.type === "item"){
             // add the item to the inventory
             itemInventory.push(targetInteractable);
         
@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
             itemTitleEl.innerHTML = targetInteractable.name;
             itemTextEl.innerHTML = targetInteractable.content;
         }
-        else if(targetInteractable.type == "document"){
+        else if(targetInteractable.type === "document"){
             documentInventory.push(targetInteractable);
 
             // get the document slot elements
