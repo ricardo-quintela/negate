@@ -130,6 +130,11 @@ h1 {
     color: white;
 }
 
+.white-lines {
+    border-color: var(--light-outlines) !important;
+    color: var(--light-text) !important;
+}
+
 .player_info {
     margin-bottom: 0.5rem;
 }
@@ -399,6 +404,17 @@ h1 {
     color: var(--light-text);
 }
 
+.back-inventory {
+    font-weight: bold;
+    font-size: 24px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: scale(1.7) translate(60%, 75%);
+    cursor: pointer;
+    color: var(--light-text);
+}
+
 .side-by-side-inventory {
     width: 80%;
     display: flex;
@@ -440,10 +456,10 @@ h1 {
 .grid-item:nth-of-type(3) {
     border-radius: 0 0.7rem 0 0;
 }
-.grid-item:nth-of-type(7) {
+.grid-item:nth-last-of-type(3) {
     border-radius: 0 0 0 0.7rem;
 }
-.grid-item:nth-of-type(9) {
+.grid-item:nth-last-of-type(1) {
     border-radius: 0 0 0.7rem 0;
 }
 
@@ -575,10 +591,10 @@ h1 {
 .document-item:nth-of-type(3) {
     border-radius: 0 0.7rem 0 0;
 }
-.document-item:nth-of-type(7) {
+.document-item:nth-last-of-type(3) {
     border-radius: 0 0 0 0.7rem;
 }
-.document-item:nth-of-type(9) {
+.document-item:nth-last-of-type(1) {
     border-radius: 0 0 0.7rem 0;
 }
 
@@ -639,6 +655,9 @@ h1 {
         left: -0.25rem;
     }
 
+    .submenu-title {
+        font-size: 16px;
+    }
 
     .inventory {
         gap: 1.5rem;
@@ -663,7 +682,6 @@ h1 {
     .document-description {
         gap: 1rem;
     }
-
 }
     
     

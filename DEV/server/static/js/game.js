@@ -19,6 +19,17 @@ function openInventory() {
 
 
 function closeInventory() {
+    let goBackEl = document.getElementById("goBackArrow");
+    if (!goBackEl.classList.contains("hidden")) goBackEl.classList.add("hidden");
+
+    let tradeMenuEl = document.getElementById("tradeMenu");
+    if (!tradeMenuEl.classList.contains("hidden")) tradeMenuEl.classList.add("hidden");
+
+    let sideBySideEl = document.getElementsByClassName("side-by-side-inventory")[0];
+    if (sideBySideEl.classList.contains("hidden")) sideBySideEl.classList.remove("hidden");
+
+    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
+
     let inventoryEl = document.getElementsByClassName("inventory")[0];
     inventoryEl.classList.add("hidden");
 }
