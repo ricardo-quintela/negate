@@ -4,7 +4,6 @@
  * @param {String} resource the resource name to load
  * @param {String} roomId the id of the room
  * @param {String} playerId the id of the player
- * @param {Boolean} isSharedSpace weather the client is the shared space or not
  * @returns the server side rendered component
  */
 function requestResource(resource, roomId, playerId, isSharedSpace) {
@@ -14,4 +13,19 @@ function requestResource(resource, roomId, playerId, isSharedSpace) {
 
     if (http.status === 200) return http.responseText;
     return null;
+}
+
+/**
+ * Calculates the distance between two points
+ * @param {Object} player the player's hitbox
+ * @param {Object} interactable the interactable's hitbox
+ * @returns the distance between both
+ */
+function calculateDistance(player, interactable) {
+
+    const playerPos = [player.x + player.width / 2, player.y + player.height / 2];
+    const intPos = [interactable.x, interactable.y];
+    
+    return Math.sqrt(Math.pow(playerPos[0] - intPos[0], 2) + Math.pow(playerPos[1] - intPos[1], 2));
+
 }

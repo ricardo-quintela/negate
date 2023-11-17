@@ -185,7 +185,7 @@ def test_websocket_event_move_player(socket: SocketIOTestClient, rooms: RoomData
 
     assert events[0]["name"] == "playerData" \
         and \
-        list(events[0]["args"][0]["players"].values())[0] == {
+        list(events[0]["args"][0].values())[0] == {
             "username": "testClient5",
             "isReady": False,
             "character": -1,
@@ -193,4 +193,139 @@ def test_websocket_event_move_player(socket: SocketIOTestClient, rooms: RoomData
             "facing": "up",
             "isMoving": True,
             "isInteracting": False,
+        }
+    
+
+def test_websocket_event_set_interact_permission_document(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerData event to
+    everyone connected after setInteractPermission event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient6"
+    })
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]
+
+    socket.emit("setInteractPermission", {
+        "roomId": "AAAAA",
+        "playerId": player_id,
+        "state": True,
+        "interactableId": 1,
+        "target": {
+            "type": "document",
+            "name": "test document",
+            "content": "test content"
+        }
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "itemData" \
+        and \
+        list(events[0]["args"][0].values())[0] == {
+            "isInteracting": True,
+            "interactableId": 1,
+            "target": {
+                "type": "document",
+                "name": "test document",
+                "content": "test content"
+            }
+        }
+
+
+def test_websocket_event_set_interact_permission_item(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerData event to
+    everyone connected after setInteractPermission event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient6"
+    })
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]
+
+    socket.emit("setInteractPermission", {
+        "roomId": "AAAAA",
+        "playerId": player_id,
+        "state": True,
+        "interactableId": 1,
+        "target": {
+            "type": "item",
+            "name": "test item",
+            "content": "test content",
+            "img": "test img url",
+        }
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "itemData" \
+        and \
+        list(events[0]["args"][0].values())[0] == {
+            "isInteracting": True,
+            "interactableId": 1,
+            "target": {
+                "type": "item",
+                "name": "test item",
+                "content": "test content",
+                "img": "test img url",
+            }
+        }
+    
+
+def test_websocket_event_set_interact_permission_empty(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerData event to
+    everyone connected after setInteractPermission event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient6"
+    })
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]
+
+    socket.emit("setInteractPermission", {
+        "roomId": "AAAAA",
+        "playerId": player_id,
+        "state": False,
+        "interactableId": 1,
+        "target": None
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "itemData" \
+        and \
+        list(events[0]["args"][0].values())[0] == {
+            "isInteracting": False,
+            "interactableId": 1,
+            "target": None
+        }
+    
+
+def test_websocket_event_interact(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerInteraction event to
+    everyone connected after interact event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient7"
+    })
+
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]  
+
+    socket.emit("interact", {
+        "roomId": "AAAAA",
+        "interactableId": 1
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "playerInteraction" \
+        and \
+        events[0]["args"][0] == {
+            "playerId": player_id,
+            "interactableId": 1
         }
