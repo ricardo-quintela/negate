@@ -329,3 +329,35 @@ def test_websocket_event_interact(socket: SocketIOTestClient, rooms: RoomData):
             "playerId": player_id,
             "interactableId": 1
         }
+
+
+def test_websocket_event_send_item(socket: SocketIOTestClient, rooms: RoomData):
+    """Tests if the server emits a playerSend event to
+    everyone connected after send_item event
+    """
+
+    socket.emit("join", {
+        "roomId": "AAAAA",
+        "username": "testClient7"
+    })
+
+    player_id = list(socket.get_received()[0]["args"][0].keys())[0]  
+
+    item = {"type": "item", "name": "test_item", "content": "test item"}
+
+    socket.emit("send_item", {
+        "roomId": "AAAAA",
+        "item": item,
+        "receiverId": "test_receiver_id",
+        "senderId": player_id
+    })
+
+    events = socket.get_received()
+
+    assert events[0]["name"] == "playerSend" \
+        and \
+        events[0]["args"][0] == {
+            "item": item,
+            "receiverId": "test_receiver_id",
+            "senderId": player_id
+        }
