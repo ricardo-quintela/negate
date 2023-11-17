@@ -7,6 +7,7 @@ var isSharedSpace = false;
 var loadedResources = false;
 
 // map and players related
+const CURRENT_MAP = "map_2";
 var mapInfo = null;
 var players = null;
 var characterAnimations = null;
@@ -235,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
 
                 // load the map and save the colliders and interactables info
-                mapInfo = await loadMap(app, "map_1", roomsSpriteSheet, objectsSpriteSheet);
+                mapInfo = await loadMap(app, CURRENT_MAP, roomsSpriteSheet, objectsSpriteSheet);
                 
                 // load the character spritesheets to animations
                 characterAnimations = await loadCharacterSpritesheets([
