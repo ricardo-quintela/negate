@@ -120,7 +120,11 @@ function openTradeMenu() {
         let el = characterEls[j];
         el.getElementsByClassName("character-image")[0].style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
         el.getElementsByClassName("name-info")[0].innerHTML = playerData[player]["username"];
-        el.getElementsByClassName("character-image")[0].onclick = function () {selectPlayerTrade(player);};
+
+        el.getElementsByClassName("character-image")[0].addEventListener("click", () => {
+            selectPlayerTrade(player);
+            closeTradeMenu();
+        });
         j++;
     }
     
@@ -450,6 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
             itemInventory.pop(targetItem);
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
             inventorySlotsEl[tradeItem].style.backgroundImage = null;
+            const itemDescriptionEl = document.querySelector(".item-description");
             const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
             itemTitleEl.innerHTML = "";
             const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");

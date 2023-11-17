@@ -423,47 +423,69 @@ function updatePlayers(socketId, mapColliders, characterAnimations) {
  */
 function calcultateInteractions(socketId, interactables) {
 
-    for (const playerId of Object.keys(playerData)) {
+    var playerInteractGroup = {};
 
-        // ignore shared space
-        if (playerId === socketId) continue;
+    // iterate through all the interactables and check player interactability
+    var interactableId = 0;
+    for (const interactable of interactables) {
 
-        var currentInteractableId = 0;
-        var interactPermission = false;
-        var interactableId = -1;
+        // skip if unavailable
+        if (!interactable.active) {
+            interactable.highlight.visible = false;
+            interactableId++;
+            continue;
+        };
 
-        for (const interactable of interactables) {
+        // to save interactions of each player and prioritize the ones that are true
+        var interactGroup = [];
 
-            // calculate the distance and the permission to interact
+        // check interact distance for every player
+        for (const playerId of Object.keys(playerData)) {
+
+            // ignore shared space socket
+            if (playerId === socketId) continue;
+
+            // set the interactable to visible or not
             const distance = calculateDistance(players[playerId].hitbox, interactable.position);
             const canInteract = distance < INTERACT_REACH;
 
-            interactable.highlight.visible = canInteract;
+            // push the interaction to the array to register all of the players
+            interactGroup.push(canInteract);
 
-            interactPermission = canInteract && interactable.active ? true : false;
-            interactableId = canInteract && interactableId === -1 ? currentInteractableId : interactableId;
+            if (playerId in playerInteractGroup) {
+                playerInteractGroup[playerId] = playerInteractGroup[playerId] ? true : canInteract;
+            } else {
+                playerInteractGroup[playerId] = canInteract;
+            }
+
+
+            // set the target
+            const target = canInteract ? interactable.target : null;
             
+            // allow the event to be called only once
+            if (playerData[playerId].isInteracting !== playerInteractGroup[playerId]) {
+                playerData[playerId].isInteracting = playerInteractGroup[playerId];
 
-            currentInteractableId++;
+                // send interact data to the server
+                socket.emit("setInteractPermission", {
+                    roomId: roomId,
+                    playerId: playerId,
+                    state: playerInteractGroup[playerId],
+                    interactableId: interactableId,
+                    target: target
+                });
+            }
+
         }
 
-        if (playerData[playerId].isInteracting !== interactPermission) {            
-            playerData[playerId].isInteracting = interactPermission;
-            
-
-            const target = !interactPermission || interactableId === -1 ? null : interactables[interactableId].target;
-
-            // send interact data to the server
-            socket.emit("setInteractPermission", {
-                roomId: roomId,
-                playerId: playerId,
-                state: interactPermission,
-                interactableId: interactableId,
-                target: target
-            });
-
-            
+        // update the interact highlight
+        var totalInteractions = false;
+        for (const inter of interactGroup){
+            totalInteractions = totalInteractions || inter;
         }
+        interactable.highlight.visible = totalInteractions;
+
+        interactableId++;
 
     }
 }
