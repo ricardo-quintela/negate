@@ -447,9 +447,7 @@ function calcultateInteractions(socketId, interactables) {
             currentInteractableId++;
         }
 
-        if (playerData[playerId].isInteracting !== interactPermission) {
-            console.log(playerData[playerId].isInteracting, interactPermission, interactableId);
-            
+        if (playerData[playerId].isInteracting !== interactPermission) {            
             playerData[playerId].isInteracting = interactPermission;
             
 
