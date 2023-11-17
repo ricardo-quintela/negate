@@ -13,6 +13,14 @@ const INTERACT_REACH = 50;
 
 
 function openInventory() {
+
+    const itemDescriptionEl = document.querySelector(".item-description");
+    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+    itemTitleEl.innerHTML = "";
+    itemTextEl.innerHTML = "";
+
     let inventoryEl = document.getElementsByClassName("inventory")[0];
     inventoryEl.classList.remove("hidden");
 }

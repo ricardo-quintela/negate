@@ -18,6 +18,7 @@ var itemInventory = [];
 var selectedItem = 0;
 var targetInteractable = null;
 var targetInteractableId = -1;
+var tradeItem = -1;
 
 /**
  * the PIXI app
@@ -75,27 +76,61 @@ function setReady() {
     socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
 }
 
+function insertItem(targetItem){
+
+    console.log("Item inserted, maybe");
+    console.log(targetItem);
+    itemInventory.push(targetItem);
+    console.log(itemInventory[0]);
+
+    const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
+    console.log(inventorySlotsEl.length);
+    inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = `url(${targetItem.img})`;
+    tradeItem = -1;
+
+    
+    
+}
+
+function selectItem(item){
+
+    tradeItem = item;
+    const itemDescriptionEl = document.querySelector(".item-description");
+    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+    itemTitleEl.innerHTML = itemInventory[item].name;
+    itemTextEl.innerHTML = itemInventory[item].content;
+
+}
+
+function selectPlayerTrade(player){
+
+    let payload = {roomId: roomId, item: itemInventory[tradeItem], receiverId: player};
+    socket.emit("send_item", payload);
+
+}
+
 function openTradeMenu() {
-    let characterEls = Array.from(document.querySelector(".character"));
+    let characterEls = Array.from(document.getElementsByClassName("character"));
     let j = 0;
     let players = Object.keys(playerData);
-    console.log(players)
     for (let i = 1; i < players.length; i++) {
-        let player = players[i];
+        const player = players[i];
         if (player === socket.id) {
             continue;
         }
         let el = characterEls[j];
-        console.log(playerData[player]);
-        console.log(`url(../img/${characterImgs[playerData[player]["character"]]})`);
-        el.querySelector(".character-image").style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
-        el.querySelector(".name-info").innerHTML = playerData[player]["username"];
+        el.getElementsByClassName("character-image")[0].style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
+        el.getElementsByClassName("name-info")[0].innerHTML = playerData[player]["username"];
+        el.getElementsByClassName("character-image")[0].onclick = function () {selectPlayerTrade(player);};
         j++;
     }
+    
 
-    const item = itemInventory[selectedItem];
-    document.querySelector(".submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
-    document.querySelector(".side-by-side-inventory")[0].classList.add("hidden");
+    const item = itemInventory[tradeItem];
+    document.getElementsByClassName("submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
+    document.getElementsByClassName("side-by-side-inventory")[0].classList.add("hidden");
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.remove("hidden");
     tradeMenuEl.classList.remove("hidden");
@@ -105,8 +140,15 @@ function closeTradeMenu() {
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.add("hidden");
     tradeMenuEl.classList.add("hidden");
-    document.querySelector(".submenu-title")[0].innerHTML = "Inventory";
-    document.querySelector(".side-by-side-inventory")[0].classList.remove("hidden");
+    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
+    document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
+    const itemDescriptionEl = document.querySelector(".item-description");
+    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+    itemTitleEl.innerHTML = "";
+    itemTextEl.innerHTML = "";
+
 }
 
 /**
@@ -334,20 +376,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // handle player interaction data event
     socket.on("playerInteraction", (payload) => {
 
+        console.log(targetInteractable.type);
         // deactivate interactable
         if (isSharedSpace) {
             mapInfo.interactables[payload.interactableId].active = false;
             return;
         }
-
+        console.log(targetInteractable.type);
         // ignore if not the correct player
         if (socket.id !== payload.playerId) return;
 
-
+        console.log(targetInteractable.type);
         if(targetInteractable.type === "item"){
             // add the item to the inventory
             itemInventory.push(targetInteractable);
-        
+            console.log(targetInteractable);
             // get the inventory slot elements
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
             const itemDescriptionEl = document.querySelector(".item-description");
@@ -379,6 +422,40 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedItem = itemInventory.length - 1;
 
 
+    });
+
+    socket.on("playerSend",(payload) => {
+
+        if(socket.id !== payload.receiverId && socket.id !== payload.senderId) return;
+
+        console.log(socket.id, payload.receiverId);
+        
+        const targetItem = payload.item;
+
+        if(socket.id === payload.receiverId){
+
+        console.log(targetItem);
+        console.log("Chegao ao p_send");
+        console.log(tradeItem);
+        insertItem(targetItem);
+        
+        }
+        if(socket.id === payload.senderId){
+
+            
+            itemInventory.pop(targetItem);
+            const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
+            console.log(inventorySlotsEl.length);
+            inventorySlotsEl[tradeItem].style.backgroundImage = null;
+            const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+            itemTitleEl = "";
+            const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+            itemTextEl = "";
+
+
+        }
+
+       
     });
 
 

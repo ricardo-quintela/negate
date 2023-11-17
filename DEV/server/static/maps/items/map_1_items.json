@@ -1,7 +1,7 @@
 {
     "targets": [
         {
-            "type": "document",
+            "type": "item",
             "name": "Cake",
             "content": "A delicious cake!",
             "img": "/maps/items/img/cake.png"
