@@ -18,6 +18,7 @@ var itemInventory = [];
 var selectedItem = 0;
 var targetInteractable = null;
 var targetInteractableId = -1;
+var tradeItem = -1;
 
 // main element of the code
 var mainEL = null;
@@ -76,6 +77,105 @@ function getKeyByValue(object, value) {
  */
 function setReady() {
     socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
+}
+
+function insertItem(targetItem){
+    itemInventory.push(targetItem);
+    
+    const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
+    
+    inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = `url(${targetItem.img})`;
+    tradeItem = -1;
+}
+
+function selectItem(item){
+
+    tradeItem = item;
+    const itemDescriptionEl = document.querySelector(".item-description");
+    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+    itemTitleEl.innerHTML = itemInventory[item].name;
+    itemTextEl.innerHTML = itemInventory[item].content;
+
+}
+
+function selectPlayerTrade(player){
+
+    let payload = {roomId: roomId, item: itemInventory[tradeItem], receiverId: player};
+    socket.emit("send_item", payload);
+
+}
+
+function openTradeMenu() {
+    let characterEls = Array.from(document.getElementsByClassName("character"));
+    let j = 0;
+    let players = Object.keys(playerData);
+    for (let i = 1; i < players.length; i++) {
+        const player = players[i];
+        if (player === socket.id) {
+            continue;
+        }
+        let el = characterEls[j];
+        el.getElementsByClassName("character-image")[0].style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
+        el.getElementsByClassName("name-info")[0].innerHTML = playerData[player]["username"];
+        el.getElementsByClassName("character-image")[0].onclick = function () {selectPlayerTrade(player);};
+        j++;
+    }
+    
+
+    const item = itemInventory[tradeItem];
+    document.getElementsByClassName("submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
+    document.getElementsByClassName("side-by-side-inventory")[0].classList.add("hidden");
+    let tradeMenuEl = document.getElementById("tradeMenu");
+    document.getElementById("goBackArrow").classList.remove("hidden");
+    tradeMenuEl.classList.remove("hidden");
+}
+
+function closeTradeMenu() {
+    let tradeMenuEl = document.getElementById("tradeMenu");
+    document.getElementById("goBackArrow").classList.add("hidden");
+    tradeMenuEl.classList.add("hidden");
+    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
+    document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
+    const itemDescriptionEl = document.querySelector(".item-description");
+    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+    itemTitleEl.innerHTML = "";
+    itemTextEl.innerHTML = "";
+
+}
+
+/**
+ * Sets the character number to the index of the clicked element
+ * @param {Element} element the character that was clicked
+ */
+function selectCharacter(element) {
+    // cannot re-select a characted when locked in
+    if (isLockedIn) return;
+
+    // cannot select a character that is unavailable
+    const characterImageEl = element.closest(".character .character-image");
+    if (characterImageEl.dataset.unavailable === "true") return;
+
+    // get the character name
+    const character = element.closest(".character").dataset.character;
+    const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
+
+    // remove hightlight
+    if (selectedCharacter === characters[character]) {
+        characterImagesEl[characters[character]].classList.remove("highlighted");
+        selectedCharacter = -1;
+        return;
+    }
+
+    // add highlight
+    characterImagesEl.forEach(charEl => charEl.classList.remove("highlighted"));
+    characterImagesEl[characters[character]].classList.add("highlighted");
+
+    // update selected character
+    selectedCharacter = characters[character];
 }
 
 /**
@@ -291,15 +391,13 @@ document.addEventListener("DOMContentLoaded", () => {
             mapInfo.interactables[payload.interactableId].active = false;
             return;
         }
-
         // ignore if not the correct player
         if (socket.id !== payload.playerId) return;
-
 
         if(targetInteractable.type === "item"){
             // add the item to the inventory
             itemInventory.push(targetInteractable);
-        
+            
             // get the inventory slot elements
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
             const itemDescriptionEl = document.querySelector(".item-description");
@@ -333,6 +431,35 @@ document.addEventListener("DOMContentLoaded", () => {
         // setting selected item on the inventory to the last added
         selectedItem = itemInventory.length - 1;
     });
+
+
+    socket.on("playerSend",(payload) => {
+
+        if(socket.id !== payload.receiverId && socket.id !== payload.senderId) return;        
+        const targetItem = payload.item;
+
+        if(socket.id === payload.receiverId){
+        
+        insertItem(targetItem);
+        
+        }
+        if(socket.id === payload.senderId){
+
+            
+            itemInventory.pop(targetItem);
+            const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
+            inventorySlotsEl[tradeItem].style.backgroundImage = null;
+            const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+            itemTitleEl.innerHTML = "";
+            const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+            itemTextEl.innerHTML = "";
+
+
+        }
+
+       
+    });
+
 
 });
 
