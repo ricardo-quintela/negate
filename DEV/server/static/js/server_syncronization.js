@@ -20,6 +20,9 @@ var targetInteractable = null;
 var targetInteractableId = -1;
 var tradeItem = -1;
 
+// main element of the code
+var mainEL = null;
+
 /**
  * the PIXI app
  */
@@ -197,37 +200,37 @@ function lockInCharacter(element) {
     element.disabled = true;
 }
 
-
 /**
  * Fires an interact event whenever the player clicks on the button
  */
 function interact() {
-
     if (targetInteractable === null) return;
     
     socket.emit("interact", { roomId: roomId, interactableId: targetInteractableId });
-
 }
 
 
-
-
-
-
+// setting window on load event to connect to the websocket
 document.addEventListener("DOMContentLoaded", () => {
-    var mainEl = document.querySelector("main");
+    mainEl = document.querySelector("main");
 
     // connect to the socket
     socket = io();
 
     // join the room
     socket.emit("join", { roomId: roomId, username: username });
-    
+
+
+
+
+
     // player in game data
     socket.on("playerData", (payload) => {
+
+        // update the player data to match the server payload
         playerData = payload;
 
-        // atualizar lista de jogadores prontos
+        // update ready players list
         if (gamePhase === "lobby") {
             if (Object.keys(playerData)[0] === socket.id) {
                 isSharedSpace = true;
@@ -246,17 +249,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            // atualizar display
+            // update ready players display
             readyCountEl.innerHTML = `${playersReady}/4`;
         }
 
-        // colocar na fase de seleção de personagens
+        // character selection phase
         if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
             gamePhase = "characterSelection";
 
             mainEl.innerHTML = requestResource("character_selection", roomId, socket.id, isSharedSpace);
 
-            if (isSharedSpace === false) {
+            if (!isSharedSpace) {
                 const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
                 for (let i = 0; i < characterImgs.length; i++) {
                     characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[i]})`;
@@ -271,13 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     charactersEl[i - 1].innerHTML = playerData[keys[i]].username;
                 }
             }
-        }
-
-        // on player interactions
-        if (gamePhase === "playing" && loadedResources) {
-            
-            //TODO: REMOVE THIS IF NOT NEEDED
-
         }
     });
 
@@ -304,7 +300,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 selectedCharacter = -1;
             }
 
-            if (isSharedSpace === true) {
+            // load the selected characters to the shared space interface to show who selected the character
+            if (isSharedSpace) {
                 const keys = Object.keys(playerData);
                 let i = keys.indexOf(playerId) - 1;
                 characterImagesEl[i].style.backgroundImage = `url(../img/${characterImgs[character]})`;
@@ -315,10 +312,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 characterNameEl.classList.remove("character-name-hidden");
 
             }
-
+            // make the selected character grayed out for other players
+            else if (playerId !== socket.id) {
+                characterImagesEl[character].classList.add("greyed-out");
+            }
+            // make all the other characters grayed out
             else {
-                if (playerId !== socket.id) {
-                    characterImagesEl[character].classList.add("greyed-out");
+                for (var i = 0; i < 4; i++) {
+                    if (i === character) continue;
+                    characterImagesEl[i].classList.add("greyed-out");
                 }
             }
         }
@@ -333,17 +335,23 @@ document.addEventListener("DOMContentLoaded", () => {
             // load the controller for the cell phone users
             if (!isSharedSpace) {
                 controller = loadController(app);
+
             } else {
+                // load the map spritesheets
                 const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
                 const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
+
+                // load the map and save the colliders and interactables info
                 mapInfo = await loadMap(app, "map_1", roomsSpriteSheet, objectsSpriteSheet);
                 
+                // load the character spritesheets to animations
                 characterAnimations = await loadCharacterSpritesheets([
                     "/sprites/characters/spritesheet_tech.json",
                     "/sprites/characters/spritesheet_journalist.json",
                     "/sprites/characters/spritesheet_detective.json",
                     "/sprites/characters/spritesheet_mechanic.json"
                 ]);
+                // load the player models and animations
                 players = await loadPlayers(app, playerData, socket.id, characterAnimations);
 
                 // update positions
@@ -358,19 +366,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // handle item data event
+
+    /**
+     * Activates and deactivates the "interact" button
+     */
     socket.on("itemData", (payload) => {
+        // ignore if the item doesn't belong to the player
+        if (!(socket.id in payload)) return;
 
-        if (socket.id in payload) {
-            playerData[socket.id].isInteracting = payload[socket.id].isInteracting;
-            targetInteractable = payload[socket.id].target;
-            targetInteractableId = payload[socket.id].interactableId;
+        // define state of player as interacting
+        playerData[socket.id].isInteracting = payload[socket.id].isInteracting;
 
-            const interactButton = document.querySelector(".interact-button");
-            interactButton.disabled = !payload[socket.id].isInteracting;
-        }
+        // load the interactable from the payload
+        targetInteractable = payload[socket.id].target;
+        targetInteractableId = payload[socket.id].interactableId;
 
+        // activate the interact button
+        const interactButton = document.querySelector(".interact-button");
+        interactButton.disabled = !payload[socket.id].isInteracting;
     });
+
+
+
 
 
     // handle player interaction data event
@@ -417,12 +434,14 @@ document.addEventListener("DOMContentLoaded", () => {
             documentTextEl.innerHTML = targetInteractable.content;
         }
         
+        // reseting target interactable
         targetInteractable = null;
         targetInteractableId = -1;
+
+        // setting selected item on the inventory to the last added
         selectedItem = itemInventory.length - 1;
-
-
     });
+
 
     socket.on("playerSend",(payload) => {
 
@@ -457,7 +476,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
        
     });
-
 
 
 });
