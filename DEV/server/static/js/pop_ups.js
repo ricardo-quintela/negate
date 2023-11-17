@@ -23,31 +23,37 @@ function characterInfo(element) {
 /**
  * Opens the inventory pop-up and closes the documents menu
  */
+
 function openInventory() {
-    const inventoryEl = document.querySelector(".inventory");
+
+    const itemDescriptionEl = document.querySelector(".item-description");
+    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+    itemTitleEl.innerHTML = "";
+    itemTextEl.innerHTML = "";
+
+    let inventoryEl = document.getElementsByClassName("inventory")[0];
     inventoryEl.classList.remove("hidden");
-    const documentInventoryEl = document.querySelector(".document");
-    documentInventoryEl.classList.add("hidden");
 }
 
-/**
- * Closes the inventory pop up
- */
+
 function closeInventory() {
-    let goBackEl = document.querySelector("#goBackArrow");
+    let goBackEl = document.getElementById("goBackArrow");
     if (!goBackEl.classList.contains("hidden")) goBackEl.classList.add("hidden");
 
-    let tradeMenuEl = document.querySelector("#tradeMenu");
+    let tradeMenuEl = document.getElementById("tradeMenu");
     if (!tradeMenuEl.classList.contains("hidden")) tradeMenuEl.classList.add("hidden");
 
-    let sideBySideEl = document.querySelector(".side-by-side-inventory");
+    let sideBySideEl = document.getElementsByClassName("side-by-side-inventory")[0];
     if (sideBySideEl.classList.contains("hidden")) sideBySideEl.classList.remove("hidden");
 
-    document.querySelector(".submenu-title").innerHTML = "Inventory";
+    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
 
-    let inventoryEl = document.querySelector(".inventory");
+    let inventoryEl = document.getElementsByClassName("inventory")[0];
     inventoryEl.classList.add("hidden");
 }
+
 
 /**
  * Opens document inventory and closes item inventory
@@ -74,7 +80,7 @@ function closeDocuments() {
  * Opens the trade menu and hides the inventory menu
  */
 function openTradeMenu() {
-    let characterEls = Array.from(document.querySelector(".character"));
+    let characterEls = Array.from(document.getElementsByClassName("character"));
     let j = 0;
     let players = Object.keys(playerData);
 
@@ -88,14 +94,15 @@ function openTradeMenu() {
         let el = characterEls[j];
 
         // filling the element with image and text corresponding to the character
-        el.querySelector(".character-image").style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
-        el.querySelector(".name-info").innerHTML = playerData[player]["username"];
+        el.getElementsByClassName("character-image")[0].style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
+        el.getElementsByClassName("name-info")[0].innerHTML = playerData[player]["username"];
+        el.getElementsByClassName("character-image")[0].onclick = function () {selectPlayerTrade(player);};
         j++;
     }
 
-    const item = itemInventory[selectedItem];
-    document.querySelector(".submenu-title").innerHTML = `Choose who to send ${item.name} to.`;
-    document.querySelector(".side-by-side-inventory").classList.add("hidden");
+    const item = itemInventory[tradeItem];
+    document.getElementsByClassName("submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
+    document.getElementsByClassName("side-by-side-inventory")[0].classList.add("hidden");
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.remove("hidden");
     tradeMenuEl.classList.remove("hidden");
@@ -109,8 +116,14 @@ function closeTradeMenu() {
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.add("hidden");
     tradeMenuEl.classList.add("hidden");
-    document.querySelector(".submenu-title").innerHTML = "Inventory";
-    document.querySelector(".side-by-side-inventory").classList.remove("hidden");
+    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
+    document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
+    const itemDescriptionEl = document.querySelector(".item-description");
+    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
+    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+
+    itemTitleEl.innerHTML = "";
+    itemTextEl.innerHTML = "";
 }
 
 /**
