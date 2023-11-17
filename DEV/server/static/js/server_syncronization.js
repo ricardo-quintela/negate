@@ -80,19 +80,12 @@ function setReady() {
 }
 
 function insertItem(targetItem){
-
-    console.log("Item inserted, maybe");
-    console.log(targetItem);
     itemInventory.push(targetItem);
-    console.log(itemInventory[0]);
-
+    
     const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
-    console.log(inventorySlotsEl.length);
+    
     inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = `url(${targetItem.img})`;
     tradeItem = -1;
-
-    
-    
 }
 
 function selectItem(item){
@@ -393,21 +386,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // handle player interaction data event
     socket.on("playerInteraction", (payload) => {
 
-        console.log(targetInteractable.type);
         // deactivate interactable
         if (isSharedSpace) {
             mapInfo.interactables[payload.interactableId].active = false;
             return;
         }
-        console.log(targetInteractable.type);
         // ignore if not the correct player
         if (socket.id !== payload.playerId) return;
 
-        console.log(targetInteractable.type);
         if(targetInteractable.type === "item"){
             // add the item to the inventory
             itemInventory.push(targetInteractable);
-            console.log(targetInteractable);
+            
             // get the inventory slot elements
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
             const itemDescriptionEl = document.querySelector(".item-description");
@@ -445,17 +435,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     socket.on("playerSend",(payload) => {
 
-        if(socket.id !== payload.receiverId && socket.id !== payload.senderId) return;
-
-        console.log(socket.id, payload.receiverId);
-        
+        if(socket.id !== payload.receiverId && socket.id !== payload.senderId) return;        
         const targetItem = payload.item;
 
         if(socket.id === payload.receiverId){
-
-        console.log(targetItem);
-        console.log("Chegao ao p_send");
-        console.log(tradeItem);
+        
         insertItem(targetItem);
         
         }
@@ -464,12 +448,11 @@ document.addEventListener("DOMContentLoaded", () => {
             
             itemInventory.pop(targetItem);
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
-            console.log(inventorySlotsEl.length);
             inventorySlotsEl[tradeItem].style.backgroundImage = null;
             const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
-            itemTitleEl = "";
+            itemTitleEl.innerHTML = "";
             const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-            itemTextEl = "";
+            itemTextEl.innerHTML = "";
 
 
         }
