@@ -151,10 +151,13 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
     var i = 0;
     var j = 0;
     for (const spriteIndex of roomLayer) {
-        const texture = PIXI.Texture.from(Object.keys(roomsSpritesheet.textures)[spriteIndex - map.tilesets[0].firstgid]);
-        const sprite = new PIXI.Sprite(texture);
-        sprite.position.set(i * sprite.width, j * sprite.height);
-        app.stage.addChild(sprite);
+
+        if (spriteIndex - map.tilesets[0].firstgid !== -1) {
+            const texture = PIXI.Texture.from(Object.keys(roomsSpritesheet.textures)[spriteIndex - map.tilesets[0].firstgid]);
+            const sprite = new PIXI.Sprite(texture);
+            sprite.position.set(i * sprite.width, j * sprite.height);
+            app.stage.addChild(sprite);
+        }
 
         if (i < roomWidth - 1) {
             i++;

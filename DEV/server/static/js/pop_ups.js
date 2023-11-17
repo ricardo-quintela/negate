@@ -80,7 +80,7 @@ function closeDocuments() {
  * Opens the trade menu and hides the inventory menu
  */
 function openTradeMenu() {
-    let characterEls = Array.from(document.getElementsByClassName("character"));
+    let characterEls = Array.from(document.querySelectorAll(".character"));
     let j = 0;
     let players = Object.keys(playerData);
 
