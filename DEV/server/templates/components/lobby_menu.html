@@ -2,10 +2,10 @@
     {% if is_shared_space %}
     <div class="ready_menu">
         <div class="background-container">
-            <img src="/img/lobby_gif.gif" alt="Your GIF" class="background-gif">
+          <!-- <img src="/img/lobby_gif.gif" alt="Your GIF" class="background-gif">-->
             <div class="text-overlay">
                 <h1 class="lobby_title">Lobby</h1>
-                <h2 class="player_info">You are the host</h2>
+                <h2 class="player_info">You are the host {{username}}</h2>
                 <h2 class="room_id">{{room_id}}</h2>
                 <div class="title">One Hit Wonder</div>
                 <h1 id="readyCount">0/4</h1>
@@ -15,7 +15,7 @@
     {% else %}
     <div class="ready_menu">
         <div class="background-container">
-            <img src="/img/lobby_gif.gif" alt="Your GIF" class="background-gif">
+          <!-- <img src="/img/lobby_gif.gif" alt="Your GIF" class="background-gif">-->
             <div class="text-overlay">
                 <h1 class="lobby_title">Lobby</h1>
                 <div class="room_id"><h1>Room Code: {{room_id}}</h1>

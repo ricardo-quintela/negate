@@ -238,6 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
             mainEl.innerHTML = requestResource("lobby_menu", roomId, socket.id, isSharedSpace);
 
             const readyCountEl = document.querySelector("#readyCount");
+            const readyStringE1 = document.querySelector("#readyButton");
             var playersReady = 0;
 
             // contar quantos jogadores estão prontos
@@ -247,8 +248,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
+        
             // update ready players display
             readyCountEl.innerHTML = `${playersReady}/4`;
+
+
+            // update button text based on the current player's ready state
+            if (playerData[socket.id] && playerData[socket.id].isReady === true) {
+                readyStringE1.innerHTML = 'Unready';
+            } else {
+                readyStringE1.innerHTML = 'Ready';
+            }
+
         }
 
         // character selection phase
