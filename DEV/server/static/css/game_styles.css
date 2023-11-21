@@ -93,17 +93,57 @@ h1 {
     gap: 1rem; 
 }
 
+
+.background-container {
+    position: absolute;
+    justify-content: center;
+    align-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem; 
+}
+
+.background-gif {
+        border-radius: 20px;
+    height: 100%;
+    width: 100%;
+    opacity: 0.4; /* Adjust the transparency as needed */
+}
+
+.text-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--light-text);
+    text-align: center;
+    z-index: 1;
+}
+
+.player_info, .room_id, .title, #readyCount {
+    margin-bottom: 1rem;
+}
+
 .ready_button {
-    margin: 0 50px;
+    margin: 0 10%;
     border-radius: 50px;
     outline: none;
     border: none;
     background-color: var(--button);
     color: var(--light-text);
-    font-size: 30px;
-    padding: 1rem;
-    font-weight: 600;
-    min-width: 250px;
+    font-size: 150%;
+    padding: 3%;
+    min-width: 45%;
+    font-weight: 100%;
     cursor: pointer;
 }
 
@@ -114,6 +154,8 @@ h1 {
     font-size: 1.5rem;
     text-align: center;
     align-content: center;
+    font-weight: 1000;
+
 }
 
 .room_id{
@@ -128,6 +170,7 @@ h1 {
     font-family: 'Modak', sans-serif;
     font-size: 3rem;
     color: white;
+    
 }
 
 .white-lines {
@@ -136,6 +179,8 @@ h1 {
 }
 
 .player_info {
+    font-weight: 1000;
+    color: black;
     margin-bottom: 0.5rem;
 }
 
@@ -161,7 +206,6 @@ h1 {
     .ready_button {
         margin: 0 30px;
         border-radius: 30px;
-        font-size: 16px;
         min-width: 125px;
     }
 
