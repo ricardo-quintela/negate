@@ -10,10 +10,11 @@ Walktrough:
 
            Telefone                                                      |                  Shared Space
 =========================================================================|=========================================================================
+1                                                                        |
                                                                          | º Criar o Lobby
                                                                          |   - Introduzir o username
                                                                          |   - Clicar em "Create Room"
-1                                                                        | > Display do room ID
+                                                                         | > Display do room ID
 º Juntar ao lobby                                                        |
   - Introduzir o username                                                |
   - Clicar em "join room"                                                |
