@@ -4,6 +4,8 @@
 
 > Deverão existir dois computadores e dois telemóveis.
 > Dois dos elementos do grupo participarão nos testes.
+> O teste deverá ser gravado.
+> Um dos testadores deve registar num *LOG* as ações do jogador e outros pontos importantes.
 
 - Um dos computadores será o shared space
 - O outro controlará duas instâncias do jogo para preencher o espaço dos jogadores em falta
