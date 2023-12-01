@@ -1,4 +1,5 @@
 // TODO: make props span multiple tiles
+// TODO: make the player's hitbox smaller
 // TODO: change the rendering of the controller
 
 /**
@@ -204,10 +205,7 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
         app.stage.addChild(highlight);
 
         // set the target item to the corresponding one on the array
-        var target = null;
-        if (prop.properties[0].value !== -1) {
-            target = mapInteractables.targets[prop.properties[0].value];
-        }
+        const target = mapInteractables.targets[prop.properties[0].value];
 
         interactables.push({
             highlight: highlight,

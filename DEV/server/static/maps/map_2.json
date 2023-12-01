@@ -887,8 +887,8 @@
                  "properties":[
                         {
                          "name":"targetId",
-                         "type":"int",
-                         "value":3
+                         "type":"string",
+                         "value":"note"
                         }],
                  "rotation":0,
                  "type":"",
@@ -905,8 +905,8 @@
                  "properties":[
                         {
                          "name":"targetId",
-                         "type":"int",
-                         "value":1
+                         "type":"string",
+                         "value":"pilotAgreement"
                         }],
                  "rotation":0,
                  "type":"",
@@ -923,8 +923,8 @@
                  "properties":[
                         {
                          "name":"targetId",
-                         "type":"int",
-                         "value":2
+                         "type":"string",
+                         "value":"acController"
                         }],
                  "rotation":0,
                  "type":"",
