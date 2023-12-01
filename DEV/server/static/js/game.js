@@ -1,6 +1,5 @@
+// TODO: make props span multiple tiles
 // TODO: change the rendering of the controller
-// TODO: change the highlight of the item <-
-// TODO: change the algorithm to stop the blinking button
 
 /**
  * Annotates the dpad buttons order
@@ -14,7 +13,6 @@ const dPadMovement = {
 
 const PLAYER_SPEED = 5;
 const INTERACT_REACH = 50;
-const PROP_ALPHA = 0.7;
 
 
 /**
@@ -196,7 +194,7 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
         const mask = new PIXI.Sprite(texture);
         highlight.addChild(mask);
         highlight.mask = mask;
-        //highlight.alpha = PROP_ALPHA;
+        highlight.visible = false;
 
         // set the sprite position
         sprite.position.set(prop.x, prop.y - sprite.height);
@@ -431,6 +429,7 @@ function calcultateInteractions(socketId, interactables) {
 
     // iterate through all the interactables and check player interactability
     var interactableId = 0;
+    var targetInteractableId = 0;
     for (const interactable of interactables) {
 
         // skip if unavailable
@@ -453,6 +452,8 @@ function calcultateInteractions(socketId, interactables) {
             const distance = calculateDistance(players[playerId].hitbox, interactable.position);
             const canInteract = distance < INTERACT_REACH;
 
+            if (canInteract) targetInteractableId = interactableId;
+
             // push the interaction to the array to register all of the players
             interactGroup.push(canInteract);
 
@@ -460,24 +461,6 @@ function calcultateInteractions(socketId, interactables) {
                 playerInteractGroup[playerId] = playerInteractGroup[playerId] ? true : canInteract;
             } else {
                 playerInteractGroup[playerId] = canInteract;
-            }
-
-
-            // set the target
-            const target = canInteract ? interactable.target : null;
-            
-            // allow the event to be called only once
-            if (playerData[playerId].isInteracting !== playerInteractGroup[playerId]) {
-                playerData[playerId].isInteracting = playerInteractGroup[playerId];
-
-                // send interact data to the server
-                socket.emit("setInteractPermission", {
-                    roomId: roomId,
-                    playerId: playerId,
-                    state: playerInteractGroup[playerId],
-                    interactableId: interactableId,
-                    target: target
-                });
             }
 
         }
@@ -488,8 +471,30 @@ function calcultateInteractions(socketId, interactables) {
             totalInteractions = totalInteractions || inter;
         }
         interactable.highlight.visible = totalInteractions;
-
         interactableId++;
 
     }
+
+    for (const playerId of Object.keys(playerInteractGroup)) {
+        if (playerInteractGroup[playerId] === playerData[playerId].isInteracting) continue;
+
+        // set the target
+        const target = playerInteractGroup[playerId] ? interactables[targetInteractableId].target : null;
+        
+        // allow the event to be called only once
+        if (playerData[playerId].isInteracting !== playerInteractGroup[playerId]) {                
+            
+            playerData[playerId].isInteracting = playerInteractGroup[playerId];
+            
+            // send interact data to the server
+            socket.emit("setInteractPermission", {
+                roomId: roomId,
+                playerId: playerId,
+                state: playerInteractGroup[playerId],
+                interactableId: targetInteractableId,
+                target: target
+            });
+        }
+    }
+    
 }

@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // update positions
                 setInterval(updatePlayers, TICK_SPEED, socket.id, mapInfo.colliders, characterAnimations);
-                setInterval(calcultateInteractions, TICK_SPEED, socket.id, mapInfo.interactables);
+                setInterval(calcultateInteractions, TICK_SPEED, socket.id, mapInfo.interactables); // TODO: set TICK_SPEED as interval
             }
 
             // set the state to be ready to play
