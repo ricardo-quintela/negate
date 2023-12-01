@@ -771,19 +771,7 @@
                  "width":32,
                  "x":352,
                  "y":96
-                }, 
-                {
-                 "gid":1098,
-                 "height":32,
-                 "id":474,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":384,
-                 "y":352
-                }, 
+                },
                 {
                  "gid":1358,
                  "height":32,
@@ -914,6 +902,24 @@
                  "width":32,
                  "x":384,
                  "y":64
+                },
+                {
+                 "gid":1098,
+                 "height":32,
+                 "id":474,
+                 "name":"",
+                 "properties":[
+                     {
+                      "name":"targetId",
+                      "type":"string",
+                      "value":"acController"
+                     }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":384,
+                 "y":352
                 }, 
                 {
                  "gid":1134,
