@@ -238,27 +238,30 @@ document.addEventListener("DOMContentLoaded", () => {
             mainEl.innerHTML = requestResource("lobby_menu", roomId, socket.id, isSharedSpace);
 
             const readyCountEl = document.querySelector("#readyCount");
-            const readyStringE1 = document.querySelector("#readyButton");
-            var playersReady = 0;
-
+            
             // contar quantos jogadores estão prontos
+            var playersReady = 0;
             for (const player in playerData) {
-                if (playerData[player].isReady === true) {
+                if (playerData[player].isReady) {
                     playersReady++;
                 }
             }
-
-        
+            
             // update ready players display
             readyCountEl.innerHTML = `${playersReady}/4`;
-
-
-            // update button text based on the current player's ready state
-            if (playerData[socket.id] && playerData[socket.id].isReady === true) {
-                readyStringE1.innerHTML = 'Unready';
-            } else {
-                readyStringE1.innerHTML = 'Ready';
+            
+            // ignore shared space screen
+            if (!isSharedSpace) {
+                // update button text based on the current player's ready state
+                const readyStringEl = document.querySelector("#readyButton");
+    
+                if (playerData[socket.id] && playerData[socket.id].isReady) {
+                    readyStringEl.innerHTML = 'Unready';
+                } else {
+                    readyStringEl.innerHTML = 'Ready';
+                }
             }
+
 
         }
 

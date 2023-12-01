@@ -1,3 +1,7 @@
+// TODO: change the rendering of the controller
+// TODO: change the highlight of the item <-
+// TODO: change the algorithm to stop the blinking button
+
 /**
  * Annotates the dpad buttons order
  */
@@ -10,6 +14,7 @@ const dPadMovement = {
 
 const PLAYER_SPEED = 5;
 const INTERACT_REACH = 50;
+const PROP_ALPHA = 0.7;
 
 
 /**
@@ -191,15 +196,14 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
         const mask = new PIXI.Sprite(texture);
         highlight.addChild(mask);
         highlight.mask = mask;
-        mask.anchor.set(0.5);
-        mask.setTransform(prop.width/2, prop.height/2, 1.3,1.3, 0,0,0,0);
+        //highlight.alpha = PROP_ALPHA;
 
         // set the sprite position
-        highlight.position.set(prop.x, prop.y - sprite.height);
         sprite.position.set(prop.x, prop.y - sprite.height);
+        highlight.position.set(prop.x, prop.y - sprite.height);
 
-        app.stage.addChild(highlight);
         app.stage.addChild(sprite);
+        app.stage.addChild(highlight);
 
         // set the target item to the corresponding one on the array
         var target = null;
