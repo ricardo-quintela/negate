@@ -1,4 +1,3 @@
-// TODO: make props span multiple tiles
 // TODO: change the rendering of the controller
 
 /**
