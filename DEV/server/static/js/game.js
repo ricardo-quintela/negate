@@ -1,5 +1,4 @@
 // TODO: make props span multiple tiles
-// TODO: make the player's hitbox smaller
 // TODO: change the rendering of the controller
 
 /**
@@ -14,6 +13,7 @@ const dPadMovement = {
 
 const PLAYER_SPEED = 5;
 const INTERACT_REACH = 50;
+const HITBOX_HEIGHT_RATIO = 1/4; // ralation of the hitbox height and the sprite height
 
 
 /**
@@ -305,9 +305,9 @@ async function loadPlayers(app, playerData, socketId, characterAnimations) {
         player.y = 100;
         const playerCollider = new PIXI.Rectangle(
             player.x,
-            player.y,
+            player.y + ((1 - HITBOX_HEIGHT_RATIO) * player.height),
             player.width,
-            player.height
+            player.height * HITBOX_HEIGHT_RATIO
         );
 
         players[playerId] = {
@@ -409,7 +409,7 @@ function updatePlayers(socketId, mapColliders, characterAnimations) {
                 break;
             }
             players[playerId].sprite.x = players[playerId].hitbox.x;
-            players[playerId].sprite.y = players[playerId].hitbox.y;
+            players[playerId].sprite.y = (players[playerId].hitbox.y + players[playerId].hitbox.height) - players[playerId].sprite.height;
         }
     }
 }
