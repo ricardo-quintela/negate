@@ -20,7 +20,7 @@ var selectedItem = 0;
 var targetInteractable = null;
 var targetInteractableId = -1;
 var tradeItem = -1;
-
+var tradeButton = null;
 // main element of the code
 var mainEL = null;
 
@@ -92,12 +92,13 @@ function insertItem(targetItem){
 function selectItem(item){
 
     tradeItem = item;
+    tradeButton = document.getElementById("TradeButton");
     const itemDescriptionEl = document.querySelector(".item-description");
     const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
     const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-
     itemTitleEl.innerHTML = itemInventory[item].name;
     itemTextEl.innerHTML = itemInventory[item].content;
+    tradeButton.disabled = false;
 
 }
 
@@ -105,6 +106,7 @@ function selectPlayerTrade(player){
 
     let payload = {roomId: roomId, item: itemInventory[tradeItem], receiverId: player};
     socket.emit("send_item", payload);
+    tradeButton.disabled = true;
 
 }
 
@@ -146,10 +148,9 @@ function closeTradeMenu() {
     const itemDescriptionEl = document.querySelector(".item-description");
     const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
     const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-
     itemTitleEl.innerHTML = "";
     itemTextEl.innerHTML = "";
-
+    tradeButton.disabled = true;
 }
 
 /**
@@ -473,6 +474,7 @@ document.addEventListener("DOMContentLoaded", () => {
             itemTitleEl.innerHTML = "";
             const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
             itemTextEl.innerHTML = "";
+            tradeButton.disabled = true;
 
 
         }
