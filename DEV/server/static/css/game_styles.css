@@ -543,6 +543,8 @@ h1 {
     background-color: var(--button);
     color: var(--light-text);
     border-radius: 0.4rem;
+    border: none;
+    outline: none;
 }
 
 .trade-button:disabled{
