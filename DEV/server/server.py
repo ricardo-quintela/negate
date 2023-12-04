@@ -511,7 +511,7 @@ def event_interact(json: JSONDictionary):
 
 
 
-@socket_server.on("send_item")
+@socket_server.on("sendItem")
 def event_send_item(json: JSONDictionary):
     """SentItem
 
@@ -521,34 +521,36 @@ def event_send_item(json: JSONDictionary):
         json (JSONDictionary): the json payload
     """
     app.logger.debug("Triggered event 'send_item'")
-    
+
     print("Chegou ao send_item.")
-    if not ValidateJson.validate_keys(json, "roomId", "receiverId","item"):
+    if not ValidateJson.validate_keys(json, "roomId", "receiverId", "itemIndex","item"):
         return
-    
+
     room_id = json["roomId"]
     item = json["item"]
+    item_id = json["itemIndex"]
     receiver_id = json["receiverId"]
     socket_id = request.sid
-    
+
     if room_id not in room_data:
         return
-    
+
     print(json)
     socket_server.emit(
         "playerSend",
         {
                 "item": item,
                 "receiverId": receiver_id,
+                "itemIndex": item_id,
                 "senderId" : socket_id
-        },   
+        },
         to=room_id
     )
     app.logger.debug("Item sent to player '%s'", receiver_id)
-    
-    
-    
-    
+
+
+
+
 #*==================================================================
 #*                      TESTING ENDPOINTS
 #*==================================================================
