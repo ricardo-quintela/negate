@@ -80,6 +80,10 @@ function setReady() {
     socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
 }
 
+/**
+ * Inserts an item on an empty slot of the inventory
+ * @param {Object} targetItem the item to insert on the inventory
+ */
 function insertItem(targetItem){
     itemInventory.push(targetItem);
     
@@ -108,81 +112,10 @@ function selectPlayerTrade(player){
     socket.emit("send_item", payload);
     tradeButton.disabled = true;
 
+    closeTradeMenu();
+
 }
 
-function openTradeMenu() {
-    let characterEls = Array.from(document.getElementsByClassName("character"));
-    let j = 0;
-    let players = Object.keys(playerData);
-    for (let i = 1; i < players.length; i++) {
-        const player = players[i];
-        if (player === socket.id) {
-            continue;
-        }
-        let el = characterEls[j];
-        el.getElementsByClassName("character-image")[0].style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
-        el.getElementsByClassName("name-info")[0].innerHTML = playerData[player]["username"];
-
-        el.getElementsByClassName("character-image")[0].addEventListener("click", () => {
-            selectPlayerTrade(player);
-            closeTradeMenu();
-        });
-        j++;
-    }
-    
-
-    const item = itemInventory[tradeItem];
-    document.getElementsByClassName("submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
-    document.getElementsByClassName("side-by-side-inventory")[0].classList.add("hidden");
-    let tradeMenuEl = document.getElementById("tradeMenu");
-    document.getElementById("goBackArrow").classList.remove("hidden");
-    tradeMenuEl.classList.remove("hidden");
-}
-
-function closeTradeMenu() {
-    let tradeMenuEl = document.getElementById("tradeMenu");
-    document.getElementById("goBackArrow").classList.add("hidden");
-    tradeMenuEl.classList.add("hidden");
-    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
-    document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
-    const itemDescriptionEl = document.querySelector(".item-description");
-    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
-    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-    itemTitleEl.innerHTML = "";
-    itemTextEl.innerHTML = "";
-    tradeButton.disabled = true;
-}
-
-/**
- * Sets the character number to the index of the clicked element
- * @param {Element} element the character that was clicked
- */
-function selectCharacter(element) {
-    // cannot re-select a characted when locked in
-    if (isLockedIn) return;
-
-    // cannot select a character that is unavailable
-    const characterImageEl = element.closest(".character .character-image");
-    if (characterImageEl.dataset.unavailable === "true") return;
-
-    // get the character name
-    const character = element.closest(".character").dataset.character;
-    const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
-
-    // remove hightlight
-    if (selectedCharacter === characters[character]) {
-        characterImagesEl[characters[character]].classList.remove("highlighted");
-        selectedCharacter = -1;
-        return;
-    }
-
-    // add highlight
-    characterImagesEl.forEach(charEl => charEl.classList.remove("highlighted"));
-    characterImagesEl[characters[character]].classList.add("highlighted");
-
-    // update selected character
-    selectedCharacter = characters[character];
-}
 
 /**
  * Emits a lockIn event to the server to lock in the character for the player
