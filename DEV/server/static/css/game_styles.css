@@ -530,18 +530,25 @@ h1 {
 }
 
 .trade-button {
+    aspect-ratio: 1/1;
     user-select: none;
     position: relative;
-    top: 50%;
-    width: 5%;
+    top: 80%;
+    left: 5%;
     align-content: center;
     align-items: left;
     justify-content: left;
-    transform: scale(2) translate(50%, 100%);
+    transform: scale(1.5) translate(0, 0);
     cursor: pointer;
     background-color: var(--button);
     color: var(--light-text);
     border-radius: 0.4rem;
+    border: none;
+    outline: none;
+}
+
+.trade-button:disabled{
+    background-color: var(--disabled);
 }
 
 .submenu-title {
