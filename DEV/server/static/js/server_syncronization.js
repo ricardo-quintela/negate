@@ -20,7 +20,6 @@ var selectedItem = 0;
 var targetInteractable = null;
 var targetInteractableId = -1;
 var tradeItem = -1;
-var tradeButton = null;
 // main element of the code
 var mainEL = null;
 
@@ -96,7 +95,7 @@ function insertItem(targetItem){
 function selectItem(item){
 
     tradeItem = item;
-    tradeButton = document.getElementById("TradeButton");
+    const tradeButton = document.getElementById("TradeButton");
     const itemDescriptionEl = document.querySelector(".item-description");
     const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
     const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
@@ -110,6 +109,8 @@ function selectPlayerTrade(player){
 
     let payload = {roomId: roomId, item: itemInventory[tradeItem], receiverId: player};
     socket.emit("send_item", payload);
+
+    const tradeButton = document.getElementById("TradeButton");
     tradeButton.disabled = true;
 
     closeTradeMenu();
@@ -398,14 +399,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if(socket.id === payload.senderId){
 
-            
-            itemInventory.pop(targetItem);
+            // remove the item from the sender's inventory
+            itemInventory.splice(tradeItem, 1);
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
             inventorySlotsEl[tradeItem].style.backgroundImage = null;
+
             const itemDescriptionEl = document.querySelector(".item-description");
             const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
-            itemTitleEl.innerHTML = "";
             const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+            const tradeButton = document.getElementById("TradeButton");
+
+            itemTitleEl.innerHTML = "";
             itemTextEl.innerHTML = "";
             tradeButton.disabled = true;
 

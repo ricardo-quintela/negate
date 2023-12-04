@@ -29,7 +29,7 @@ function openInventory() {
     const itemDescriptionEl = document.querySelector(".item-description");
     const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
     const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-    tradeButton = document.getElementById("TradeButton");
+    const tradeButton = document.getElementById("TradeButton");
 
     itemTitleEl.innerHTML = "";
     itemTextEl.innerHTML = "";
