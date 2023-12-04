@@ -10,16 +10,45 @@
             "name": "Pilot File",
             "content": "This Agreement (\"Agreement\") effective [Date] between [Pilot's Full Name] (\"Pilot\") and [Team Name] (\"Team\").\n\n1. Engagement:\n   1.1 Pilot competes for Team in the [Year] Formula 1 Championship season.\n\n2. Compensation:\n   2.1 Pilot receives a base salary of [Amount].\n\n3. Obligations:\n   3.1 Pilot follows FIA regulations and engages in promotional activities.\n\n4. Termination:\n   4.1 Termination for material breach or in accordance with FIA rules.\n\n5. Confidentiality:\n   5.1 Pilot maintains confidentiality of Team's information.\n\n6. Governing Law:\n   6.1 Governed by the laws of [Jurisdiction].\n\n7. Miscellaneous:\n   7.1 Entire understanding between Pilot and Team."
         },
-        "acController": {
-            "type": "item",
-            "name": "AC Controller",
-            "content": "This controller can change the temperature of the AC",
-            "img": "/maps/items/img/ac_controller.png"
-        },
-        "note": {
+        "Carta": {
             "type": "document",
-            "name": "Note",
-            "content": "Do not forget to wash the car!"
+            "name": "Carta",
+            "content": "Acho que estou a ser perseguida, não sei por quem..."        },
+        "Pa": {
+            "type": "item",
+            "name": "Pá suja",
+            "content": "Uma pá com sangue?",
+            "img": "/maps/items/img/pa.png"
+        },
+        "Comprimidos": {
+            "type": "item",
+            "name": "Comprimidos fortes",
+            "content": "Caixas de comprimidos quase vazias",
+            "img": "/maps/items/img/comprimidos.png"
+        },
+        "Bolo": {
+            "type": "item",
+            "name": "Bolo",
+            "content": "Bolo com um aspeto delicioso YUMMY",
+            "img": "/maps/items/img/bolo.png"
+        },
+        "Faca": {
+            "type": "item",
+            "name": "Faca",
+            "content": "Uma faca perdida?",
+            "img": "/maps/items/img/Faca.png"
+        },
+        "Construtor": {
+            "type": "item",
+            "name": "Informação do construtor",
+            "content": "EU NÃO SEI DE NADA... Só vim fazer o meu trabalho",
+            "img": "/maps/items/img/Construtor.png"
+        },
+        "Ceringa": {
+            "type": "item",
+            "name": "Ceringa",
+            "content": "Uma ceringa no local de construções",
+            "img": "/maps/items/img/Ceringa.png"
         }
     }
 }
