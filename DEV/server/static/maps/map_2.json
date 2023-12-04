@@ -882,7 +882,12 @@
                          "name":"characterId",
                          "type":"int",
                          "value":2
-                         }],
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":""
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -905,7 +910,12 @@
                          "name":"characterId",
                          "type":"int",
                          "value":1
-                         }],
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":""
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -928,7 +938,12 @@
                       "name":"characterId",
                       "type":"int",
                       "value":0
-                      }],
+                      },
+                      {
+                       "name":"requiredItemId",
+                       "type":"string",
+                       "value":"note"
+                       }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -951,7 +966,12 @@
                          "name":"characterId",
                          "type":"int",
                          "value":0
-                         }],
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":"note"
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
