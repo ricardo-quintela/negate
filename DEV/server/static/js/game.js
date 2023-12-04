@@ -209,6 +209,9 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
         // get the character that can interact with the prop
         const characterId = prop.properties[1].value;
 
+        // get the required item id to use the item
+        const requiredItemId = prop.properties[2].value;
+
         // initialize the prop data if it hasn't been already
         if (!(propId in propQueue)) {
             propQueue[propId] = {
@@ -216,6 +219,7 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
                 sprites: [],
                 active: true,
                 characterId: characterId,
+                requiredItemId: requiredItemId,
                 target: mapInteractables.targets[propId]
             };
         }
@@ -481,14 +485,21 @@ function calcultateInteractions(socketId, interactables) {
 
             var canInteract;
 
-            // ignore the interaction if the prop is not active or the player's character cannot interact with it
-            if (!interactables[targetId].active || (interactables[targetId].characterId !== -1 && playerData[playerId].character !== interactables[targetId].characterId)) {
-
+            // ignore the interaction if the prop is not active or the player's inventory doesn't have the required item
+            if (!interactables[targetId].active || (interactables[targetId].requiredItemId !== "" && !playerInventories[playerId].includes(interactables[targetId].requiredItemId))) {
+                
                 canInteract = false;
             } else {
-                // set the interactable to visible or not
-                const distance = calculateDistance(players[playerId].hitbox, interactables[targetId].position);
-                canInteract = distance < INTERACT_REACH;
+
+                // if the character cannot interact with the item
+                if (interactables[targetId].characterId !== -1 && playerData[playerId].character !== interactables[targetId].characterId) {
+                    canInteract = false;
+                } else {
+                    // set the interactable to visible or not
+                    const distance = calculateDistance(players[playerId].hitbox, interactables[targetId].position);
+                    canInteract = distance < INTERACT_REACH;
+                }
+                
             }
 
 

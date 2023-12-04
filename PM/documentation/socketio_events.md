@@ -148,3 +148,43 @@ Fired whenever a player is near something they can interact
     }
 }
 ```
+
+## sendItem
+
+**client -> server**
+
+- Sent whenever a player wants to send an item to other player
+
+```json
+{
+    "roomId": "AAAAA",
+    "item": {
+        "type": "item" | "document",
+        "name": "target's name",
+        "content" | "img": "document content" | "img url"
+    },
+    "itemIndex": 1,
+    "receiverId": *receiver_id*
+}
+```
+
+
+## playerSend
+
+**server -> client**
+
+- Sent as a response to:
+    - `sendItem`
+
+```json
+{
+    "item": {
+        "type": "item" | "document",
+        "name": "target's name",
+        "content" | "img": "document content" | "img url"
+    },
+    "receiverId": *receiver_id*,
+    "itemIndex": 1,
+    "senderId" : *socket_id*
+}
+```

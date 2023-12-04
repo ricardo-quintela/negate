@@ -16,9 +16,10 @@ var mapInteractables = null;
 // client related -> inventories
 var documentInventory = [];
 var itemInventory = [];
+var playerInventories = {};
 var selectedItem = 0;
 var targetInteractable = null;
-var targetInteractableId = -1;
+var targetInteractableId = null;
 var tradeItem = -1;
 // main element of the code
 var mainEL = null;
@@ -107,8 +108,8 @@ function selectItem(item){
 
 function selectPlayerTrade(player){
 
-    let payload = {roomId: roomId, item: itemInventory[tradeItem], receiverId: player};
-    socket.emit("send_item", payload);
+    let payload = {roomId: roomId, item: itemInventory[tradeItem], itemIndex: tradeItem, receiverId: player};
+    socket.emit("sendItem", payload);
 
     const tradeButton = document.getElementById("TradeButton");
     tradeButton.disabled = true;
@@ -204,8 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
             gamePhase = "characterSelection";
 
+            
             mainEl.innerHTML = requestResource("character_selection", roomId, socket.id, isSharedSpace);
-
+            
             if (!isSharedSpace) {
                 const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
                 for (let i = 0; i < characterImgs.length; i++) {
@@ -215,10 +217,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
             else {
+                
                 const charactersEl = Array.from(document.querySelectorAll(".characters > .character > .name-info > h2"));
                 let keys = Object.keys(playerData);
                 for (let i = 1; i < keys.length; i++) {
                     charactersEl[i - 1].innerHTML = playerData[keys[i]].username;
+                }
+    
+                // initialize players inventories on the shared space
+                for (const playerId of Object.keys(playerData)) {
+                    if (playerId === socket.id) continue;
+
+                    playerInventories[playerId] = [];
                 }
             }
         }
@@ -343,6 +353,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // deactivate interactable
         if (isSharedSpace) {
             mapInfo.interactables[payload.interactableId].active = false;
+
+            // add the item id to the player's inventory
+            if (mapInfo.interactables[payload.interactableId].target.type === "item") {
+                playerInventories[payload.playerId].push(payload.interactableId);
+            }
             return;
         }
         // ignore if not the correct player
@@ -380,7 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // reseting target interactable
         targetInteractable = null;
-        targetInteractableId = -1;
+        targetInteractableId = null;
 
         // setting selected item on the inventory to the last added
         selectedItem = itemInventory.length - 1;
@@ -389,7 +404,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     socket.on("playerSend",(payload) => {
 
-        if(socket.id !== payload.receiverId && socket.id !== payload.senderId) return;        
+        // update the players inventories ids
+        if (isSharedSpace) {
+            playerInventories[payload.receiverId].push(playerInventories[payload.senderId][payload.itemIndex]);
+            playerInventories[payload.senderId].splice(payload.itemIndex,1);
+        }
+
+        if(socket.id !== payload.receiverId && socket.id !== payload.senderId) return;
         const targetItem = payload.item;
 
         if(socket.id === payload.receiverId){
@@ -412,7 +433,6 @@ document.addEventListener("DOMContentLoaded", () => {
             itemTitleEl.innerHTML = "";
             itemTextEl.innerHTML = "";
             tradeButton.disabled = true;
-
 
         }
 
