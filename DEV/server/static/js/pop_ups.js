@@ -59,6 +59,13 @@ function closeInventory() {
  * Opens document inventory and closes item inventory
  */
 function openDocuments() {
+    const docDescriptionEl = document.querySelector(".document-description");
+    const docTitleEl = docDescriptionEl.querySelector(".document-desc-title");
+    const docTextEl = docDescriptionEl.querySelector(".document-desc-text");
+
+    docTitleEl.innerHTML = "";
+    docTextEl.innerHTML = "";
+
     const documentInventoryEl = document.querySelector(".document");
     documentInventoryEl.classList.remove("hidden");
 

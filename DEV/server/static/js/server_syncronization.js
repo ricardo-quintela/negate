@@ -101,6 +101,17 @@ function selectItem(item){
 
 }
 
+function selectDocument(doc){
+
+    const docDescriptionEl = document.querySelector(".document-description");
+    const docTitleEl = docDescriptionEl.querySelector(".document-desc-title");
+    const docTextEl = docDescriptionEl.querySelector(".document-desc-text");
+
+    docTitleEl.innerHTML = documentInventory[doc].name;
+    docTextEl.innerHTML = documentInventory[doc].content;
+
+}
+
 function selectPlayerTrade(player){
 
     let payload = {roomId: roomId, item: itemInventory[tradeItem], receiverId: player};
