@@ -877,7 +877,17 @@
                          "name":"targetId",
                          "type":"string",
                          "value":"note"
-                        }],
+                        },
+                        {
+                         "name":"characterId",
+                         "type":"int",
+                         "value":2
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":""
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -895,7 +905,17 @@
                          "name":"targetId",
                          "type":"string",
                          "value":"pilotAgreement"
-                        }],
+                        },
+                        {
+                         "name":"characterId",
+                         "type":"int",
+                         "value":1
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":""
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -913,7 +933,17 @@
                       "name":"targetId",
                       "type":"string",
                       "value":"acController"
-                     }],
+                     },
+                     {
+                      "name":"characterId",
+                      "type":"int",
+                      "value":0
+                      },
+                      {
+                       "name":"requiredItemId",
+                       "type":"string",
+                       "value":"note"
+                       }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -931,7 +961,17 @@
                          "name":"targetId",
                          "type":"string",
                          "value":"acController"
-                        }],
+                        },
+                        {
+                         "name":"characterId",
+                         "type":"int",
+                         "value":0
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":"note"
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

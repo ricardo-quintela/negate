@@ -7,7 +7,7 @@ var isSharedSpace = false;
 var loadedResources = false;
 
 // map and players related
-const CURRENT_MAP = "map_2";
+const CURRENT_MAP = "map_3";
 var mapInfo = null;
 var players = null;
 var characterAnimations = null;
@@ -16,9 +16,10 @@ var mapInteractables = null;
 // client related -> inventories
 var documentInventory = [];
 var itemInventory = [];
+var playerInventories = {};
 var selectedItem = 0;
 var targetInteractable = null;
-var targetInteractableId = -1;
+var targetInteractableId = null;
 var tradeItem = -1;
 var receivedItems = 0;
 
@@ -81,6 +82,10 @@ function setReady() {
     socket.emit("ready", { roomId: roomId, isReady: !playerData[socket.id].isReady });
 }
 
+/**
+ * Inserts an item on an empty slot of the inventory
+ * @param {Object} targetItem the item to insert on the inventory
+ */
 function insertItem(targetItem){
     itemInventory.push(targetItem);
     
@@ -93,12 +98,13 @@ function insertItem(targetItem){
 function selectItem(item){
 
     tradeItem = item;
+    const tradeButton = document.getElementById("TradeButton");
     const itemDescriptionEl = document.querySelector(".item-description");
     const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
     const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-
     itemTitleEl.innerHTML = itemInventory[item].name;
     itemTextEl.innerHTML = itemInventory[item].content;
+    tradeButton.disabled = false;
 
 }
 
@@ -115,85 +121,16 @@ function selectDocument(doc){
 
 function selectPlayerTrade(player){
 
-    let payload = {roomId: roomId, item: itemInventory[tradeItem], receiverId: player};
-    socket.emit("send_item", payload);
+    let payload = {roomId: roomId, item: itemInventory[tradeItem], itemIndex: tradeItem, receiverId: player};
+    socket.emit("sendItem", payload);
+
+    const tradeButton = document.getElementById("TradeButton");
+    tradeButton.disabled = true;
+
+    closeTradeMenu();
 
 }
 
-function openTradeMenu() {
-    let characterEls = Array.from(document.getElementsByClassName("character"));
-    let j = 0;
-    let players = Object.keys(playerData);
-    for (let i = 1; i < players.length; i++) {
-        const player = players[i];
-        if (player === socket.id) {
-            continue;
-        }
-        let el = characterEls[j];
-        el.getElementsByClassName("character-image")[0].style.backgroundImage = `url(../img/${characterImgs[playerData[player]["character"]]})`;
-        el.getElementsByClassName("name-info")[0].innerHTML = playerData[player]["username"];
-
-        el.getElementsByClassName("character-image")[0].addEventListener("click", () => {
-            selectPlayerTrade(player);
-            closeTradeMenu();
-        });
-        j++;
-    }
-    
-
-    const item = itemInventory[tradeItem];
-    document.getElementsByClassName("submenu-title")[0].innerHTML = `Choose who to send ${item.name} to.`;
-    document.getElementsByClassName("side-by-side-inventory")[0].classList.add("hidden");
-    let tradeMenuEl = document.getElementById("tradeMenu");
-    document.getElementById("goBackArrow").classList.remove("hidden");
-    tradeMenuEl.classList.remove("hidden");
-}
-
-function closeTradeMenu() {
-    let tradeMenuEl = document.getElementById("tradeMenu");
-    document.getElementById("goBackArrow").classList.add("hidden");
-    tradeMenuEl.classList.add("hidden");
-    document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
-    document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
-    const itemDescriptionEl = document.querySelector(".item-description");
-    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
-    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-
-    itemTitleEl.innerHTML = "";
-    itemTextEl.innerHTML = "";
-
-}
-
-/**
- * Sets the character number to the index of the clicked element
- * @param {Element} element the character that was clicked
- */
-function selectCharacter(element) {
-    // cannot re-select a characted when locked in
-    if (isLockedIn) return;
-
-    // cannot select a character that is unavailable
-    const characterImageEl = element.closest(".character .character-image");
-    if (characterImageEl.dataset.unavailable === "true") return;
-
-    // get the character name
-    const character = element.closest(".character").dataset.character;
-    const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
-
-    // remove hightlight
-    if (selectedCharacter === characters[character]) {
-        characterImagesEl[characters[character]].classList.remove("highlighted");
-        selectedCharacter = -1;
-        return;
-    }
-
-    // add highlight
-    characterImagesEl.forEach(charEl => charEl.classList.remove("highlighted"));
-    characterImagesEl[characters[character]].classList.add("highlighted");
-
-    // update selected character
-    selectedCharacter = characters[character];
-}
 
 /**
  * Emits a lockIn event to the server to lock in the character for the player
@@ -281,8 +218,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (gamePhase === "lobby" && playersReady === 4 && Object.keys(playerData).length === 5) {
             gamePhase = "characterSelection";
 
+            
             mainEl.innerHTML = requestResource("character_selection", roomId, socket.id, isSharedSpace);
-
+            
             if (!isSharedSpace) {
                 const characterImagesEl = Array.from(document.querySelectorAll(".character > .character-image"));
                 for (let i = 0; i < characterImgs.length; i++) {
@@ -292,10 +230,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
             else {
+                
                 const charactersEl = Array.from(document.querySelectorAll(".characters > .character > .name-info > h2"));
                 let keys = Object.keys(playerData);
                 for (let i = 1; i < keys.length; i++) {
                     charactersEl[i - 1].innerHTML = playerData[keys[i]].username;
+                }
+    
+                // initialize players inventories on the shared space
+                for (const playerId of Object.keys(playerData)) {
+                    if (playerId === socket.id) continue;
+
+                    playerInventories[playerId] = [];
                 }
             }
         }
@@ -362,8 +308,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } else {
                 // load the map spritesheets
-                const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
-                const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
+                const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms2.json");
+                const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors2.json");
 
                 // load the map and save the colliders and interactables info
                 mapInfo = await loadMap(app, CURRENT_MAP, roomsSpriteSheet, objectsSpriteSheet);
@@ -420,6 +366,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // deactivate interactable
         if (isSharedSpace) {
             mapInfo.interactables[payload.interactableId].active = false;
+
+            // add the item id to the player's inventory
+            if (mapInfo.interactables[payload.interactableId].target.type === "item") {
+                playerInventories[payload.playerId].push(payload.interactableId);
+            }
             return;
         }
         // ignore if not the correct player
@@ -457,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // reseting target interactable
         targetInteractable = null;
-        targetInteractableId = -1;
+        targetInteractableId = null;
 
         // setting selected item on the inventory to the last added
         selectedItem = itemInventory.length - 1;
@@ -466,7 +417,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     socket.on("playerSend",(payload) => {
 
-        if(socket.id !== payload.receiverId && socket.id !== payload.senderId) return;        
+        // update the players inventories ids
+        if (isSharedSpace) {
+            playerInventories[payload.receiverId].push(playerInventories[payload.senderId][payload.itemIndex]);
+            playerInventories[payload.senderId].splice(payload.itemIndex,1);
+        }
+
+        if(socket.id !== payload.receiverId && socket.id !== payload.senderId) return;
         const targetItem = payload.item;
 
         if(socket.id === payload.receiverId){
@@ -480,16 +437,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if(socket.id === payload.senderId){
 
-            
-            itemInventory.pop(targetItem);
+            // remove the item from the sender's inventory
+            itemInventory.splice(tradeItem, 1);
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
             inventorySlotsEl[tradeItem].style.backgroundImage = null;
+
             const itemDescriptionEl = document.querySelector(".item-description");
             const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
-            itemTitleEl.innerHTML = "";
             const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-            itemTextEl.innerHTML = "";
+            const tradeButton = document.getElementById("TradeButton");
 
+            itemTitleEl.innerHTML = "";
+            itemTextEl.innerHTML = "";
+            tradeButton.disabled = true;
 
         }
 

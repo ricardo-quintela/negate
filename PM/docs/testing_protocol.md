@@ -51,22 +51,20 @@
 > "Agora, a tua tarefa é fazer com que o jogo comece".
 
 ### 5. Pedir ao jogador para selecionar o personagem  
-> "No jogo existem diversos personagens controláveis
-> com papéis diferentes.
-> Podes tentar saber mais sobre cada um deles e escolher um.
-> Agora, seleciona o personagem com que pretendes jogar."
+> "No jogo existem diversos personagens
+> com papéis diferentes que podes controlar.
+> Descobre mais sobre cada um deles e escolhe um para jogar."
 
 - Antes de que o jogador selecione, um dos personagens (qualquer um) deve ser bloqueado pelo testador no telemóvel.
 - Depois do jogador selecionar, o testador no computador seleciona os seus personagens
 
 ### 6. Pedir ao jogador para movimentar o seu personagem.  
-> "Agora foi apresentado o mundo. Podes fazer com que o teu
-> personagem se movimente nele para explorar.
-> Preciso que movimentes o teu personagem, podes andar para onde quiseres."
+> "Agora foi apresentado o mundo. Move o teu personagem para explorá-lo.
+> Podes andar para onde quiseres."
 
 ### 7. Pedir ao jogador para encontrar itens no mundo  
-> "No mundo onde estás a jogar existem itens e documentos que podem ser apanhados,
-> tenta encontrar um deles e apanhá-lo."
+> "No mundo onde estás a jogar existem itens e documentos que podem ser apanhados.
+> Encontra um deles e apanha-o."
 
 ### 8. Pedir ao jogador para consultar os seus inventários.  
 > "Os itens que apanhas pelo mundo são guardados no teu inventário e os
@@ -76,7 +74,7 @@
 ### 9. Pedir ao jogador para trocar um item com o testador do telemóvel  
 > "Um item apanhado poder útil para um personagem, mas para outro não. Isso depende
 > do papel do personagem.
-> Caso apanhes um item que não te é útil podes enviá-lo a outro jogador.
+> É possivel trocar itens com outros jogadores caso estes não te sejam úteis.
 > Envia o item que apanhaste ao jogador com o personagem mais adequado."
 
 ## Questionário

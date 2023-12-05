@@ -32,9 +32,11 @@ function openInventory() {
     const itemDescriptionEl = document.querySelector(".item-description");
     const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
     const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+    const tradeButton = document.getElementById("TradeButton");
 
     itemTitleEl.innerHTML = "";
     itemTextEl.innerHTML = "";
+    tradeButton.disabled = true;
 
     let inventoryEl = document.getElementsByClassName("inventory")[0];
     inventoryEl.classList.remove("hidden");
@@ -129,11 +131,6 @@ function closeTradeMenu() {
     document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
     document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
     const itemDescriptionEl = document.querySelector(".item-description");
-    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
-    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-
-    itemTitleEl.innerHTML = "";
-    itemTextEl.innerHTML = "";
 }
 
 /**
