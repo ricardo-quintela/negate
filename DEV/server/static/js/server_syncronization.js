@@ -20,6 +20,7 @@ var selectedItem = 0;
 var targetInteractable = null;
 var targetInteractableId = -1;
 var tradeItem = -1;
+var receivedItems = 0;
 
 // main element of the code
 var mainEL = null;
@@ -471,7 +472,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if(socket.id === payload.receiverId){
         
         insertItem(targetItem);
-        
+        receivedItems++;
+        notificationBadgeEl = document.getElementsByClassName("badge")[0];
+        notificationBadgeEl.innerHTML = `${receivedItems}`;
+        notificationBadgeEl.classList.remove("hidden");
+
         }
         if(socket.id === payload.senderId){
 

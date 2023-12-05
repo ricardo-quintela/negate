@@ -26,6 +26,9 @@ function characterInfo(element) {
 
 function openInventory() {
 
+    let notificationBadgeEl = document.getElementsByClassName("badge")[0];
+    notificationBadgeEl.classList.add("hidden");
+    receivedItems = 0;
     const itemDescriptionEl = document.querySelector(".item-description");
     const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
     const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
