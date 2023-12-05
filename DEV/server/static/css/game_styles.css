@@ -478,10 +478,10 @@ h1 {
     overflow-y: scroll;
 }
 
-.grid::-webkit-scrollbar, .item-description::-webkit-scrollbar {
+.grid::-webkit-scrollbar, .item-desc-text::-webkit-scrollbar {
     background-color: transparent;
 }
-.grid::-webkit-scrollbar-thumb, .item-description::-webkit-scrollbar-thumb  {
+.grid::-webkit-scrollbar-thumb, .item-desc-text::-webkit-scrollbar-thumb  {
     background-color: #d6dee1;
     border-radius: 20px;
 }
@@ -513,7 +513,6 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 3rem;
-    overflow-y: auto;
 }
 
 .item-desc-title {
@@ -527,6 +526,7 @@ h1 {
     align-items: left;
     text-align: left;
     color:var(--light-text);
+    overflow-y: auto;
 }
 
 .trade-button {
@@ -617,14 +617,14 @@ h1 {
     flex-direction: column;
     gap: 0.5rem;
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
-.document-list::-webkit-scrollbar, .item-description::-webkit-scrollbar {
+.document-list::-webkit-scrollbar, .document-desc-text::-webkit-scrollbar {
     background-color: transparent;
 }
 
-.document-list::-webkit-scrollbar-thumb, .item-description::-webkit-scrollbar-thumb  {
+.document-list::-webkit-scrollbar-thumb, .document-desc-text::-webkit-scrollbar-thumb  {
     background-color: #d6dee1;
     border-radius: 20px;
 }
@@ -658,6 +658,7 @@ h1 {
 }
 .document-desc-text {
     color:var(--light-text);
+    overflow-y: auto;
 }
 
 /* *MEDIA QUERIES* */

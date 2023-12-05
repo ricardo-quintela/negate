@@ -345,10 +345,11 @@ def test_websocket_event_send_item(socket: SocketIOTestClient, rooms: RoomData):
 
     item = {"type": "item", "name": "test_item", "content": "test item"}
 
-    socket.emit("send_item", {
+    socket.emit("sendItem", {
         "roomId": "AAAAA",
         "item": item,
         "receiverId": "test_receiver_id",
+        "itemIndex": 1,
         "senderId": player_id
     })
 
@@ -359,5 +360,6 @@ def test_websocket_event_send_item(socket: SocketIOTestClient, rooms: RoomData):
         events[0]["args"][0] == {
             "item": item,
             "receiverId": "test_receiver_id",
+            "itemIndex": 1,
             "senderId": player_id
         }
