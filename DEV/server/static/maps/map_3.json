@@ -4522,11 +4522,11 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"SpriteFinal.tsx"
+         "source":"spritesheet_interiors2.tsx"
         }, 
         {
          "firstgid":6017,
-         "source":"SpriteFinal_paredes.tsx"
+         "source":"spritesheet_rooms2.tsx"
         }],
  "tilewidth":32,
  "type":"map",
