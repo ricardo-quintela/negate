@@ -1,54 +1,55 @@
 {
     "targets": {
-        "loveLetter": {
+        "love_letter": {
             "type": "document",
             "name": "Love letter",
             "content": "In the realms of cyberspace and love, here's a little secret for you: the key to my heart and the password to my world are one and the same. It's a combination of the joy you bring, the warmth of your smile, and the magic of our shared moments.\n\nSo, if you ever need access to the core of my being or the digital confines of my computer, just remember this passphrase: 'password123'. It's a testament to the unique love we share."
         },
-        "pilotAgreement": {
+        "pilot_agreement": {
             "type": "document",
             "name": "Pilot File",
             "content": "This Agreement (\"Agreement\") effective [Date] between [Pilot's Full Name] (\"Pilot\") and [Team Name] (\"Team\").\n\n1. Engagement:\n   1.1 Pilot competes for Team in the [Year] Formula 1 Championship season.\n\n2. Compensation:\n   2.1 Pilot receives a base salary of [Amount].\n\n3. Obligations:\n   3.1 Pilot follows FIA regulations and engages in promotional activities.\n\n4. Termination:\n   4.1 Termination for material breach or in accordance with FIA rules.\n\n5. Confidentiality:\n   5.1 Pilot maintains confidentiality of Team's information.\n\n6. Governing Law:\n   6.1 Governed by the laws of [Jurisdiction].\n\n7. Miscellaneous:\n   7.1 Entire understanding between Pilot and Team."
         },
-        "Carta": {
+        "letter": {
             "type": "document",
-            "name": "Carta",
-            "content": "Acho que estou a ser perseguida, não sei por quem..."        },
-        "Pa": {
-            "type": "item",
-            "name": "Pá suja",
-            "content": "Uma pá com sangue?",
-            "img": "/maps/items/img/pa.png"
+            "name": "Letter",
+            "content": "I think I'm being followed, I don't know by whom..."
         },
-        "Comprimidos": {
+        "shovel": {
             "type": "item",
-            "name": "Comprimidos fortes",
-            "content": "Caixas de comprimidos quase vazias",
-            "img": "/maps/items/img/comprimidos.png"
+            "name": "Dirty Shovel",
+            "content": "A shovel with blood?",
+            "img": "/maps/items/img/shovel.png"
         },
-        "Bolo": {
+        "strong_pills": {
             "type": "item",
-            "name": "Bolo",
-            "content": "Bolo com um aspeto delicioso YUMMY",
-            "img": "/maps/items/img/bolo.png"
+            "name": "Strong Pills",
+            "content": "Boxes of almost empty pills",
+            "img": "/maps/items/img/strong_pills.png"
         },
-        "Faca": {
+        "cake": {
             "type": "item",
-            "name": "Faca",
-            "content": "Uma faca perdida?",
-            "img": "/maps/items/img/Faca.png"
+            "name": "Cake",
+            "content": "Cake with a delicious look YUMMY",
+            "img": "/maps/items/img/cake.png"
         },
-        "Construtor": {
+        "knife": {
             "type": "item",
-            "name": "Informação do construtor",
-            "content": "EU NÃO SEI DE NADA... Só vim fazer o meu trabalho",
-            "img": "/maps/items/img/Construtor.png"
+            "name": "Knife",
+            "content": "A lost knife?",
+            "img": "/maps/items/img/knife.png"
         },
-        "Ceringa": {
+        "builder_info": {
             "type": "item",
-            "name": "Ceringa",
-            "content": "Uma ceringa no local de construções",
-            "img": "/maps/items/img/Ceringa.png"
+            "name": "Builder's Information",
+            "content": "I DON'T KNOW ANYTHING... Just came to do my job",
+            "img": "/maps/items/img/builder_info.png"
+        },
+        "syringe": {
+            "type": "item",
+            "name": "Syringe",
+            "content": "A syringe at the construction site",
+            "img": "/maps/items/img/syringe.png"
         }
     }
 }
