@@ -7,7 +7,7 @@ var isSharedSpace = false;
 var loadedResources = false;
 
 // map and players related
-const CURRENT_MAP = "map_2";
+const CURRENT_MAP = "map_3";
 var mapInfo = null;
 var players = null;
 var characterAnimations = null;
@@ -306,8 +306,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } else {
                 // load the map spritesheets
-                const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms.json");
-                const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors.json");
+                const roomsSpriteSheet = await loadSprites("rooms", "/sprites/spritesheet_rooms2.json");
+                const objectsSpriteSheet = await loadSprites("objects", "/sprites/spritesheet_interiors2.json");
 
                 // load the map and save the colliders and interactables info
                 mapInfo = await loadMap(app, CURRENT_MAP, roomsSpriteSheet, objectsSpriteSheet);
