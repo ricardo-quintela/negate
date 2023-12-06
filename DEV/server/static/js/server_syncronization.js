@@ -453,7 +453,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             // remove the item from the sender's inventory
             itemInventory.splice(tradeItem, 1);
-            inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = null;
+            inventorySlotsEl[itemInventory.length].style.backgroundImage = null;
 
             const itemDescriptionEl = document.querySelector(".item-description");
             const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
