@@ -2,11 +2,14 @@
 <span class="material-symbols-outlined icon" onclick="openInventory()">
 backpack
 </span>
-<span class="badge hidden"> 0 </span>
+<span class="badge hidden" id="invBadge"> 0 </span>
 </div>
-<span class="material-symbols-outlined document-button" onclick="openDocuments()">
+<div class="document-button">
+<span class="material-symbols-outlined icon" onclick="openDocuments()">
     description
 </span>
+<span class="badge hidden" id="docBadge"> 0 </span>
+</div>
 
 <button class="material-symbols-outlined interact-button" onclick="interact()" disabled>touch_app</button>
 

@@ -26,7 +26,7 @@ function characterInfo(element) {
 
 function openInventory() {
 
-    let notificationBadgeEl = document.getElementsByClassName("badge")[0];
+    let notificationBadgeEl = document.getElementById("invBadge");
     notificationBadgeEl.classList.add("hidden");
     receivedItems = 0;
     const itemDescriptionEl = document.querySelector(".item-description");
@@ -64,6 +64,9 @@ function closeInventory() {
  * Opens document inventory and closes item inventory
  */
 function openDocuments() {
+    let notificationBadgeEl = document.getElementById("docBadge");
+    notificationBadgeEl.classList.add("hidden");
+    receivedDocs = 0;
     const docDescriptionEl = document.querySelector(".document-description");
     const docTitleEl = docDescriptionEl.querySelector(".document-desc-title");
     const docTextEl = docDescriptionEl.querySelector(".document-desc-text");
