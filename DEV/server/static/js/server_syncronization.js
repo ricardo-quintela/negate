@@ -447,11 +447,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
         if(socket.id === payload.senderId){
-
+            const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
+            for (let i = tradeItem; i + 1 < itemInventory.length; i++) {
+                inventorySlotsEl[i].style.backgroundImage = inventorySlotsEl[i + 1].style.backgroundImage;
+            }
             // remove the item from the sender's inventory
             itemInventory.splice(tradeItem, 1);
-            const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
-            inventorySlotsEl[tradeItem].style.backgroundImage = null;
+            inventorySlotsEl[itemInventory.length].style.backgroundImage = null;
 
             const itemDescriptionEl = document.querySelector(".item-description");
             const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
