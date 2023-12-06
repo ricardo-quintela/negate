@@ -22,6 +22,7 @@ var targetInteractable = null;
 var targetInteractableId = null;
 var tradeItem = -1;
 var receivedItems = 0;
+var receivedDocs = 0;
 
 // main element of the code
 var mainEL = null;
@@ -379,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(targetInteractable.type === "item"){
             // add the item to the inventory
             itemInventory.push(targetInteractable);
-            
+
             // get the inventory slot elements
             const inventorySlotsEl = Array.from(document.querySelectorAll(".side-by-side-inventory > .grid > .grid-item"));
             const itemDescriptionEl = document.querySelector(".item-description");
@@ -392,9 +393,9 @@ document.addEventListener("DOMContentLoaded", () => {
             itemTextEl.innerHTML = targetInteractable.content;
 
             receivedItems++;
-            notificationBadgeEl = document.getElementsByClassName("badge")[0];
+            let notificationBadgeEl = document.getElementById("invBadge");
             notificationBadgeEl.innerHTML = `${receivedItems}`;
-            notificationBadgeEl.classList.remove("hidden");
+            if (notificationBadgeEl.classList.contains("hidden")) notificationBadgeEl.classList.remove("hidden");
         }
         else if(targetInteractable.type === "document"){
             documentInventory.push(targetInteractable);
@@ -409,6 +410,11 @@ document.addEventListener("DOMContentLoaded", () => {
             documentSlotsEl[documentInventory.length - 1].innerHTML = targetInteractable.name;
             documentTitleEl.innerHTML = targetInteractable.name;
             documentTextEl.innerHTML = targetInteractable.content;
+
+            receivedDocs++;
+            let notificationBadgeEl = document.getElementById("docBadge");
+            notificationBadgeEl.innerHTML = `${receivedDocs}`;
+            if (notificationBadgeEl.classList.contains("hidden")) notificationBadgeEl.classList.remove("hidden");
         }
         
         // reseting target interactable
@@ -435,9 +441,9 @@ document.addEventListener("DOMContentLoaded", () => {
         
         insertItem(targetItem);
         receivedItems++;
-        notificationBadgeEl = document.getElementsByClassName("badge")[0];
+        let notificationBadgeEl = document.getElementById("invBadge");
         notificationBadgeEl.innerHTML = `${receivedItems}`;
-        notificationBadgeEl.classList.remove("hidden");
+        if (notificationBadgeEl.classList.contains("hidden")) notificationBadgeEl.classList.remove("hidden");
 
         }
         if(socket.id === payload.senderId){
