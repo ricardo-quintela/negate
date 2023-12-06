@@ -37,8 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (roomId === "") {
             return;
         }
-        
-        window.location.replace(`/join-room?roomId=${roomId}&username=${username}`);
+
+        window.location.replace(`/join-room?roomId=${roomId.toUpperCase()}&username=${username}`);
 
     });
 
