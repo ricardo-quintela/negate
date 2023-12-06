@@ -1,5 +1,3 @@
-// TODO: change the rendering of the controller
-
 /**
  * Annotates the dpad buttons order
  */
@@ -50,11 +48,14 @@ function loadController(app) {
 
     const CONTROLLER_SIZE = 50;
 
+    // get the supposed height to fix the controller positioning
+    const height = app.screen.height < app.screen.width ? app.screen.height : app.screen.width;
+
     const dPadPositions = [
-        [CONTROLLER_SIZE * 3 + 10, app.screen.height - CONTROLLER_SIZE * 2],
-        [CONTROLLER_SIZE * 2, app.screen.height - CONTROLLER_SIZE + 10],
-        [CONTROLLER_SIZE - 10, app.screen.height - CONTROLLER_SIZE * 2],
-        [CONTROLLER_SIZE * 2, app.screen.height - CONTROLLER_SIZE * 3 - 10],
+        [CONTROLLER_SIZE * 3 + 10, height - CONTROLLER_SIZE * 2],
+        [CONTROLLER_SIZE * 2, height - CONTROLLER_SIZE + 10],
+        [CONTROLLER_SIZE - 10, height - CONTROLLER_SIZE * 2],
+        [CONTROLLER_SIZE * 2, height - CONTROLLER_SIZE * 3 - 10],
     ];
 
     var controller = {
@@ -86,12 +87,24 @@ function loadController(app) {
         dPadButton.interactive = true;
 
         // set touchevents
-        dPadButton.on("touchstart", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true }));
-        dPadButton.on("touchend", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false }));
+        dPadButton.on("touchstart", (event) => {
+            event.preventDefault(); // prevent selection
+            socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true });
+        });
+        dPadButton.on("touchend", (event) => {
+            event.preventDefault(); // prevent selection
+            socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false });
+        });
 
         // set mouse events
-        dPadButton.on("mousedown", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true }));
-        dPadButton.on("mouseup", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false }));
+        dPadButton.on("mousedown", (event) => {
+            event.preventDefault(); // prevent selection
+            socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true });
+        });
+        dPadButton.on("mouseup", (event) => {
+            event.preventDefault(); // prevent selection
+            socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false });
+        });
 
         // add the child to the stage
         app.stage.addChild(dPadButton);
