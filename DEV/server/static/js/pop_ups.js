@@ -26,12 +26,17 @@ function characterInfo(element) {
 
 function openInventory() {
 
+    let notificationBadgeEl = document.getElementById("invBadge");
+    notificationBadgeEl.classList.add("hidden");
+    receivedItems = 0;
     const itemDescriptionEl = document.querySelector(".item-description");
     const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
     const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
+    const tradeButton = document.getElementById("TradeButton");
 
     itemTitleEl.innerHTML = "";
     itemTextEl.innerHTML = "";
+    tradeButton.disabled = true;
 
     let inventoryEl = document.getElementsByClassName("inventory")[0];
     inventoryEl.classList.remove("hidden");
@@ -59,6 +64,16 @@ function closeInventory() {
  * Opens document inventory and closes item inventory
  */
 function openDocuments() {
+    let notificationBadgeEl = document.getElementById("docBadge");
+    notificationBadgeEl.classList.add("hidden");
+    receivedDocs = 0;
+    const docDescriptionEl = document.querySelector(".document-description");
+    const docTitleEl = docDescriptionEl.querySelector(".document-desc-title");
+    const docTextEl = docDescriptionEl.querySelector(".document-desc-text");
+
+    docTitleEl.innerHTML = "";
+    docTextEl.innerHTML = "";
+
     const documentInventoryEl = document.querySelector(".document");
     documentInventoryEl.classList.remove("hidden");
 
@@ -119,11 +134,6 @@ function closeTradeMenu() {
     document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
     document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
     const itemDescriptionEl = document.querySelector(".item-description");
-    const itemTitleEl = itemDescriptionEl.querySelector(".item-desc-title");
-    const itemTextEl = itemDescriptionEl.querySelector(".item-desc-text");
-
-    itemTitleEl.innerHTML = "";
-    itemTextEl.innerHTML = "";
 }
 
 /**

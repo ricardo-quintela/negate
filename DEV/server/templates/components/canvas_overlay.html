@@ -1,11 +1,22 @@
+<div class="landscape-mode-overlay">
+    <h1>Use landscape mode</h1>
+    <span class="material-symbols-outlined">
+    screen_rotation
+    </span>
+</div>
 
-<span class="material-symbols-outlined inventory-button" onclick="openInventory()">
+<div class="inventory-button">
+<span class="material-symbols-outlined icon" onclick="openInventory()">
 backpack
 </span>
-
-<span class="material-symbols-outlined document-button" onclick="openDocuments()">
+<span class="badge hidden" id="invBadge"> 0 </span>
+</div>
+<div class="document-button">
+<span class="material-symbols-outlined icon" onclick="openDocuments()">
     description
 </span>
+<span class="badge hidden" id="docBadge"> 0 </span>
+</div>
 
 <button class="material-symbols-outlined interact-button" onclick="interact()" disabled>touch_app</button>
 
@@ -29,9 +40,9 @@ backpack
             <div class="item-desc-title"></div>
             <div class="item-desc-text"></div>
         </div>
-        <span class="material-symbols-outlined trade-button" onclick="openTradeMenu()">
+        <button class="material-symbols-outlined trade-button" id="TradeButton" onclick="openTradeMenu()" disabled>
             send
-        </span>
+        </button>
     </div>
     <div class="characters hidden" id="tradeMenu">
         <div class="character">
@@ -60,10 +71,10 @@ backpack
     <div class="submenu-title"> Documents </div>
     <div class="document-content">
         <div class="document-list">
-            <div class="document-item"></div>
-            <div class="document-item"></div>
-            <div class="document-item"></div>
-            <div class="document-item"></div>
+            <div class="document-item" onclick="selectDocument(0)"></div>
+            <div class="document-item" onclick="selectDocument(1)"></div>
+            <div class="document-item" onclick="selectDocument(2)"></div>
+            <div class="document-item" onclick="selectDocument(3)"></div>
         </div>
         <div class="document-description">
             <div class="document-desc-title"></div>

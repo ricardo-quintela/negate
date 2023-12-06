@@ -1,0 +1,117 @@
+Este documento serve para descrever ações dos jogadores e suas consequências.
+
+Legenda:
+"-" -> Ação
+">" -> Consequência
+"$" -> Précondição
+
+
+Walktrough:
+
+           Telefone                                                      |                  Shared Space
+=========================================================================|=========================================================================
+1                                                                        |
+                                                                         | º Criar o Lobby
+                                                                         |   - Introduzir o username
+                                                                         |   - Clicar em "Create Room"
+                                                                         | > Display do room ID
+º Juntar ao lobby                                                        |
+  - Introduzir o username                                                |
+  - Clicar em "join room"                                                |
+  - Introduzir o room ID                                                 |
+  - Clicar em "join"                                                     |
+                                                                         |
+$ Jogador está no lobby                                                  |
+º Colocar-se "Ready"                                                     |
+  - Clicar no botão "ready"                                              |
+ > "Ready Count" aumenta                                                 |> "Ready Count" aumenta
+  - Clicar no botão "unready"                                            |
+ > "Ready Count" diminui                                                 |> "Ready Count" diminui
+$ Todos os jogadores estão ready                                         |$ Todos os jogadores estão ready
+   -Ecrã muda para o próximo                                             |   -Ecrã muda para o próximo
+=========================================================================|=========================================================================
+2                                                                        |
+º Escolher personagem                                                    |
+  - Jogador explora as personagens (verifica detalhes e quais existem.)  |
+  - Jogador seleciona personagem                                         |
+  - Jogador dá "lock in" na personagem                                   |
+ > Personagem fica escolhido e bloqueado                                 |> Personagem é mostrado no Shared Space
+ > Outros personagens ficam bloqueados                                   |
+$ Quando todos os jogadores tiverem dado "lock in" na                    |$ Quando todos os jogadores tiverem dado "lock in" na 
+personagem, página muda para o jogo                                      |personagem, página muda para o jogo
+                                                                         |
+=========================================================================|=========================================================================
+3                                                                        |
+º Movimentação                                                           |
+  - Jogador pressiona numa das setas do DPAD                             |> Personagem correspondente ao jogador move-se na
+                                                                         |direção clicada
+  - Jogador para de pressionar na seta do DPAD                           |> Personagem correspondente ao jogador para de se
+                                                                         |mover
+º Inventário de Itens                                                    |
+$ Jogador não possui nenhum item                                         |
+  - Jogador carrega no botão do inventário                               |
+ > Pop-Up do inventário surge                                            |
+    - Nada está no inventário                                            |
+$ Jogador possui um item                                                 |
+  - Jogador carrega no botão do inventário                               |
+ > Pop-Up do inventário surge                                            |
+    - O icone do item é mostrado no primeiro do slot do inventário       |
+  - Jogador carrega no ícone do item                                     |
+ > Descrição e título do item são mostrados                              |
+ > Botão de troca fica ativo                                             |
+                                                                         |
+$ Jogador tem o inventário de itens aberto                               |
+  - Jogador carrega na "X" no canto superior direito do inventário       |
+ > Pop-Up do inventário é fechado                                        |
+                                                                         |
+º Inventário de Documentos                                               |
+$ Jogador não possui nenhum documento                                    |
+  - Jogador carrega no botão dos documentos                              |
+ > Pop-Up dos documentos surge                                           |
+    - Nada está na coleção                                               |
+$ Jogador possui um documento                                            |
+  - Jogador carrega no botão dos documentos                              |
+ > Pop-Up dos documentos surge                                           |
+    - O título do documento é mostrado na coleção                        |
+  - Jogador carrega no documento na coleção                              |
+ > Título e descrição do documento são mostrados                         |
+                                                                         |
+$ Jogador tem o inventário de documentos aberto                          |
+  - Jogador carrega na "X" no canto superior direito dos documentos      |
+ > Pop-Up dos documentos é fechado                                       |
+=========================================================================|=========================================================================
+4                                                                        |
+º Interação com itens e documentos no mundo                              |
+  - Jogador movimenta-se até um objeto                                   | > Objeto ganha um contorno branco
+                                                                         |
+ > Botão de interação ativa-se                                           |
+  - Jogador carrega no botão de interação                                |
+$ O objeto era um item                                                   |
+ > Aparece o item no inventário de itens do jogador                      |
+                                                                         |
+$ O objeto era um documento                                              |
+ > Aparece um documento no inventário do jogador                         |
+                                                                         |
+ > Botão de interação desativa-se                                        | > Objeto deixa de ter o contorno branco
+=========================================================================|=========================================================================
+5                                                                        |
+º Troca entre personagens entre J1 e J2                                  |
+$ J1 possui um item                                                      |
+  - J1 abre o inventário                                                 |
+ > O Pop-Up do Inventário surge                                          |
+   - O icone do item é mostrado no primeiro do slot do inventário        |
+  - Jogador carrega no ícone do item                                     |
+ > Descrição e título do item são mostrados                              |
+ > Botão de troca fica ativo                                             |
+  - J1 carrega no botão de troca                                         |
+ > O Pop-Up de escolher para quem enviar surge                           |
+  - J1 carrega sobre J2                                                  |
+ > O Pop-Up é fechado retornando ao inventário                           |
+ > O item desaparece do seu inventário                                   |
+                                                                         |
+$ J2 não possui nenhum item                                              |
+$ J1 trocou o item com J2                                                |
+  - J2 abre o inventário                                                 |
+ > O Pop-Up do Inventário surge                                          |
+   - O icone do item trocado é mostrado no primeiro do slot do           |
+inventário                                                               |

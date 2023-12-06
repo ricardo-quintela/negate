@@ -771,19 +771,7 @@
                  "width":32,
                  "x":352,
                  "y":96
-                }, 
-                {
-                 "gid":1098,
-                 "height":32,
-                 "id":474,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":384,
-                 "y":352
-                }, 
+                },
                 {
                  "gid":1358,
                  "height":32,
@@ -887,9 +875,19 @@
                  "properties":[
                         {
                          "name":"targetId",
+                         "type":"string",
+                         "value":"note"
+                        },
+                        {
+                         "name":"characterId",
                          "type":"int",
-                         "value":3
-                        }],
+                         "value":2
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":""
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -905,15 +903,53 @@
                  "properties":[
                         {
                          "name":"targetId",
+                         "type":"string",
+                         "value":"pilotAgreement"
+                        },
+                        {
+                         "name":"characterId",
                          "type":"int",
                          "value":1
-                        }],
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":""
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":32,
                  "x":384,
                  "y":64
+                },
+                {
+                 "gid":1098,
+                 "height":32,
+                 "id":474,
+                 "name":"",
+                 "properties":[
+                     {
+                      "name":"targetId",
+                      "type":"string",
+                      "value":"acController"
+                     },
+                     {
+                      "name":"characterId",
+                      "type":"int",
+                      "value":0
+                      },
+                      {
+                       "name":"requiredItemId",
+                       "type":"string",
+                       "value":"note"
+                       }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":384,
+                 "y":352
                 }, 
                 {
                  "gid":1134,
@@ -923,9 +959,19 @@
                  "properties":[
                         {
                          "name":"targetId",
+                         "type":"string",
+                         "value":"acController"
+                        },
+                        {
+                         "name":"characterId",
                          "type":"int",
-                         "value":2
-                        }],
+                         "value":0
+                         },
+                         {
+                          "name":"requiredItemId",
+                          "type":"string",
+                          "value":"note"
+                          }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

@@ -15,7 +15,7 @@ Negate - Home
 <main>
     <div id="main-menu" class="mainMenu">
         <div id="title" class="title"> One Hit Wonder </div>
-        <input type="text" id="usernameInput" class="inputField" placeholder="Enter your username">
+        <input type="text" id="usernameInput" class="inputField" autocomplete="off" placeholder="Enter your username">
         <div id="create-join" class="create-join">
             <form id="createRoomForm">
                 <input type="submit" class="room_button" value="Create Room">
@@ -28,7 +28,7 @@ Negate - Home
         <span id="close-join-popup" class="close-join-popup" onclick=closePopup()> &times </span>
         <form id="joinRoomForm" class="joinRoomForm">
             <div class="roomIdInput">
-                <input type="text" placeholder="Room ID" id="roomIdInput" class="inputField">
+                <input type="text" placeholder="Room ID" id="roomIdInput" class="inputField" style="text-transform:uppercase;" autocomplete="off">
             </div>
             <div id="join-room-button" class="join-room-button">
                 <input type="submit" class="room_button" value="Join">

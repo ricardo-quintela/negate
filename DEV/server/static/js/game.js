@@ -9,7 +9,8 @@ const dPadMovement = {
 }
 
 const PLAYER_SPEED = 5;
-const INTERACT_REACH = 50;
+const INTERACT_REACH = 80;
+const HITBOX_HEIGHT_RATIO = 1/4; // raletion of the hitbox height and the sprite height
 
 
 /**
@@ -47,11 +48,14 @@ function loadController(app) {
 
     const CONTROLLER_SIZE = 50;
 
+    // get the supposed height to fix the controller positioning
+    const height = app.screen.height < app.screen.width ? app.screen.height : app.screen.width;
+
     const dPadPositions = [
-        [CONTROLLER_SIZE * 3 + 10, app.screen.height - CONTROLLER_SIZE * 2],
-        [CONTROLLER_SIZE * 2, app.screen.height - CONTROLLER_SIZE + 10],
-        [CONTROLLER_SIZE - 10, app.screen.height - CONTROLLER_SIZE * 2],
-        [CONTROLLER_SIZE * 2, app.screen.height - CONTROLLER_SIZE * 3 - 10],
+        [CONTROLLER_SIZE * 3 + 10, height - CONTROLLER_SIZE * 2],
+        [CONTROLLER_SIZE * 2, height - CONTROLLER_SIZE + 10],
+        [CONTROLLER_SIZE - 10, height - CONTROLLER_SIZE * 2],
+        [CONTROLLER_SIZE * 2, height - CONTROLLER_SIZE * 3 - 10],
     ];
 
     var controller = {
@@ -83,12 +87,24 @@ function loadController(app) {
         dPadButton.interactive = true;
 
         // set touchevents
-        dPadButton.on("touchstart", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true }));
-        dPadButton.on("touchend", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false }));
+        dPadButton.on("touchstart", (event) => {
+            event.preventDefault(); // prevent selection
+            socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true });
+        });
+        dPadButton.on("touchend", (event) => {
+            event.preventDefault(); // prevent selection
+            socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false });
+        });
 
         // set mouse events
-        dPadButton.on("mousedown", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true }));
-        dPadButton.on("mouseup", (_) => socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false }));
+        dPadButton.on("mousedown", (event) => {
+            event.preventDefault(); // prevent selection
+            socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: true });
+        });
+        dPadButton.on("mouseup", (event) => {
+            event.preventDefault(); // prevent selection
+            socket.emit("movePlayer", { roomId: roomId, key: dPadMovement[index], state: false });
+        });
 
         // add the child to the stage
         app.stage.addChild(dPadButton);
@@ -176,43 +192,83 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
         app.stage.addChild(sprite);
     }
 
-    const interactables = []
+    const propQueue = {};
     // load the props
     const props = map.layers[2].objects;
     for (const prop of props) {
+        // load the texture
         const texture = PIXI.Texture.from(Object.keys(objectsSpritesheet.textures)[prop.gid - map.tilesets[1].firstgid]);
+        // build the sprite
         const sprite = new PIXI.Sprite(texture);
 
-        // create the highlighted sprite
+        // create the highlight of the sprite sprite
+        // create a white sprite
         const highlight = new PIXI.Graphics();
         highlight.beginFill(0xFFFFFF);
         highlight.drawRect(0,0, prop.width, prop.height);
         highlight.endFill();
+
+        // mask the highlight with the prop's shape
         const mask = new PIXI.Sprite(texture);
         highlight.addChild(mask);
         highlight.mask = mask;
-        mask.anchor.set(0.5);
-        mask.setTransform(prop.width/2, prop.height/2, 1.3,1.3, 0,0,0,0);
 
-        // set the sprite position
-        highlight.position.set(prop.x, prop.y - sprite.height);
-        sprite.position.set(prop.x, prop.y - sprite.height);
+        // set the highlight as invisible
+        highlight.visible = false;
 
-        app.stage.addChild(highlight);
-        app.stage.addChild(sprite);
+        // get the id of the prop from its properties
+        const propId = prop.properties[2].value;
 
-        // set the target item to the corresponding one on the array
-        var target = null;
-        if (prop.properties[0].value !== -1) {
-            target = mapInteractables.targets[prop.properties[0].value];
+        // get the character that can interact with the prop
+        const characterId = prop.properties[0].value;
+
+        // get the required item id to use the item
+        const requiredItemId = prop.properties[1].value;
+
+        // initialize the prop data if it hasn't been already
+        if (!(propId in propQueue)) {
+            propQueue[propId] = {
+                position: {x: -1, y: -1}, // position reset
+                sprites: [],
+                active: true,
+                characterId: characterId,
+                requiredItemId: requiredItemId,
+                target: mapInteractables.targets[propId]
+            };
         }
 
-        interactables.push({
-            highlight: highlight,
-            position: highlight.position,
-            active: true,
-            target: target
-        });
+        // push the prop into the queue on the corresponding prop id
+        propQueue[propId].sprites.push(
+            {
+                position: {
+                    x: prop.x,
+                    y: prop.y
+                },
+                sprite: sprite,
+                highlight: highlight,
+            }
+        );
+
+        // set the sprite and highlight positions
+        sprite.position.set(prop.x, prop.y - sprite.height);
+        highlight.position.set(prop.x, prop.y - sprite.height);
+
+        // calculate the center of the prop
+        const propPosition = propQueue[propId].sprites.reduce(
+            (accumulator, sprite) => {
+                accumulator.x += sprite.position.x;
+                accumulator.y += sprite.position.y;
+                return accumulator;
+            },
+            {x:0, y:0}
+        );
+        // set the center position of the prop
+        propQueue[propId].position.x = propPosition.x / propQueue[propId].sprites.length;
+        propQueue[propId].position.y = propPosition.y / propQueue[propId].sprites.length;
+
+        // add the sprite and highlight to the stage
+        app.stage.addChild(sprite);
+        app.stage.addChild(highlight);
 
     }
 
@@ -234,8 +290,10 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
         mapColliders.push(mapCollider);
     }
 
+    // get the players spawns
+    const spawns = map.layers[4].objects;
 
-    return {colliders: mapColliders, interactables: interactables};
+    return {colliders: mapColliders, interactables: propQueue, playerSpawns: spawns};
 }
 
 /**
@@ -283,7 +341,7 @@ async function loadCharacterSpritesheets(characterSpritesheetFiles) {
  * @param {String} characterAnimations the animation set for each one of the characters
  * @returns the players object
  */
-async function loadPlayers(app, playerData, socketId, characterAnimations) {
+async function loadPlayers(app, playerData, socketId, characterAnimations, playerSpawns) {
 
     var players = {}
 
@@ -301,13 +359,13 @@ async function loadPlayers(app, playerData, socketId, characterAnimations) {
         player.setTransform(0, 0, 2, 2, 0, 0, 0, 0, 0);
 
         // position
-        player.x = 100;
-        player.y = 100;
+        player.x = playerSpawns[playerData[playerId].character].x;
+        player.y = playerSpawns[playerData[playerId].character].y;
         const playerCollider = new PIXI.Rectangle(
             player.x,
-            player.y,
+            player.y + ((1 - HITBOX_HEIGHT_RATIO) * player.height),
             player.width,
-            player.height
+            player.height * HITBOX_HEIGHT_RATIO
         );
 
         players[playerId] = {
@@ -409,7 +467,7 @@ function updatePlayers(socketId, mapColliders, characterAnimations) {
                 break;
             }
             players[playerId].sprite.x = players[playerId].hitbox.x;
-            players[playerId].sprite.y = players[playerId].hitbox.y;
+            players[playerId].sprite.y = (players[playerId].hitbox.y + players[playerId].hitbox.height) - players[playerId].sprite.height;
         }
     }
 }
@@ -418,26 +476,21 @@ function updatePlayers(socketId, mapColliders, characterAnimations) {
 /**
  * Calculates the distance between players and interactables and
  * sets the player to be able to interact
- * @param {String} socketId the socket id to ignore
- * @param {Array} interactables the map colliders
+ * @param {String} socketId the socket id to ignore (shared space)
+ * @param {Object} interactables the map interactables
  */
 function calcultateInteractions(socketId, interactables) {
 
     var playerInteractGroup = {};
 
     // iterate through all the interactables and check player interactability
-    var interactableId = 0;
-    for (const interactable of interactables) {
+    var targetInteractableIds = {};
+    for (const targetId of Object.keys(interactables)) {
 
-        // skip if unavailable
-        if (!interactable.active) {
-            interactable.highlight.visible = false;
-            interactableId++;
-            continue;
-        };
-
-        // to save interactions of each player and prioritize the ones that are true
-        var interactGroup = [];
+        // set the highlight to invisible
+        interactables[targetId].sprites.forEach(sprite => {
+            sprite.highlight.visible = false;
+        });
 
         // check interact distance for every player
         for (const playerId of Object.keys(playerData)) {
@@ -445,12 +498,33 @@ function calcultateInteractions(socketId, interactables) {
             // ignore shared space socket
             if (playerId === socketId) continue;
 
-            // set the interactable to visible or not
-            const distance = calculateDistance(players[playerId].hitbox, interactable.position);
-            const canInteract = distance < INTERACT_REACH;
+            var canInteract;
 
-            // push the interaction to the array to register all of the players
-            interactGroup.push(canInteract);
+            // ignore the interaction if the prop is not active or the player's inventory doesn't have the required item
+            if (!interactables[targetId].active || (interactables[targetId].requiredItemId !== "" && !playerInventories[playerId].includes(interactables[targetId].requiredItemId))) {
+                
+                canInteract = false;
+            } else {
+
+                // if the character cannot interact with the item
+                if (interactables[targetId].characterId !== -1 && playerData[playerId].character !== interactables[targetId].characterId) {
+                    canInteract = false;
+                } else {
+                    // set the interactable to visible or not
+                    const distance = calculateDistance(players[playerId].hitbox, interactables[targetId].position);
+                    canInteract = distance < INTERACT_REACH;
+                }
+                
+            }
+
+
+            // set the targetId if the player can interact with the prop
+            if (!(playerId in targetInteractableIds)) {
+                targetInteractableIds[playerId] = canInteract ? targetId : null;
+            } else {
+                targetInteractableIds[playerId] = canInteract ? targetId : targetInteractableIds[playerId];
+            }
+
 
             if (playerId in playerInteractGroup) {
                 playerInteractGroup[playerId] = playerInteractGroup[playerId] ? true : canInteract;
@@ -458,34 +532,40 @@ function calcultateInteractions(socketId, interactables) {
                 playerInteractGroup[playerId] = canInteract;
             }
 
-
-            // set the target
-            const target = canInteract ? interactable.target : null;
-            
-            // allow the event to be called only once
-            if (playerData[playerId].isInteracting !== playerInteractGroup[playerId]) {
-                playerData[playerId].isInteracting = playerInteractGroup[playerId];
-
-                // send interact data to the server
-                socket.emit("setInteractPermission", {
-                    roomId: roomId,
-                    playerId: playerId,
-                    state: playerInteractGroup[playerId],
-                    interactableId: interactableId,
-                    target: target
-                });
-            }
-
         }
 
-        // update the interact highlight
-        var totalInteractions = false;
-        for (const inter of interactGroup){
-            totalInteractions = totalInteractions || inter;
-        }
-        interactable.highlight.visible = totalInteractions;
+        // item can be interacted with
+        for (const playerId of Object.keys(targetInteractableIds)){
+            if (targetInteractableIds[playerId] === null) continue;
 
-        interactableId++;
+            interactables[targetInteractableIds[playerId]].sprites.forEach(sprite => {
+                sprite.highlight.visible = true;
+            });
+        }
 
     }
+
+
+    for (const playerId of Object.keys(targetInteractableIds)) {
+        if (playerInteractGroup[playerId] === playerData[playerId].isInteracting) continue;
+        
+        // set the target to the target object or null if it can't be interacted
+        const target = targetInteractableIds[playerId] !== null ? interactables[targetInteractableIds[playerId]].target : null;
+        
+        // allow the event to be called only once
+        if (playerData[playerId].isInteracting !== playerInteractGroup[playerId]) {                
+            
+            playerData[playerId].isInteracting = playerInteractGroup[playerId];
+            
+            // send interact data to the server
+            socket.emit("setInteractPermission", {
+                roomId: roomId,
+                playerId: playerId,
+                state: playerInteractGroup[playerId],
+                interactableId: targetInteractableIds[playerId],
+                target: target
+            });
+        }
+    }
+    
 }
