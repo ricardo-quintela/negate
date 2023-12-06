@@ -5189,7 +5189,7 @@
                                           {
                                                  "name": "character_id",
                                                  "type": "int",
-                                                 "value": -1
+                                                 "value": 1
                                           },
                                           {
                                                  "name": "required_item_id",
@@ -5218,7 +5218,7 @@
                                           {
                                                  "name": "character_id",
                                                  "type": "int",
-                                                 "value": -1
+                                                 "value": 2
                                           },
                                           {
                                                  "name": "required_item_id",
@@ -5247,7 +5247,7 @@
                                           {
                                                  "name": "character_id",
                                                  "type": "int",
-                                                 "value": -1
+                                                 "value": 2
                                           },
                                           {
                                                  "name": "required_item_id",
@@ -5276,7 +5276,7 @@
                                           {
                                                  "name": "character_id",
                                                  "type": "int",
-                                                 "value": -1
+                                                 "value": 2
                                           },
                                           {
                                                  "name": "required_item_id",
@@ -5363,7 +5363,7 @@
                                           {
                                                  "name": "character_id",
                                                  "type": "int",
-                                                 "value": -1
+                                                 "value": 1
                                           },
                                           {
                                                  "name": "required_item_id",
@@ -5392,7 +5392,7 @@
                                           {
                                                  "name": "character_id",
                                                  "type": "int",
-                                                 "value": -1
+                                                 "value": 1
                                           },
                                           {
                                                  "name": "required_item_id",
@@ -5416,12 +5416,12 @@
                                           {
                                                  "name": "target_id",
                                                  "type": "string",
-                                                 "value": "seringe"
+                                                 "value": "syringe"
                                           },
                                           {
                                                  "name": "character_id",
                                                  "type": "int",
-                                                 "value": -1
+                                                 "value": 2
                                           },
                                           {
                                                  "name": "required_item_id",

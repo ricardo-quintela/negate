@@ -40,15 +40,14 @@
             "img": "/maps/items/img/knife.png"
         },
         "builder_info": {
-            "type": "item",
+            "type": "document",
             "name": "Builder's Information",
-            "content": "I DON'T KNOW ANYTHING... Just came to do my job",
-            "img": "/maps/items/img/builder_info.png"
+            "content": "I DON'T KNOW ANYTHING... Just came to do my job"
         },
         "syringe": {
             "type": "item",
             "name": "Syringe",
-            "content": "A syringe at the construction site",
+            "content": "A used syringe at the construction site",
             "img": "/maps/items/img/syringe.png"
         }
     }
