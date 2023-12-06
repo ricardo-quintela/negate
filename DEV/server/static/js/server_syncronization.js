@@ -322,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "/sprites/characters/spritesheet_mechanic.json"
                 ]);
                 // load the player models and animations
-                players = await loadPlayers(app, playerData, socket.id, characterAnimations);
+                players = await loadPlayers(app, playerData, socket.id, characterAnimations, mapInfo.playerSpawns);
 
                 // update positions
                 setInterval(updatePlayers, TICK_SPEED, socket.id, mapInfo.colliders, characterAnimations);
@@ -390,6 +390,11 @@ document.addEventListener("DOMContentLoaded", () => {
             inventorySlotsEl[itemInventory.length - 1].style.backgroundImage = `url(${targetInteractable.img})`;
             itemTitleEl.innerHTML = targetInteractable.name;
             itemTextEl.innerHTML = targetInteractable.content;
+
+            receivedItems++;
+            notificationBadgeEl = document.getElementsByClassName("badge")[0];
+            notificationBadgeEl.innerHTML = `${receivedItems}`;
+            notificationBadgeEl.classList.remove("hidden");
         }
         else if(targetInteractable.type === "document"){
             documentInventory.push(targetInteractable);
