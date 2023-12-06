@@ -504,12 +504,14 @@ h1 {
 }
 .grid-item {
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: contain;
     border-style: solid;
     border-color: var(--light-outlines);
     color: var(--light-text);
     aspect-ratio: 1/1;
     text-align: center;
+
+    image-rendering: pixelated;
 }
 .grid-item:nth-of-type(1) {
     border-radius: 0.7rem 0 0 0;

@@ -1,30 +1,36 @@
 {
     "targets": {
-        "love_letter": {
+        "excavator_info": {
             "type": "document",
-            "name": "Love letter",
-            "content": "In the realms of cyberspace and love, here's a little secret for you: the key to my heart and the password to my world are one and the same. It's a combination of the joy you bring, the warmth of your smile, and the magic of our shared moments.\n\nSo, if you ever need access to the core of my being or the digital confines of my computer, just remember this passphrase: 'password123'. It's a testament to the unique love we share."
+            "name": "Excavator",
+            "content": "The hydraulics of this excavator have been sabotaged. It seems that it was not long ago due to the oil that is still dripping."
         },
-        "pilot_agreement": {
+        "car_info": {
             "type": "document",
-            "name": "Pilot File",
-            "content": "This Agreement (\"Agreement\") effective [Date] between [Pilot's Full Name] (\"Pilot\") and [Team Name] (\"Team\").\n\n1. Engagement:\n   1.1 Pilot competes for Team in the [Year] Formula 1 Championship season.\n\n2. Compensation:\n   2.1 Pilot receives a base salary of [Amount].\n\n3. Obligations:\n   3.1 Pilot follows FIA regulations and engages in promotional activities.\n\n4. Termination:\n   4.1 Termination for material breach or in accordance with FIA rules.\n\n5. Confidentiality:\n   5.1 Pilot maintains confidentiality of Team's information.\n\n6. Governing Law:\n   6.1 Governed by the laws of [Jurisdiction].\n\n7. Miscellaneous:\n   7.1 Entire understanding between Pilot and Team."
+            "name": "Parked Car",
+            "content": "It seems to be an old model. The rear tire is flat and the engine seems to be leaking coolant."
         },
         "letter": {
             "type": "document",
             "name": "Letter",
             "content": "I think I'm being followed, I don't know by whom..."
         },
+        "note": {
+            "type": "item",
+            "name": "Note: Computer's Password",
+            "content": "The computer's password is 1234",
+            "img": "/maps/items/img/note.png"
+        },
         "shovel": {
             "type": "item",
             "name": "Dirty Shovel",
-            "content": "A shovel with blood?",
+            "content": "A shovel that appears to be similar to those found on the construction site.",
             "img": "/maps/items/img/shovel.png"
         },
         "strong_pills": {
             "type": "item",
             "name": "Strong Pills",
-            "content": "Boxes of almost empty pills",
+            "content": "Boxes of almost empty antidepressant pills",
             "img": "/maps/items/img/strong_pills.png"
         },
         "cake": {
@@ -36,13 +42,23 @@
         "knife": {
             "type": "item",
             "name": "Knife",
-            "content": "A lost knife?",
+            "content": "A knife stained with dry blood.",
             "img": "/maps/items/img/knife.png"
         },
         "builder_info": {
             "type": "document",
             "name": "Builder's Information",
             "content": "I DON'T KNOW ANYTHING... Just came to do my job"
+        },
+        "email": {
+            "type": "document",
+            "name": "Email",
+            "content": "to: Ronald Ericson\nfrom: David Hutcherson\n\nYou didn't fix my car properly! You'll pay for this!"
+        },
+        "dead_body": {
+            "type": "document",
+            "name": "Dead Body",
+            "content": "The deceased person is Mr. Ronald Ericson.\nAge: 34\nProfession: Mechanic"
         },
         "syringe": {
             "type": "item",

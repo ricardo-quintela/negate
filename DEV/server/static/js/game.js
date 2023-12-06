@@ -11,7 +11,7 @@ const dPadMovement = {
 }
 
 const PLAYER_SPEED = 5;
-const INTERACT_REACH = 50;
+const INTERACT_REACH = 80;
 const HITBOX_HEIGHT_RATIO = 1/4; // raletion of the hitbox height and the sprite height
 
 
@@ -204,13 +204,13 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
         highlight.visible = false;
 
         // get the id of the prop from its properties
-        const propId = prop.properties[0].value;
+        const propId = prop.properties[2].value;
 
         // get the character that can interact with the prop
-        const characterId = prop.properties[1].value;
+        const characterId = prop.properties[0].value;
 
         // get the required item id to use the item
-        const requiredItemId = prop.properties[2].value;
+        const requiredItemId = prop.properties[1].value;
 
         // initialize the prop data if it hasn't been already
         if (!(propId in propQueue)) {
@@ -277,8 +277,10 @@ async function loadMap(app, mapName, roomsSpritesheet, objectsSpritesheet) {
         mapColliders.push(mapCollider);
     }
 
+    // get the players spawns
+    const spawns = map.layers[4].objects;
 
-    return {colliders: mapColliders, interactables: propQueue};
+    return {colliders: mapColliders, interactables: propQueue, playerSpawns: spawns};
 }
 
 /**
@@ -326,7 +328,7 @@ async function loadCharacterSpritesheets(characterSpritesheetFiles) {
  * @param {String} characterAnimations the animation set for each one of the characters
  * @returns the players object
  */
-async function loadPlayers(app, playerData, socketId, characterAnimations) {
+async function loadPlayers(app, playerData, socketId, characterAnimations, playerSpawns) {
 
     var players = {}
 
@@ -344,8 +346,8 @@ async function loadPlayers(app, playerData, socketId, characterAnimations) {
         player.setTransform(0, 0, 2, 2, 0, 0, 0, 0, 0);
 
         // position
-        player.x = 100;
-        player.y = 100;
+        player.x = playerSpawns[playerData[playerId].character].x;
+        player.y = playerSpawns[playerData[playerId].character].y;
         const playerCollider = new PIXI.Rectangle(
             player.x,
             player.y + ((1 - HITBOX_HEIGHT_RATIO) * player.height),
