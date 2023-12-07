@@ -19,7 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
         
-        window.location.replace(`/create-room?username=${username}`);
+        // window.location.replace(`/create-room?username=${username}`); // TODO: change in PROD
+        window.location.replace(`/game/ABCDE?username=${username}`);
         
     });
 
