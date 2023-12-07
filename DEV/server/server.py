@@ -557,7 +557,7 @@ def event_send_item(json: JSONDictionary):
 
 
 
-@app.route("/testing/create-room", methods=["POST"])
+@app.route("/testing/create-room", methods=["GET"])
 def testing_create_room() -> JSONDictionary:
     """Creates a room in memory with the given ID
 
@@ -565,16 +565,16 @@ def testing_create_room() -> JSONDictionary:
         JSONDictionary: the room info in JSON format
     """
     # bad request
-    if request.method != "POST":
+    if request.method != "GET":
         abort(400)
 
-    payload = request.form
+    args = request.args
 
     # validate the payload
-    if not ValidateJson.validate_keys(payload, "roomId"):
+    if "roomId" not in args:
         abort(400)
 
-    room_id = room_data.create_room(payload["roomId"])
+    room_id = room_data.create_room(args["roomId"])
 
     return {
         "roomId": room_id,

@@ -88,11 +88,8 @@ def test_game_route(client: FlaskClient, rooms: RoomData):
 def test_testing_create_room(client: FlaskClient):
     """Tests if the testing endpoint can create a room
     """
-    response = client.post(
-        "/testing/create-room",
-        data={
-            "roomId": "AAAAA"
-        }
+    response = client.get(
+        "/testing/create-room?roomId=AAAAA"
     )
 
     assert response.json == {
