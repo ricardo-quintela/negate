@@ -72,7 +72,7 @@ def create_room():
     room_id = room_data.create_room()
 
     app.logger.debug("Opened room '%s'", room_id)
-    
+
     return redirect(f"/game/{room_id}?username={username}", code=303)
 
 
@@ -197,7 +197,16 @@ def load_resource():
     if player_id not in player_data:
         abort(403)
 
-    app.logger.debug("Rendered '%s' on '%s'", resource, room_id)
+    if room_data.get_players(room_id)[player_id]["character"] == -1:
+        app.logger.debug(
+            "Rendered '%s' for player '%d'",
+            resource, room_data.get_players(room_id)[player_id]["username"]
+        )
+    else:
+        app.logger.debug(
+            "Rendered '%s' for player '%d'",
+            resource, room_data.get_players(room_id)[player_id]["character"]
+        )
 
     # render the template
     return render_template(
@@ -240,10 +249,14 @@ def event_join(json: JSONDictionary):
     if room_id not in room_data:
         return
 
-    app.logger.debug("Joined '%s' to room '%s'", socket_id, room_id)
 
     # add the player to the room data
     room_data.add_player(room_id, socket_id, username)
+
+    app.logger.debug(
+        "Player '%s' joined room '%s'",
+        room_data.get_players(room_id)[socket_id]["username"], room_id
+    )
 
     # send player data to all players
     socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
@@ -321,7 +334,17 @@ def event_ready(json: JSONDictionary):
         return
 
     room_data.get_players(room_id)[socket_id]["isReady"] = is_ready
-    app.logger.debug("Set ready state of '%s' on room '%s' to '%s'", socket_id, room_data, is_ready)
+
+    if is_ready:
+        app.logger.debug(
+            "Player '%s' is ready",
+            room_data.get_players(room_id)[socket_id]["username"]
+        )
+    else:
+        app.logger.debug(
+            "Player '%s' is not ready",
+            room_data.get_players(room_id)[socket_id]["username"]
+        )
 
     # send player data to all players
     socket_server.emit("playerData", room_data.get_players(room_id), to=room_id)
@@ -355,7 +378,11 @@ def event_lock_in(json: JSONDictionary):
 
     # set the player's character
     room_data.get_players(room_id)[socket_id]["character"] = character
-    app.logger.debug("Selected character '%d' for player '%s'", character, socket_id)
+    app.logger.debug(
+        "Player '%s' selected character '%d'",
+        room_data.get_players(room_id)[socket_id]["username"],
+        character,
+    )
 
     data = room_data.get_players(room_id)
 
@@ -401,6 +428,18 @@ def event_move_player(json: JSONDictionary):
     # room doesn't exist
     if data is None:
         return
+
+    if state:
+        app.logger.debug(
+            "Player '%d' is moving '%s'",
+            room_data.get_players(room_id)[socket_id]["character"],
+            facing
+        )
+    else:
+        app.logger.debug(
+            "Player '%d' stopped moving",
+            room_data.get_players(room_id)[socket_id]["character"]
+        )
 
 
     # send player data to all players
@@ -461,6 +500,20 @@ def event_set_interact_permission(json: JSONDictionary):
 
     player_data = room_data.get_players(room_id)
 
+
+    if player_data[player_id]["isInteracting"]:
+        app.logger.debug(
+            "Player '%d' can interact with '%s'",
+            room_data.get_players(room_id)[player_id]["character"],
+            interactable_id
+        )
+    else:
+        app.logger.debug(
+            "Player '%d' can no longer interact",
+            room_data.get_players(room_id)[player_id]["character"]
+        )
+
+
     item_data = {
         player_id: {
             "isInteracting": player_data[player_id]["isInteracting"],
@@ -498,6 +551,12 @@ def event_interact(json: JSONDictionary):
     if room_id not in room_data:
         return
 
+    app.logger.debug(
+        "Player '%d' interacted with '%s'",
+        room_data.get_players(room_id)[socket_id]["character"],
+        interactable_id
+    )
+
     # send player data to all players
     socket_server.emit(
         "playerInteraction",
@@ -520,10 +579,9 @@ def event_send_item(json: JSONDictionary):
     Args:
         json (JSONDictionary): the json payload
     """
-    app.logger.debug("Triggered event 'send_item'")
+    app.logger.debug("Triggered event 'sendItem'")
 
-    print("Chegou ao send_item.")
-    if not ValidateJson.validate_keys(json, "roomId", "receiverId", "itemIndex","item"):
+    if not ValidateJson.validate_keys(json, "roomId", "receiverId", "itemIndex", "item"):
         return
 
     room_id = json["roomId"]
@@ -535,7 +593,14 @@ def event_send_item(json: JSONDictionary):
     if room_id not in room_data:
         return
 
-    print(json)
+
+    app.logger.debug(
+        "Item '%s' sent from player '%d' to player '%d'",
+        item["name"],
+        room_data.get_players(room_id)[socket_id]["character"],
+        room_data.get_players(room_id)[receiver_id]["character"]
+    )
+
     socket_server.emit(
         "playerSend",
         {
@@ -546,7 +611,7 @@ def event_send_item(json: JSONDictionary):
         },
         to=room_id
     )
-    app.logger.debug("Item sent to player '%s'", receiver_id)
+    app.logger.debug("Sent item data to all in room '%s'", room_id)
 
 
 
@@ -576,6 +641,8 @@ def testing_create_room() -> JSONDictionary:
 
     room_id = room_data.create_room(args["roomId"])
 
+    app.logger.debug("New testing session started on room '%s'", room_id)
+
     return {
         "roomId": room_id,
         "roomData": room_data.get(room_id)
@@ -604,6 +671,8 @@ def testing_delete_room() -> JSONDictionary:
         abort(400)
 
     room_id = args["roomId"]
+
+    app.logger.debug("Deleted room '%s'", room_id)
 
     return {
         "roomId": room_id,
