@@ -199,12 +199,12 @@ def load_resource():
 
     if room_data.get_players(room_id)[player_id]["character"] == -1:
         app.logger.debug(
-            "Rendered '%s' for player '%d'",
+            "Rendered '%s' for player '%s'",
             resource, room_data.get_players(room_id)[player_id]["username"]
         )
     else:
         app.logger.debug(
-            "Rendered '%s' for player '%d'",
+            "Rendered '%s' for player '%s'",
             resource, room_data.get_players(room_id)[player_id]["character"]
         )
 
@@ -379,7 +379,7 @@ def event_lock_in(json: JSONDictionary):
     # set the player's character
     room_data.get_players(room_id)[socket_id]["character"] = character
     app.logger.debug(
-        "Player '%s' selected character '%d'",
+        "Player '%s' selected character '%s'",
         room_data.get_players(room_id)[socket_id]["username"],
         character,
     )
@@ -431,13 +431,13 @@ def event_move_player(json: JSONDictionary):
 
     if state:
         app.logger.debug(
-            "Player '%d' is moving '%s'",
+            "Player '%s' is moving '%s'",
             room_data.get_players(room_id)[socket_id]["character"],
             facing
         )
     else:
         app.logger.debug(
-            "Player '%d' stopped moving",
+            "Player '%s' stopped moving",
             room_data.get_players(room_id)[socket_id]["character"]
         )
 
@@ -503,13 +503,13 @@ def event_set_interact_permission(json: JSONDictionary):
 
     if player_data[player_id]["isInteracting"]:
         app.logger.debug(
-            "Player '%d' can interact with '%s'",
+            "Player '%s' can interact with '%s'",
             room_data.get_players(room_id)[player_id]["character"],
             interactable_id
         )
     else:
         app.logger.debug(
-            "Player '%d' can no longer interact",
+            "Player '%s' can no longer interact",
             room_data.get_players(room_id)[player_id]["character"]
         )
 
@@ -552,7 +552,7 @@ def event_interact(json: JSONDictionary):
         return
 
     app.logger.debug(
-        "Player '%d' interacted with '%s'",
+        "Player '%s' interacted with '%s'",
         room_data.get_players(room_id)[socket_id]["character"],
         interactable_id
     )
@@ -595,7 +595,7 @@ def event_send_item(json: JSONDictionary):
 
 
     app.logger.debug(
-        "Item '%s' sent from player '%d' to player '%d'",
+        "Item '%s' sent from player '%s' to player '%s'",
         item["name"],
         room_data.get_players(room_id)[socket_id]["character"],
         room_data.get_players(room_id)[receiver_id]["character"]
@@ -614,6 +614,40 @@ def event_send_item(json: JSONDictionary):
     app.logger.debug("Sent item data to all in room '%s'", room_id)
 
 
+@socket_server.on("testingClick")
+def event_testing_click(json: JSONDictionary):
+    """TestingClick
+
+    This event is issued whenever a player 
+    opens the inventory
+
+    TESTING ONLY
+
+    Args:
+        json (JSONDictionary): the json payload
+    """
+
+    app.logger.debug("Triggered event testingClick")
+
+    if not ValidateJson.validate_keys(json, "roomId", "message"):
+        return
+
+    room_id = json["roomId"]
+    message = json["message"]
+    socket_id = request.sid
+
+    if room_data.get_players(room_id)[socket_id]["character"] == -1:
+        app.logger.debug(
+            "Player '%s' %s",
+            room_data.get_players(room_id)[socket_id]["username"],
+            message
+        )
+    else:
+        app.logger.debug(
+            "Player '%s' %s",
+            room_data.get_players(room_id)[socket_id]["character"],
+            message
+        )
 
 
 #*==================================================================

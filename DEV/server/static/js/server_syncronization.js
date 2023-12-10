@@ -107,6 +107,8 @@ function selectItem(item){
     itemTextEl.innerHTML = itemInventory[item].content;
     tradeButton.disabled = false;
 
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: `selected item '${itemInventory[item].name}'` });
 }
 
 function selectDocument(doc){
@@ -117,6 +119,9 @@ function selectDocument(doc){
 
     docTitleEl.innerHTML = documentInventory[doc].name;
     docTextEl.innerHTML = documentInventory[doc].content;
+
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: `selected document '${documentInventory[doc].name}'` });
 
 }
 

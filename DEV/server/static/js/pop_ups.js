@@ -17,6 +17,9 @@ function characterInfo(element) {
     const character = element.closest(".character").dataset.character;
     const characterIntroductionEl = Array.from(document.querySelectorAll(".character-info"));
     characterIntroductionEl[characters[character]].classList.remove("hidden");
+
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: `checked info of '${characters[character]}'` });
 }
 
 
@@ -40,6 +43,9 @@ function openInventory() {
 
     let inventoryEl = document.getElementsByClassName("inventory")[0];
     inventoryEl.classList.remove("hidden");
+
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: "opened inventory" });
 }
 
 
@@ -57,6 +63,9 @@ function closeInventory() {
 
     let inventoryEl = document.getElementsByClassName("inventory")[0];
     inventoryEl.classList.add("hidden");
+
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: "closed inventory" });
 }
 
 
@@ -79,6 +88,9 @@ function openDocuments() {
 
     const inventoryEl = document.querySelector(".inventory");
     inventoryEl.classList.add("hidden");
+
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: "opened document collection" });
 }
 
 
@@ -88,6 +100,9 @@ function openDocuments() {
 function closeDocuments() {
     let document1 = document.querySelector(".document");
     document1.classList.add("hidden");
+
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: "closed document collection" });
 }
 
 
@@ -121,6 +136,9 @@ function openTradeMenu() {
     let tradeMenuEl = document.getElementById("tradeMenu");
     document.getElementById("goBackArrow").classList.remove("hidden");
     tradeMenuEl.classList.remove("hidden");
+
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: "opened trade menu" });
 }
 
 
@@ -134,6 +152,9 @@ function closeTradeMenu() {
     document.getElementsByClassName("submenu-title")[0].innerHTML = "Inventory";
     document.getElementsByClassName("side-by-side-inventory")[0].classList.remove("hidden");
     const itemDescriptionEl = document.querySelector(".item-description");
+
+    // TODO: remove testing event
+    socket.emit("testingClick", { roomId: roomId, message: "closed trade menu" });
 }
 
 /**
