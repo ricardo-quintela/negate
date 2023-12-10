@@ -47,8 +47,15 @@ main {
 button {
     font-weight: 600;
 }
+
 h1 {
     font-size: 2.6rem;
+}
+
+canvas {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 
